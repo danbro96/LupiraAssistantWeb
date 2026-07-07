@@ -16,7 +16,7 @@ The idea is sound and the design fits the core goal: the LLM runs at only two en
 | comms-api | Built end-to-end (Telegram userbot, deterministic segmentation, TopicReleased push). Email, research search, rerank, triage: doc-only. |
 | Mobile app | Built (location uploader, read-only Inbox). |
 
-Agent tool surface (MCP `/mcp`, LAN-only): cal 12 · tasks 16 · career 10 (rw) · health 5 (ro) · location 7 (ro, coarse) · LlmUtility ~28 (deterministic) · LlmSandbox `run_code` · DevOps 10. assistant-api exposes none (consumer — correct).
+Agent tool surface (MCP `/mcp`, LAN-only): cal 17 · tasks 16 · career 10 (rw) · health 5 (ro) · location 7 (ro, coarse) · LlmUtility ~28 (deterministic) · LlmSandbox `run_code` · DevOps 10. assistant-api exposes none (consumer — correct).
 
 ## Weak points, ranked
 
@@ -31,21 +31,21 @@ Agent tool surface (MCP `/mcp`, LAN-only): cal 12 · tasks 16 · career 10 (rw) 
 
 ## Determinism playbook (leverage order)
 
-1. **Grammar-constrained decoding** — hub sends contract `Output` schema as `response_format` (llama.cpp json_schema→GBNF); gateway validates response vs caller schema before returning. Invalid shape becomes impossible, not retried.
-2. **`AgentRun` event-sourced aggregate** — prompt-template id+hash, model id, contract, context refs, tool calls+results, raw output, validation verdict, retries. `ProposedAction.sourceRef` → run. Every proposal replayable from DB.
+1. ✅ **Grammar-constrained decoding** (batch 2) — hub sends contract `Output` schema as strict `response_format` (llama.cpp json_schema→GBNF); gpt-api validates the response vs the caller schema before returning (502 on miss); `ContractValidator` stays as the semantic backstop. Three layers.
+2. ✅ **`AgentRun` event-sourced aggregate** (batch 2) — prompt hash + version, resolved model, contract, per-attempt raw request/response + validation verdict + retries, terminal outcome. `ProposedAction.RunId` → run. Every proposal replayable from DB. (Context refs beyond inbound item + tool-call results land with memory/connector work.)
 3. **Provenance-per-field** — every substantive `ProposedAction` field carries an evidence ref (message/answer/record id); validator rejects ungrounded fields.
 4. **Candidate-selection over free generation** — code fetches candidates (contacts, calendars, lists); LLM picks index or `none`, never free-texts an identifier. Extend the `TargetResolver` seam to extraction.
 5. **No LLM date arithmetic** — model emits ISO-8601 only; hub parses + range-checks.
 6. **Outbox/reconcile comms→assistant** — outbox in comms, or assistant-side catch-up poll of `GET /topics?status=released&cursor=` (endpoint exists). Boot-time reconciler re-enqueues corpus rows with no topic assignment.
 7. **Segmentation decision log** — append-only (message, candidates, scores, threshold, action) for calibration + golden replays.
-8. **Tool allowlist as code** — contract `Tools` filters the runner's tool set, enforced in hub, every call logged into `AgentRun`. Hub keeps typed REST clients (not MCP) for writes.
+8. **Tool allowlist as code** — contract `Tools` filters the runner's tool set, enforced in hub, every call logged into `AgentRun`. Hub keeps typed REST clients (not MCP) for writes. *(Partial: contract `Tools` are now recorded on `AgentRunStarted`; per-tool-call logging awaits the connector/tool-execution work.)*
 9. **Confidence → policy thresholds in DB** per proposal kind; no auto-apply band until precision data exists.
 10. **Consistency sweep as DevOps-calendar `ItemAction(RunJob)`** — dangling relations, orphaned heartbeats, monitors without prompts, parked fires.
 
 ## Build order
 
 1. ✅ **`lupira-cal-worker`** — shipped (batch 1): separate host sharing `LupiraCalApi.Core`, SKIP-LOCKED claim loop + lease, push `/fires`, attempts/backoff/expiry, `principal_id` stamping; >35d one-shot + `Guid.Empty` bugs fixed; doc drift (assistant/tasks/health) corrected.
-2. Gateway schema enforcement (#1) + `AgentRun` envelope (#2) — before the first real extraction, so the audit trail exists from day one.
+2. ✅ **Gateway schema enforcement (#1) + `AgentRun` envelope (#2)** — shipped (batch 2): three-layer structured-output enforcement (worker GBNF → gpt-api validation → `ContractValidator`) + full event-sourced `AgentRun` with per-attempt raw bodies; `ProposedAction.RunId` traces every proposal to its run.
 3. Comms outbox/reconcile (#6) — before widening capture beyond Telegram.
 4. Triage gate + segmentation decision log — before email connectors multiply volume.
 
