@@ -21,7 +21,7 @@ Agent tool surface (MCP `/mcp`, LAN-only): cal 17 · tasks 16 · career 10 (rw) 
 ## Weak points, ranked
 
 1. ~~**Firing spine missing.**~~ **Done (batch 1):** `lupira-cal-worker` ships from the cal-api repo (claim/lease/backoff/expiry, push to `/fires`); the >35d one-shot and `Guid.Empty` materialisation bugs are fixed (`FireContext` resolver + widened sweep).
-2. **Comms loss modes** (violates "nothing slips through"): `TopicCloser` commits Released then pushes — failed push never retried, no outbox; crash between embedding commit and topic commit orphans the message permanently; in-memory ingest queue strands accepted-unprocessed messages on shutdown (sidecar re-POST deduped away, no re-enqueue).
+2. ~~**Comms loss modes.**~~ **Done (batch 3):** durable `comms.topic_outbox` written in the same commit as `TopicReleased` + dispatcher (SKIP LOCKED claim/lease, unbounded retry w/ capped backoff); embedding + topic assignment now commit in one shared PG transaction; boot+periodic ingest reconciler re-drives unprocessed rows; re-released topics redeliver via `ReleasedAt`-versioned dedupe keys (assistant `/inbound`).
 3. **Single validation layer.** Gateway enforces nothing; hub's `ContractValidator` is the only defense. Schema misses become retry→OnMiss churn on constrained hardware.
 4. **Segmentation uncalibrated + unaudited.** Fixed `θ_attach=0.55`, EMA centroid drift, cross-conversation merging, per-message embeddings of short text. No record of why a message landed in a topic — can't review or tune.
 5. **No actionability triage** → every idle conversation runs extraction on a gateway where only `qwen3-1.7b` is warm, reasoning tier cold-loads 120B on CPU (head-of-line blocking), bursts 429.
@@ -36,7 +36,7 @@ Agent tool surface (MCP `/mcp`, LAN-only): cal 17 · tasks 16 · career 10 (rw) 
 3. **Provenance-per-field** — every substantive `ProposedAction` field carries an evidence ref (message/answer/record id); validator rejects ungrounded fields.
 4. **Candidate-selection over free generation** — code fetches candidates (contacts, calendars, lists); LLM picks index or `none`, never free-texts an identifier. Extend the `TargetResolver` seam to extraction.
 5. **No LLM date arithmetic** — model emits ISO-8601 only; hub parses + range-checks.
-6. **Outbox/reconcile comms→assistant** — outbox in comms, or assistant-side catch-up poll of `GET /topics?status=released&cursor=` (endpoint exists). Boot-time reconciler re-enqueues corpus rows with no topic assignment.
+6. ✅ **Outbox/reconcile comms→assistant** (batch 3) — durable outbox in comms (atomic with release) + dispatcher; single-transaction message processing; boot+periodic ingest reconciler. Poll endpoint retained as read fallback.
 7. **Segmentation decision log** — append-only (message, candidates, scores, threshold, action) for calibration + golden replays.
 8. **Tool allowlist as code** — contract `Tools` filters the runner's tool set, enforced in hub, every call logged into `AgentRun`. Hub keeps typed REST clients (not MCP) for writes. *(Partial: contract `Tools` are now recorded on `AgentRunStarted`; per-tool-call logging awaits the connector/tool-execution work.)*
 9. **Confidence → policy thresholds in DB** per proposal kind; no auto-apply band until precision data exists.
@@ -46,7 +46,7 @@ Agent tool surface (MCP `/mcp`, LAN-only): cal 17 · tasks 16 · career 10 (rw) 
 
 1. ✅ **`lupira-cal-worker`** — shipped (batch 1): separate host sharing `LupiraCalApi.Core`, SKIP-LOCKED claim loop + lease, push `/fires`, attempts/backoff/expiry, `principal_id` stamping; >35d one-shot + `Guid.Empty` bugs fixed; doc drift (assistant/tasks/health) corrected.
 2. ✅ **Gateway schema enforcement (#1) + `AgentRun` envelope (#2)** — shipped (batch 2): three-layer structured-output enforcement (worker GBNF → gpt-api validation → `ContractValidator`) + full event-sourced `AgentRun` with per-attempt raw bodies; `ProposedAction.RunId` traces every proposal to its run.
-3. Comms outbox/reconcile (#6) — before widening capture beyond Telegram.
+3. ✅ **Comms outbox/reconcile (#6)** — shipped (batch 3): outbox + dispatcher, atomic ingest transaction, reconciler, re-release redelivery (`Topic:{ref}:{releasedAt}` dedupe keys). Follow-up noted: redelivery carries the full merged window (no message windowing yet).
 4. Triage gate + segmentation decision log — before email connectors multiply volume.
 
 Non-recommendation: don't split the hub. Internal seams are clean; the work is finishing the spine and adding defense-in-depth, not reshaping topology.
