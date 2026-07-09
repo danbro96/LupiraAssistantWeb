@@ -1,9 +1,9 @@
 # Lupira Assistant — Roadmap
 
-**Status:** assessment + build order, as of 2026-07-07 (code-inspected across all repos). Reads with `product-brief.md` and the backbone docs it references.
+**Status:** assessment + remaining work, as of 2026-07-09 (code-inspected across all repos). Reads with `product-brief.md` and the backbone docs it references. The backbones document the **intended final state**; this file holds status + remaining work.
 
 ## Verdict
-The idea is sound and the design fits the core goal: the LLM runs at only two entry points (contracted `ItemPrompt` fires, closed-topic extraction), all outbound interaction is deterministic and frozen, proposals are event-sourced, consent gates every user-record write. Weak points are in the reliability spine (missing), validation concentrated in one layer, and comms loss modes — not in the concept.
+The idea is sound and the design fits the core goal: the LLM runs at only two entry points (contracted `ItemPrompt` fires, closed-topic extraction), all outbound interaction is deterministic and frozen, proposals are event-sourced, consent gates every user-record write. The original structural weak points — missing firing spine, single validation layer, comms loss modes — are fixed (Shipped, below). What remains: finishing the hub's write path, building the app surface, calibrating segmentation + adding triage, and defence-in-depth (consistency + isolation).
 
 ## State of the world (code vs docs)
 
@@ -12,43 +12,110 @@ The idea is sound and the design fits the core goal: the LLM runs at only two en
 | assistant-api | Substantially built (intake, FireProcessor, ProposalRouter, ContractValidator, TargetResolver, OBO tokens, Telegram channel, CI). |
 | cal-api | Fully built: materialisation (classes, curation, XOR payloads, `scheduled_fire` + stamped `principal_id`, Completeness) **and** the `lupira-cal-worker` dispatcher (claim leases, retry/backoff, per-kind expiry, push to `/fires`). |
 | tasks-api | Ahead of its own doc: relations, `ListKind.Agent`, rich `ItemStatus`, metadata shipped. 16 MCP tools. No scheduler (non-goal honored). |
-| gpt-api | Deployed thin passthrough: `response_format`/`tools` forwarded blind, no schema validation, no tool allowlist, token budgets unenforced. |
-| comms-api | Built end-to-end (Telegram userbot, deterministic segmentation, TopicReleased push). Email, research search, rerank, triage: doc-only. |
-| Mobile app | Built (location uploader, read-only Inbox). |
+| gpt-api | Deployed: strict `response_format` json_schema→GBNF + response-vs-schema validation (batch 2); tool defs forwarded blind (no executor), token budgets unenforced. |
+| comms-api | Built end-to-end: Telegram userbot, semantic segmentation, durable outbox push, Facebook backfill importer, MCP `archive_search` (FTS + pgvector + gateway rerank) + topic reads. Email connectors + triage: doc-only. |
+| Mobile app | Auth + registration + location pipeline built. Inbox UI + offline cache shipped; the fetch and grant-status calls are stubs (no hub `/inbox` yet). |
 
 Agent tool surface (MCP `/mcp`, LAN-only): cal 17 · tasks 16 · career 10 (rw) · health 5 (ro) · location 7 (ro, coarse) · LlmUtility ~28 (deterministic) · LlmSandbox `run_code` · DevOps 10. assistant-api exposes none (consumer — correct).
 
-## Weak points, ranked
+## Shipped
 
-1. ~~**Firing spine missing.**~~ **Done (batch 1):** `lupira-cal-worker` ships from the cal-api repo (claim/lease/backoff/expiry, push to `/fires`); the >35d one-shot and `Guid.Empty` materialisation bugs are fixed (`FireContext` resolver + widened sweep).
-2. ~~**Comms loss modes.**~~ **Done (batch 3):** durable `comms.topic_outbox` written in the same commit as `TopicReleased` + dispatcher (SKIP LOCKED claim/lease, unbounded retry w/ capped backoff); embedding + topic assignment now commit in one shared PG transaction; boot+periodic ingest reconciler re-drives unprocessed rows; re-released topics redeliver via `ReleasedAt`-versioned dedupe keys (assistant `/inbound`).
-3. **Single validation layer.** Gateway enforces nothing; hub's `ContractValidator` is the only defense. Schema misses become retry→OnMiss churn on constrained hardware.
-4. **Segmentation uncalibrated + unaudited.** Fixed `θ_attach=0.55`, EMA centroid drift, cross-conversation merging, per-message embeddings of short text. No record of why a message landed in a topic — can't review or tune.
-5. **No actionability triage** → every idle conversation runs extraction on a gateway where only `qwen3-1.7b` is warm, reasoning tier cold-loads 120B on CPU (head-of-line blocking), bursts 429.
-6. **Cross-substrate consistency manual.** Relations are by-convention strings (no existence/authz check); standing-monitor close is two unrelated writes, no reconciler; orphaned heartbeats fire forever.
-7. **Isolation/security defense-in-depth.** Comms release path skips per-message principal cross-check; refresh-token vault = crown jewels (key mgmt undecided); gateway keys plaintext/unscoped; userbot files other people's group messages under owner principal (multi-user policy question).
-8. ~~**Doc drift.**~~ **Done (batch 1):** assistant-backbone/README, tasks tracking-backbone, health README all corrected to present state.
+- **Batch 1 — cal firing spine.** `lupira-cal-worker`: SKIP-LOCKED claim/lease, retry/backoff, per-kind expiry, push `/fires`, `principal_id` stamping; >35d one-shot + `Guid.Empty` materialisation bugs fixed.
+- **Batch 2 — three-layer structured output + run ledger.** Worker GBNF grammar constraint → gpt-api response-vs-schema validation (502 on miss) → `ContractValidator` semantic backstop; event-sourced `AgentRun` (prompt hash/version, per-attempt raw request/response + verdict, terminal outcome); `ProposedAction.RunId` traces every proposal to its run.
+- **Batch 3 — comms reliability spine.** Atomic ingest transaction (EF + Marten, one commit), boot+periodic ingest reconciler, durable `comms.topic_outbox` + dispatcher (SKIP LOCKED + lease, unbounded capped retry), `ReleasedAt`-versioned re-release redelivery. Follow-up: redelivery carries the full merged window (no message windowing yet).
+- **Batch 4 — anti-guessing guards.** Provenance-per-field: extraction cites per-message ordinals, ungrounded content fields strict-rejected (retry→Drop), durable refs persisted on `ProposedAction.sources` (`targetCalendar`/`isAllDay` the only exempt fields). No-LLM-date-arithmetic: reference instant in the prompt, strict-ISO parse + range check before emit.
+- **Since batch 4:** comms MCP surface (`archive_search` FTS + pgvector + gateway rerank; topic reads) · cal `ItemCategory` taxonomy + composable `ItemDetails` + Places catalog · assistant bills/deliveries→tasks routing + `AssistantProfile` routing defaults · doc convention set: backbones = intended final state, roadmap = status + remaining work.
 
-## Determinism playbook (leverage order)
+## Remaining work
 
-1. ✅ **Grammar-constrained decoding** (batch 2) — hub sends contract `Output` schema as strict `response_format` (llama.cpp json_schema→GBNF); gpt-api validates the response vs the caller schema before returning (502 on miss); `ContractValidator` stays as the semantic backstop. Three layers.
-2. ✅ **`AgentRun` event-sourced aggregate** (batch 2) — prompt hash + version, resolved model, contract, per-attempt raw request/response + validation verdict + retries, terminal outcome. `ProposedAction.RunId` → run. Every proposal replayable from DB. (Context refs beyond inbound item + tool-call results land with memory/connector work.)
-3. ✅ **Provenance-per-field** (batch 4) — extraction renders the window with per-message ordinals (`[#n sender @ ts]`); the model returns a `sources` map (field → message #s); `ContractValidator` rejects any ungrounded content field (retry→Drop), and the durable refs persist on `ProposedAction.sources`. Strict: `targetCalendar`/`isAllDay` are the only exempt (routing) fields — the one calibration knob.
-4. **Candidate-selection over free generation** — code fetches candidates (contacts, calendars, lists); LLM picks index or `none`, never free-texts an identifier. Extend the `TargetResolver` seam to extraction. *(Note: the payload schema already blocks free-texted ids — this mainly enables grounded references to existing entities; needs new list-contents fetchers + run-time OBO in `AgentRunner`.)*
-5. ✅ **No LLM date arithmetic** (batch 4) — the prompt states the run's reference instant (topic: latest message; fire: occurrence) and requires absolute ISO-8601; the validator strict-parses + range-checks every date field before emit, rejecting relative words / malformed dates.
-6. ✅ **Outbox/reconcile comms→assistant** (batch 3) — durable outbox in comms (atomic with release) + dispatcher; single-transaction message processing; boot+periodic ingest reconciler. Poll endpoint retained as read fallback.
-7. **Segmentation decision log** — append-only (message, candidates, scores, threshold, action) for calibration + golden replays.
-8. **Tool allowlist as code** — contract `Tools` filters the runner's tool set, enforced in hub, every call logged into `AgentRun`. Hub keeps typed REST clients (not MCP) for writes. *(Partial: contract `Tools` are now recorded on `AgentRunStarted`; per-tool-call logging awaits the connector/tool-execution work.)*
-9. **Confidence → policy thresholds in DB** per proposal kind; no auto-apply band until precision data exists.
-10. **Consistency sweep as DevOps-calendar `ItemAction(RunJob)`** — dangling relations, orphaned heartbeats, monitors without prompts, parked fires.
+### Weak points (ranked)
+1. **Segmentation uncalibrated + unaudited.** Fixed `θ_attach=0.55`, EMA centroid drift, cross-conversation merging, per-message embeddings of short text. No record of why a message landed in a topic — can't review or tune. → decision log + triage (build order 1).
+2. **No actionability triage** → every idle conversation runs extraction on a gateway where only `qwen3-1.7b` is warm; the reasoning tier cold-loads 120B on CPU (head-of-line blocking), bursts 429. → build order 1.
+3. **Cross-substrate consistency manual.** Relations are by-convention strings (no existence/authz check; no reverse lookup on the tasks side); standing-monitor close is two unrelated writes, no reconciler; orphaned heartbeats fire forever. → consistency sweep (playbook).
+4. **Isolation/security defence-in-depth.** Comms release path skips the per-message principal cross-check; refresh-token vault = crown jewels (key mgmt undecided); gateway keys plaintext/unscoped; the userbot files other people's group messages under the owner principal (multi-user policy question).
 
-## Build order
+### Determinism playbook (open levers)
+- **Candidate-selection over free generation** — instantiated as the `Resolve × RefKind` profile family (backbone: Agent run profiles): contact/event/task/place/container identity via a deterministic-first ladder, LLM candidate-pick only on ambiguity (`index | create | unresolved`, pick ∈ offered set). Needs list-contents fetchers + run-time OBO in `AgentRunner`. (The payload schema already blocks free-texted ids — this enables grounded references to existing entities and moves new-vs-update out of Extract.)
+- **Segmentation decision log** — append-only (message, candidates, scores, threshold, action) for calibration + golden replays.
+- **Tool allowlist as code** — contract `Tools` filters the runner's tool set, enforced in the hub, every call logged into `AgentRun`. *(Partial: `Tools` recorded on `AgentRunStarted`; the executor loop + per-call logging land with connector work.)*
+- **Confidence → policy thresholds in DB** per proposal kind; no auto-apply band until precision data exists.
+- **Consistency sweep** as a DevOps-calendar `ItemAction(RunJob)` — dangling relations, orphaned heartbeats, monitors without prompts, parked fires.
 
-1. ✅ **`lupira-cal-worker`** — shipped (batch 1): separate host sharing `LupiraCalApi.Core`, SKIP-LOCKED claim loop + lease, push `/fires`, attempts/backoff/expiry, `principal_id` stamping; >35d one-shot + `Guid.Empty` bugs fixed; doc drift (assistant/tasks/health) corrected.
-2. ✅ **Gateway schema enforcement (#1) + `AgentRun` envelope (#2)** — shipped (batch 2): three-layer structured-output enforcement (worker GBNF → gpt-api validation → `ContractValidator`) + full event-sourced `AgentRun` with per-attempt raw bodies; `ProposedAction.RunId` traces every proposal to its run.
-3. ✅ **Comms outbox/reconcile (#6)** — shipped (batch 3): outbox + dispatcher, atomic ingest transaction, reconciler, re-release redelivery (`Topic:{ref}:{releasedAt}` dedupe keys). Follow-up noted: redelivery carries the full merged window (no message windowing yet).
-4. ✅ **Provenance-per-field (#3) + no-LLM-date-arithmetic (#5)** — shipped (batch 4): extraction grounds every content field to a cited message (`ProposedAction.sources`), strict-reject on ungrounded (retry→Drop); reference-date anchor + strict-ISO/range date validation before emit.
-5. Triage gate + segmentation decision log — before email connectors multiply volume.
-6. Candidate-selection (#4) — grounded references to existing entities; needs new list-contents fetchers + run-time OBO in `AgentRunner`.
+### assistant-api
+P0 core loop is live end-to-end (intake → contracted run → validation → policy → Telegram approval → cal/tasks writers).
+
+**Write path**
+- Policy classifies by action *kind* (`SendCheckIn`/`CreatePrompt`/`Report` free, all else asks) — the ownership/calendar-class-aware line is unbuilt (`PolicyService`).
+- Writer arms missing: `CreatePrompt`, `UpdateContact`, `CreateRelation`, `CreateCareerEntry` → `NotSupportedException` → `WriteFailed`. `CreatePrompt` is policy-**Free**, so it auto-applies then fails at the writer.
+- career-api unwired: no client, no `career` audience minted (enum kind + doc-comments only).
+- `ItemAction`: only `SendCheckIn` executes; `Notify`/`CreateLinkedTask`/`ExpireTarget`/`RescheduleSelf`/`RunJob`/`Rescore` are declared no-ops (`ActionExecutor`).
+- Runner `report` output: declared in the schema, never parsed/persisted.
+- Extraction is the single-pass monolith (non-strict, whole window, all-or-nothing Drop); the two-phase Scan→Extract design, the `(Intent × Target.Kind)` runner profiles, and the `Resolve × RefKind` family (backbone: Agent run profiles) are unbuilt — today only extraction-vs-contracted differ, and `AgentRun` has no `ParentRunId` chaining.
+- Reply-obligation tracking (`Extract × Reply` → "Replies" list + recurring nudge) designed, unbuilt; prerequisites: principal-marked window rendering (the scan must know which sender is the user); the email case is gated on the email connector (build order 3).
+
+**Reliability / auth**
+- Revoked grant → write fails with "Re-authentication required" on the action ledger only; fire-parking (`Parked` scaffolded, never appended) + proactive re-auth notice unbuilt; `OfflineGrantStatus.Expired` never set.
+- Intake queue: no startup re-drive — a crash between the 202 ack and processing strands the item at `Recorded` (the `IntakeQueue` comment claims re-drive exists).
+- Proposal-path `SendCheckIn` (OnMiss=Ask) delivers via `ActionWriter.DeliverAsync` without recording a pending `CheckIn` → the answer can't correlate, no follow-up run. Fired check-ins (`CheckInService`) unaffected.
+- `FallbackMode.Ask`/`Retry` indistinguishable: always 2 attempts then Ask-unless-Drop (enum doc-comment contradicts).
+- Ownership re-verify (principal owns `item_id`'s calendar) — open decision, unimplemented.
+
+**Channel / hygiene**
+- Telegram Edit button records intent only (no payload); edit-to-learn deferred.
+- `PUT /me/profile/routing` can't set `CheckInCalendarId`/`BillsListId`/`DeliveriesListId` — discovery-only.
+- comms pull tail (`ICommsApiClient.GetTopicTailAsync`) scaffolded + registered, unconsumed.
+- Stale code comments: `OnBehalfOfTokenProvider` claims the runner parks fires; `GatewayClient`/`GatewayOptions` comment calls `JsonObject` the default (actual = `JsonSchema`).
+
+### Mobile app
+Foundation (layers/eslint-boundaries, PKCE auth, DeviceKey-vs-bearer split, store-and-forward + receipts, pause kill-switch, cursor-resume) matches the backbone.
+
+**App ↔ hub integration seams**
+- Enrollment mismatch: the app opens `/connect?return_uri=lupiraassistant://connected` (`data/auth/connect.ts`); the hub shipped `GET /auth/login` with `RedirectUri` hardcoded to `/auth/done` (an HTML close-me page — no deep-link return). One side must move; the return leg is an open decision in the app backbone.
+- Grant status mismatch: the app intends `GET /me` (stub); the hub shipped `GET /auth/status` + `GET /me/profile`.
+- Inbox fetch is a stub: `inbox-store.refresh()`/`refreshGrant()` log and return (`TODO(hub-spec)`); no assistant client exists; the offline cache is read-wired but never written; `grantStatus` stays `unknown`, so the reconnect card is never driven by live data. The hub has no `/inbox`.
+- The hub lacks every other app-facing endpoint: proposals resolve, check-in answer, push-tokens, connectors, preferences.
+
+**Unbuilt surface**
+- `acks` stream: no `pending_acks` table/repo/uploader; `Stream` = `location|ring|summaries` only.
+- Orval clients: no orval config, no `generated/` — the API layer is hand-written.
+- Push: `expo-notifications` not a dependency, no wiring.
+- Connectors/preferences stores + screens; tab navigation (still a native stack: RegisterDevice → Inbox, Settings via header).
+
+**Scaffolding only**
+- ring/summaries streams: seq keys, `pending_*` tables, and HealthApi ingest fns exist, but nothing writes them and the sync engine flushes only `location`; the HealthApi device key isn't minted.
+
+### cal-api
+- **DAV object paths don't gate on `Class == Agenda`.** System calendars are hidden from PROPFIND discovery, but a direct `REPORT`/`GET` with a known calendar GUID is only ACL-checked (`DavRouter.HandleCalendarReport`/`GetItem`) — the backbone's "System calendars never in DAV" isn't a hard guarantee.
+- Rubric tune parked: weak-location (city-vs-venue → 0.5) not implemented — location presence is binary on `PlaceId`.
+- Transitional: fire rows materialised before principal-stamping resolve their principal via the calendar's first `Owner` grant at dispatch; drop the fallback once pre-stamp rows have drained.
+- `PromptIntent` still carries `CreateFollowUp`/`AskUser` — retired by the run-profile design (they're run *outputs*); prune the enum with the profile work.
+
+### tasks-api
+- **No reverse relation lookup.** cal-api exposes `GET /relations?toKind=&toRef=`; tasks-api lists only forward by `FromId` — "which task monitors this cal item" needs the cal-side query or a scan.
+- Relation `ToKind`/`RelationType` are unvalidated free strings, asymmetric across APIs (tasks→cal `"cal-item"`, cal→tasks `"task"`) — no existence/authz check (weak point 3).
+- VTODO regeneration drops stored VALARM sub-components (known `VtodoMapper` gap).
+
+### comms-api
+- **Attachments unwired**: `IAttachmentStore` is the `NoOp` seam; `Message.ObjectKey` never populated; media-only messages dropped at the connector/importer — the corpus is text-only.
+- **Release path skips the per-message principal cross-check** (weak point 4): the payload builder fetches message bodies by id unscoped; contamination is only prevented by the assigner's principal-scoped candidate query.
+- No topic merge (`θ_merge` is a doc knob with zero code) and no LLM topic labels (provisional label = the message's first words).
+- `archive_search` fusion is concat + id-dedup — the reranker is the sole ranker (no score fusion/RRF); the `source` filter is the `Telegram|Facebook` enum, so future platforms (email) need an enum addition to be filterable.
+- `GET /topics/{id}` / `get_topic` are not status-restricted — "open-topic tail" is convention, any topic's detail is returned.
+- Optional close-time steps unbuilt: rerank-members-before-release, `qwen3-1.7b` triage (build order 1).
+- Participant→Contact binding unwired: `Participant.ContactId` is a null seam — needs the write-back endpoint (`PUT /participants/{id}/contact`), `senderContactId` on topic payloads, and a `contactId` filter on `archive_search`; the resolving side is `Resolve × Contact` (build order 2).
+- Topic payload doesn't mark the principal's own messages (`fromPrincipal` per message) — required by reply-obligation detection (build order 1c).
+
+## Build order (next)
+
+1. **Two-phase extraction (Scan → Extract) + segmentation decision log** — weak points 1–2; the `Scan × Topic` candidate inventory replaces the boolean triage gate, then one strict per-candidate `Extract` run each (backbone: Agent run profiles). Land before email connectors multiply volume. Decomposition:
+   - **1a — profile spine (behaviour-preserving):** `RunProfile` (template · tier · strict · allowed outputs · grounding mode · tools · OnMiss) + registry keyed `(RunKind × Target.Kind)`; port today's two paths onto it; `ParentRunId` on `AgentRunStarted` (additive).
+   - **1b — Scan + per-candidate Extract (flagged):** candidate-inventory schema + span validation (reuse the ordinal machinery); code-owned loop in the intake processor; strict per-kind `Extract` schemas (derive from `OutputSchemas`); per-candidate Drop; behind an `Extraction:TwoPhase` flag until it defaults on.
+   - **1c — reply vertical:** comms `fromPrincipal` per topic-payload message → principal-marked window rendering → `reply` candidate kind + `Extract × Reply` → "Replies" list scaffolding + recurring nudge.
+   - Segmentation decision log rides alongside in comms-api.
+2. **Candidate-selection (`Resolve × RefKind` family)** — grounded identity for contacts/events/tasks/places/containers (career refs join with the career wiring); list-contents fetchers + run-time OBO in `AgentRunner`; pre-consent so approval cards show resolved targets. Includes the Participant→Contact write-back (comms endpoint + `senderContactId` payload field + `contactId` search filter).
+3. **Email connector** — IMAP sidecar → `POST /ingest` + mbox batch import for history; adds a `Source` enum value (also unlocks the `archive_search` platform filter). Gated on 1.
+4. *(possible)* **Facebook Messenger live connector** — Facebook is backfill-only (export CLI). No official API for personal DMs: unofficial client (ban risk; same read-only posture as the Telegram userbot) vs periodic manual re-export (the `(PrincipalId, Source, SourceRef)` dedup makes re-imports safe). Decide if Messenger traffic warrants it.
+
+Not yet sequenced: hub write-path completion (writer arms, ownership-aware policy, `ItemAction` executors, fire-parking + re-auth notice) · app surface (hub `/inbox` + resolve/answer endpoints, `acks` stream, native push) · memory (per-user facts + pgvector recall — unblocked since the gateway shipped `/v1/embeddings` + `/v1/rerank`) · consistency sweep + confidence thresholds (playbook).
 
 Non-recommendation: don't split the hub. Internal seams are clean; the work is finishing the spine and adding defense-in-depth, not reshaping topology.
