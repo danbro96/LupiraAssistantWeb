@@ -111,7 +111,7 @@ The assistant tracks its own work in two substrates, split by whether the work *
 - **Calendar (cal-api)** — things with a moment of action: events and prompts that fire at a time. Owns the clock.
 - **Tasks (tasks-api)** — open items tracked to completion, with no firing moment: the assistant's backlog.
 
-So an unhealthy API → a task (fix it); "research desserts Friday and report" → a prompt event; "tell me when the game releases" → a task (the durable goal) plus a recurring prompt that does the checking and closes the task when met. They compose: prompts spawn prompts, prompts spawn tasks, tasks spawn prompts.
+So an unhealthy API → a task (fix it); "research desserts Friday and report" → a prompt event; "tell me when the game releases" → a task (the durable goal) plus a recurring prompt that does the checking and closes the task when met. **A bill or a delivery is a task** — tracked to done (paid / received), on its own "Bills"/"Deliveries" list, never a calendar event; its due date or arrival is a linked prompt that fires the nudge. They compose: prompts spawn prompts, prompts spawn tasks, tasks spawn prompts.
 
 The assistant keeps its own lists and calendars, separate from mine. Per-user agent work is isolated like everything else; system/ops work (health, upgrades) is the operator's, not any user's. Creating its own tracking item is internal bookkeeping — no approval; the real-world action it leads to still follows consent-first.
 
