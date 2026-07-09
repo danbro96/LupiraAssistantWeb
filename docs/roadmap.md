@@ -3,7 +3,7 @@
 **Status:** assessment + remaining work, as of 2026-07-09 (code-inspected across all repos). Reads with `product-brief.md` and the backbone docs it references. The backbones document the **intended final state**; this file holds status + remaining work.
 
 ## Verdict
-The idea is sound and the design fits the core goal: the LLM runs at only two entry points (contracted `ItemPrompt` fires, closed-topic extraction), all outbound interaction is deterministic and frozen, proposals are event-sourced, consent gates every user-record write. The original structural weak points — missing firing spine, single validation layer, comms loss modes — are fixed (Shipped, below). What remains: finishing the hub's write path, building the app surface, calibrating segmentation + adding triage, and defence-in-depth (consistency + isolation).
+The idea is sound and the design fits the core goal: the LLM runs at only two entry points (contracted `ItemPrompt` fires, closed-topic extraction), all outbound interaction is deterministic and frozen, proposals are event-sourced, consent gates every user-record write. The original structural weak points — missing firing spine, single validation layer, comms loss modes — are fixed (Shipped, below), and the extraction path now decomposes into a triaging Scan + strict per-candidate Extract. What remains: finishing the hub's write path, building the app surface, calibrating segmentation, and defence-in-depth (consistency + isolation).
 
 ## State of the world (code vs docs)
 
@@ -24,15 +24,15 @@ Agent tool surface (MCP `/mcp`, LAN-only): cal 17 · tasks 16 · career 10 (rw) 
 - **Batch 2 — three-layer structured output + run ledger.** Worker GBNF grammar constraint → gpt-api response-vs-schema validation (502 on miss) → `ContractValidator` semantic backstop; event-sourced `AgentRun` (prompt hash/version, per-attempt raw request/response + verdict, terminal outcome); `ProposedAction.RunId` traces every proposal to its run.
 - **Batch 3 — comms reliability spine.** Atomic ingest transaction (EF + Marten, one commit), boot+periodic ingest reconciler, durable `comms.topic_outbox` + dispatcher (SKIP LOCKED + lease, unbounded capped retry), `ReleasedAt`-versioned re-release redelivery. Follow-up: redelivery carries the full merged window (no message windowing yet).
 - **Batch 4 — anti-guessing guards.** Provenance-per-field: extraction cites per-message ordinals, ungrounded content fields strict-rejected (retry→Drop), durable refs persisted on `ProposedAction.sources` (`targetCalendar`/`isAllDay` the only exempt fields). No-LLM-date-arithmetic: reference instant in the prompt, strict-ISO parse + range check before emit.
+- **Batch 5 — run profiles + two-phase extraction + reply vertical.** `RunProfile` spine (behaviour-preserving) with `ParentRunId` ledger lineage; two-phase `Scan → per-candidate Extract` behind `Extraction:TwoPhase` (default off) — the Scan subsumes the actionability-triage gate (warm small tier; empty inventory = triage-negative), each Extract strict + single-kind + failure-isolated. `fromPrincipal` marks the owner's own messages end-to-end (comms ingest → topic payload → the "you" window); reply obligations extract to a "Replies" task + one-shot nudge.
 - **Since batch 4:** comms MCP surface (`archive_search` FTS + pgvector + gateway rerank; topic reads) · cal `ItemCategory` taxonomy + composable `ItemDetails` + Places catalog · assistant bills/deliveries→tasks routing + `AssistantProfile` routing defaults · doc convention set: backbones = intended final state, roadmap = status + remaining work.
 
 ## Remaining work
 
 ### Weak points (ranked)
-1. **Segmentation uncalibrated + unaudited.** Fixed `θ_attach=0.55`, EMA centroid drift, cross-conversation merging, per-message embeddings of short text. No record of why a message landed in a topic — can't review or tune. → decision log + triage (build order 1).
-2. **No actionability triage** → every idle conversation runs extraction on a gateway where only `qwen3-1.7b` is warm; the reasoning tier cold-loads 120B on CPU (head-of-line blocking), bursts 429. → build order 1.
-3. **Cross-substrate consistency manual.** Relations are by-convention strings (no existence/authz check; no reverse lookup on the tasks side); standing-monitor close is two unrelated writes, no reconciler; orphaned heartbeats fire forever. → consistency sweep (playbook).
-4. **Isolation/security defence-in-depth.** Comms release path skips the per-message principal cross-check; refresh-token vault = crown jewels (key mgmt undecided); gateway keys plaintext/unscoped; the userbot files other people's group messages under the owner principal (multi-user policy question).
+1. **Segmentation uncalibrated + unaudited.** Fixed `θ_attach=0.55`, EMA centroid drift, cross-conversation merging, per-message embeddings of short text. No record of why a message landed in a topic — can't review or tune. → decision log (build order 1). *(Actionability triage is addressed — the batch-5 Scan is the gate — but the flag is still default-off pending burn-in, and segmentation calibration itself is untouched.)*
+2. **Cross-substrate consistency manual.** Relations are by-convention strings (no existence/authz check; no reverse lookup on the tasks side); standing-monitor close is two unrelated writes, no reconciler; orphaned heartbeats fire forever. → consistency sweep (playbook).
+3. **Isolation/security defence-in-depth.** Comms release path skips the per-message principal cross-check; refresh-token vault = crown jewels (key mgmt undecided); gateway keys plaintext/unscoped; the userbot files other people's group messages under the owner principal (multi-user policy question).
 
 ### Determinism playbook (open levers)
 - **Candidate-selection over free generation** — instantiated as the `Resolve × RefKind` profile family (backbone: Agent run profiles): contact/event/task/place/container identity via a deterministic-first ladder, LLM candidate-pick only on ambiguity (`index | create | unresolved`, pick ∈ offered set). Needs list-contents fetchers + run-time OBO in `AgentRunner`. (The payload schema already blocks free-texted ids — this enables grounded references to existing entities and moves new-vs-update out of Extract.)
@@ -50,8 +50,8 @@ P0 core loop is live end-to-end (intake → contracted run → validation → po
 - career-api unwired: no client, no `career` audience minted (enum kind + doc-comments only).
 - `ItemAction`: only `SendCheckIn` executes; `Notify`/`CreateLinkedTask`/`ExpireTarget`/`RescheduleSelf`/`RunJob`/`Rescore` are declared no-ops (`ActionExecutor`).
 - Runner `report` output: declared in the schema, never parsed/persisted.
-- Extraction is the single-pass monolith (non-strict, whole window, all-or-nothing Drop); the two-phase Scan→Extract design, the `(Intent × Target.Kind)` runner profiles, and the `Resolve × RefKind` family (backbone: Agent run profiles) are unbuilt — today only extraction-vs-contracted differ, and `AgentRun` has no `ParentRunId` chaining.
-- Reply-obligation tracking (`Extract × Reply` → "Replies" list + recurring nudge) designed, unbuilt; prerequisites: principal-marked window rendering (the scan must know which sender is the user); the email case is gated on the email connector (build order 3).
+- Two-phase `Scan → Extract` + `RunProfile` spine + `ParentRunId` shipped (batch 5), but behind `Extraction:TwoPhase=false`; the single-pass monolith is still the live path until the flag flips (build order 1). The `Resolve × RefKind` family remains unbuilt (build order 2).
+- Reply nudge is a **one-shot** (~24h) reminder, not the backbone's recurring-until-done; the recurring + skip-if-task-done upgrade needs a cal-api RRULE reminder + a tasks-api status read (rides the consistency-sweep work).
 
 **Reliability / auth**
 - Revoked grant → write fails with "Re-authentication required" on the action ledger only; fire-parking (`Parked` scaffolded, never appended) + proactive re-auth notice unbuilt; `OfflineGrantStatus.Expired` never set.
@@ -92,28 +92,23 @@ Foundation (layers/eslint-boundaries, PKCE auth, DeviceKey-vs-bearer split, stor
 
 ### tasks-api
 - **No reverse relation lookup.** cal-api exposes `GET /relations?toKind=&toRef=`; tasks-api lists only forward by `FromId` — "which task monitors this cal item" needs the cal-side query or a scan.
-- Relation `ToKind`/`RelationType` are unvalidated free strings, asymmetric across APIs (tasks→cal `"cal-item"`, cal→tasks `"task"`) — no existence/authz check (weak point 3).
+- Relation `ToKind`/`RelationType` are unvalidated free strings, asymmetric across APIs (tasks→cal `"cal-item"`, cal→tasks `"task"`) — no existence/authz check (weak point 2).
 - VTODO regeneration drops stored VALARM sub-components (known `VtodoMapper` gap).
 
 ### comms-api
 - **Attachments unwired**: `IAttachmentStore` is the `NoOp` seam; `Message.ObjectKey` never populated; media-only messages dropped at the connector/importer — the corpus is text-only.
-- **Release path skips the per-message principal cross-check** (weak point 4): the payload builder fetches message bodies by id unscoped; contamination is only prevented by the assigner's principal-scoped candidate query.
+- **Release path skips the per-message principal cross-check** (weak point 3): the payload builder fetches message bodies by id unscoped; contamination is only prevented by the assigner's principal-scoped candidate query.
 - No topic merge (`θ_merge` is a doc knob with zero code) and no LLM topic labels (provisional label = the message's first words).
 - `archive_search` fusion is concat + id-dedup — the reranker is the sole ranker (no score fusion/RRF); the `source` filter is the `Telegram|Facebook` enum, so future platforms (email) need an enum addition to be filterable.
 - `GET /topics/{id}` / `get_topic` are not status-restricted — "open-topic tail" is convention, any topic's detail is returned.
-- Optional close-time steps unbuilt: rerank-members-before-release, `qwen3-1.7b` triage (build order 1).
-- Participant→Contact binding unwired: `Participant.ContactId` is a null seam — needs the write-back endpoint (`PUT /participants/{id}/contact`), `senderContactId` on topic payloads, and a `contactId` filter on `archive_search`; the resolving side is `Resolve × Contact` (build order 2).
-- Topic payload doesn't mark the principal's own messages (`fromPrincipal` per message) — required by reply-obligation detection (build order 1c).
+- Optional rerank-members-before-release at close time is unbuilt; the "skip topics with nothing actionable" close-time triage is superseded by the assistant-side Scan (batch 5), so comms needn't add its own.
+- Participant→Contact binding unwired: `Participant.ContactId` is a null seam — needs the write-back endpoint (`PUT /participants/{id}/contact`), `senderContactId` on topic payloads, and a `contactId` filter on `archive_search`; the resolving side is `Resolve × Contact` (build order 2). *(The `fromPrincipal` direction marker on the topic payload shipped in batch 5.)*
 
 ## Build order (next)
 
-1. **Two-phase extraction (Scan → Extract) + segmentation decision log** — weak points 1–2; the `Scan × Topic` candidate inventory replaces the boolean triage gate, then one strict per-candidate `Extract` run each (backbone: Agent run profiles). Land before email connectors multiply volume. Decomposition:
-   - **1a — profile spine (behaviour-preserving):** `RunProfile` (template · tier · strict · allowed outputs · grounding mode · tools · OnMiss) + registry keyed `(RunKind × Target.Kind)`; port today's two paths onto it; `ParentRunId` on `AgentRunStarted` (additive).
-   - **1b — Scan + per-candidate Extract (flagged):** candidate-inventory schema + span validation (reuse the ordinal machinery); code-owned loop in the intake processor; strict per-kind `Extract` schemas (derive from `OutputSchemas`); per-candidate Drop; behind an `Extraction:TwoPhase` flag until it defaults on.
-   - **1c — reply vertical:** comms `fromPrincipal` per topic-payload message → principal-marked window rendering → `reply` candidate kind + `Extract × Reply` → "Replies" list scaffolding + recurring nudge.
-   - Segmentation decision log rides alongside in comms-api.
+1. **Burn in two-phase, then flip the flag + segmentation decision log.** The `Scan → Extract` pipeline shipped behind `Extraction:TwoPhase=false` (batch 5). Remaining: exercise it on real topics, flip the default on, delete the single-pass monolith; add the append-only segmentation decision log (message, candidates, scores, threshold, action) in comms-api for calibration + golden replays.
 2. **Candidate-selection (`Resolve × RefKind` family)** — grounded identity for contacts/events/tasks/places/containers (career refs join with the career wiring); list-contents fetchers + run-time OBO in `AgentRunner`; pre-consent so approval cards show resolved targets. Includes the Participant→Contact write-back (comms endpoint + `senderContactId` payload field + `contactId` search filter).
-3. **Email connector** — IMAP sidecar → `POST /ingest` + mbox batch import for history; adds a `Source` enum value (also unlocks the `archive_search` platform filter). Gated on 1.
+3. **Email connector** — IMAP sidecar → `POST /ingest` + mbox batch import for history; adds a `Source` enum value (also unlocks the `archive_search` platform filter).
 4. *(possible)* **Facebook Messenger live connector** — Facebook is backfill-only (export CLI). No official API for personal DMs: unofficial client (ban risk; same read-only posture as the Telegram userbot) vs periodic manual re-export (the `(PrincipalId, Source, SourceRef)` dedup makes re-imports safe). Decide if Messenger traffic warrants it.
 
 Not yet sequenced: hub write-path completion (writer arms, ownership-aware policy, `ItemAction` executors, fire-parking + re-auth notice) · app surface (hub `/inbox` + resolve/answer endpoints, `acks` stream, native push) · memory (per-user facts + pgvector recall — unblocked since the gateway shipped `/v1/embeddings` + `/v1/rerank`) · consistency sweep + confidence thresholds (playbook).
