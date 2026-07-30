@@ -66,6 +66,9 @@ const config: ExpoConfig = {
     'expo-status-bar',
     'expo-font',
   ],
+  owner: 'danbro96',
+  updates: { url: 'https://u.expo.dev/89b3a2d6-094e-4419-bbfd-b3af9b3c50c8' },
+  extra: { eas: { projectId: '89b3a2d6-094e-4419-bbfd-b3af9b3c50c8' } },
 };
 
 export default config;
