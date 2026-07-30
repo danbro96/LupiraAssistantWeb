@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { SECURE_KEYS } from '../../config/secure-keys';
-import type { RegisterDeviceResponse, HealthRecord } from '../../domain/registration';
+import type { RegisterDeviceResponse } from '../api/generated/location/models';
+import type { HealthRecordDto } from '../api/generated/health/models';
 
 // `apiKey` lives ONLY in the OS secure keystore — never logged, never in Zustand/SQLite.
 
@@ -36,7 +37,7 @@ export async function loadCredentials(): Promise<DeviceCredentials | null> {
 }
 
 /** The apiKey is returned once — store it now. */
-export async function saveCredentials(resp: RegisterDeviceResponse, record: HealthRecord): Promise<void> {
+export async function saveCredentials(resp: RegisterDeviceResponse, record: HealthRecordDto): Promise<void> {
   await Promise.all([
     SecureStore.setItemAsync(SECURE_KEYS.apiKey, resp.apiKey),
     SecureStore.setItemAsync(SECURE_KEYS.keyId, resp.keyId),

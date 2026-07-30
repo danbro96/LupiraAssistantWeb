@@ -1,0 +1,743 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Lupira Assistant API",
+    "description": "The assistant hub/brain for Lupira: fire intake, agent runs, consent, and on-behalf-of writes. Authenticate with a Bearer token issued by Authentik.",
+    "version": "v1"
+  },
+  "paths": {
+    "/fires": {
+      "post": {
+        "tags": [
+          "Intake"
+        ],
+        "summary": "Accept a due fire from lupira-cal-worker (accept-then-own).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FireRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FireAcceptedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/inbound": {
+      "post": {
+        "tags": [
+          "Intake"
+        ],
+        "summary": "Accept a closed topic from comms-api (accept-then-own).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboundTopicRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FireAcceptedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/status": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/me/profile": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Get the caller's assistant profile (routing defaults).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/me/profile/routing": {
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Set routing defaults (calendar/list/address-book) the assistant writes to.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutingUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActionKind": {
+        "enum": [
+          "SendCheckIn",
+          "Notify",
+          "CreateLinkedTask",
+          "ExpireTarget",
+          "RescheduleSelf",
+          "RunJob",
+          "Rescore"
+        ]
+      },
+      "CalendarClass": {
+        "enum": [
+          "Agenda",
+          "System"
+        ]
+      },
+      "CalendarKind": {
+        "enum": [
+          "Personal",
+          "Group",
+          "Birthdays",
+          "Availability",
+          "Inbox",
+          "LlmPrompts",
+          "UserCheckIn",
+          "DevOps",
+          "FoodPlan",
+          "Generic"
+        ]
+      },
+      "FallbackMode": {
+        "enum": [
+          "Retry",
+          "Ask",
+          "Drop"
+        ]
+      },
+      "FireAcceptedResponse": {
+        "required": [
+          "inboundItemId",
+          "duplicate"
+        ],
+        "type": "object",
+        "properties": {
+          "inboundItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "duplicate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FireRequest": {
+        "required": [
+          "principalId",
+          "itemId",
+          "calendarId",
+          "calendarClass",
+          "calendarKind",
+          "occurrenceAt",
+          "dedupeKey"
+        ],
+        "type": "object",
+        "properties": {
+          "principalId": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "calendarId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "calendarClass": {
+            "$ref": "#/components/schemas/CalendarClass"
+          },
+          "calendarKind": {
+            "$ref": "#/components/schemas/CalendarKind"
+          },
+          "occurrenceAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dedupeKey": {
+            "type": "string"
+          },
+          "expireAfter": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "prompt": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemPrompt"
+              }
+            ]
+          },
+          "action": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemAction"
+              }
+            ]
+          }
+        }
+      },
+      "InboundSource": {
+        "enum": [
+          "CalWorker",
+          "Comms",
+          "CheckIn",
+          null
+        ]
+      },
+      "InboundTopicRequest": {
+        "required": [
+          "principalId",
+          "topicRef",
+          "label",
+          "messages"
+        ],
+        "type": "object",
+        "properties": {
+          "principalId": {
+            "type": "string"
+          },
+          "topicRef": {
+            "type": "string"
+          },
+          "releasedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "label": {
+            "type": "string"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopicMessage"
+            }
+          },
+          "source": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/InboundSource"
+              }
+            ]
+          }
+        }
+      },
+      "ItemAction": {
+        "required": [
+          "kind",
+          "target",
+          "paramsJson",
+          "fire",
+          "enabled"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ActionKind"
+          },
+          "target": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "paramsJson": {
+            "type": "string"
+          },
+          "fire": {
+            "$ref": "#/components/schemas/PromptFire"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ItemPrompt": {
+        "required": [
+          "intent",
+          "target",
+          "instruction",
+          "output",
+          "tools",
+          "tier",
+          "onMiss",
+          "fire",
+          "enabled"
+        ],
+        "type": "object",
+        "properties": {
+          "intent": {
+            "$ref": "#/components/schemas/PromptIntent"
+          },
+          "target": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "output": {
+            "$ref": "#/components/schemas/OutputKind"
+          },
+          "tools": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "tier": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModelTier"
+              }
+            ]
+          },
+          "onMiss": {
+            "$ref": "#/components/schemas/FallbackMode"
+          },
+          "fire": {
+            "$ref": "#/components/schemas/PromptFire"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ModelTier": {
+        "enum": [
+          "Small",
+          "Medium",
+          "Large",
+          null
+        ]
+      },
+      "OutputKind": {
+        "enum": [
+          "RecordEdit",
+          "Event",
+          "Task",
+          "Message",
+          "Summary",
+          "Question",
+          "Relation",
+          "Place",
+          "None"
+        ]
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProfileResponse": {
+        "required": [
+          "principalId",
+          "routing"
+        ],
+        "type": "object",
+        "properties": {
+          "principalId": {
+            "type": "string"
+          },
+          "routing": {
+            "$ref": "#/components/schemas/RoutingResponse"
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "PromptFire": {
+        "required": [
+          "kind",
+          "offsetMinutes",
+          "allDayAt"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/PromptFireKind"
+          },
+          "offsetMinutes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "allDayAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "time"
+          }
+        }
+      },
+      "PromptFireKind": {
+        "enum": [
+          "OnStart",
+          "OnEnd",
+          "Offset",
+          "AllDayAt"
+        ]
+      },
+      "PromptIntent": {
+        "enum": [
+          "EnrichRecord",
+          "Research",
+          "CreateFollowUp",
+          "Monitor",
+          "Summarise",
+          "AskUser"
+        ]
+      },
+      "Ref": {
+        "required": [
+          "kind",
+          "id",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/RefKind"
+          },
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RefKind": {
+        "enum": [
+          "Event",
+          "Contact",
+          "Task",
+          "Place",
+          "External"
+        ]
+      },
+      "RoutingResponse": {
+        "required": [
+          "personalCalendarId",
+          "groupCalendarId",
+          "assistantListId",
+          "addressBookId"
+        ],
+        "type": "object",
+        "properties": {
+          "personalCalendarId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "groupCalendarId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "assistantListId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "addressBookId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "RoutingUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "personalCalendarId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "groupCalendarId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "assistantListId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "addressBookId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "TopicMessage": {
+        "required": [
+          "sender",
+          "timestamp",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "sender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fromPrincipal": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "OIDC bearer token. Send as `Authorization: Bearer <token>`.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Intake"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Profile"
+    }
+  ]
+}

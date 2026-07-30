@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { applyReceipt } from './receipt-apply';
-import type { LocationIngestReceipt, RingIngestReceipt } from './receipts';
+import type { IngestReceipt } from './receipts';
 
-function locReceipt(over: Partial<LocationIngestReceipt> = {}): LocationIngestReceipt {
-  return { submitted: 0, inserted: 0, duplicates: 0, rejected: 0, highWaterSeq: null, rejects: [], paused: false, ...over };
+function locReceipt(over: Partial<IngestReceipt> = {}): IngestReceipt {
+  return { rejects: [], paused: false, ...over };
 }
 
 describe('applyReceipt', () => {
   it('deletes confirmed rows (inserted AND duplicates) and advances to the max seq', () => {
-    const plan = applyReceipt(locReceipt({ inserted: 2, duplicates: 1 }), [1, 2, 3]);
+    const plan = applyReceipt(locReceipt(), [1, 2, 3]);
     expect(plan.deleteSeqs).toEqual([1, 2, 3]);
     expect(plan.dropRejectSeqs).toEqual([]);
     expect(plan.advanceTo).toBe(3);
@@ -42,8 +42,7 @@ describe('applyReceipt', () => {
   });
 
   it('ring receipt (no paused field) is treated as not paused', () => {
-    const ring: RingIngestReceipt = { submitted: 1, inserted: 1, duplicates: 0, rejected: 0, highWaterSeq: 9, rejects: [] };
-    const plan = applyReceipt(ring, [9]);
+    const plan = applyReceipt({ rejects: [] }, [9]);
     expect(plan.paused).toBe(false);
     expect(plan.deleteSeqs).toEqual([9]);
   });

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { bootstrap, registerDevice } from '../data/api/registration';
+import { postMeBootstrap } from '../data/api/generated/health/me/me';
+import { postDevices } from '../data/api/generated/location/devices/devices';
 import {
   loadCredentials,
   saveCredentials,
@@ -11,7 +12,8 @@ import * as fixesRepo from '../data/db/pending-fixes-repo';
 import * as ringRepo from '../data/db/pending-ring-repo';
 import * as summariesRepo from '../data/db/pending-summaries-repo';
 import * as syncState from '../data/db/sync-state-repo';
-import type { DeviceKind } from '../domain/registration';
+import type { DeviceKind, RegisterDeviceResponse } from '../data/api/generated/location/models';
+import type { HealthRecordDto } from '../data/api/generated/health/models';
 import { logDebug } from '../debug/log';
 
 // Non-secret mirror of the registered device; the apiKey lives ONLY in secure-store.
@@ -60,8 +62,9 @@ export const useDevice = create<DeviceState & DeviceActions>((set) => ({
 
   register: async (label) => {
     try {
-      const record = await bootstrap();
-      const resp = await registerDevice({ kind: 'Phone', label });
+      // The mutator throws on non-2xx, so the generated error/void response branches are unreachable.
+      const { data: record } = (await postMeBootstrap()) as { data: HealthRecordDto };
+      const { data: resp } = (await postDevices({ kind: 'Phone', label })) as { data: RegisterDeviceResponse };
       await saveCredentials(resp, record);
 
       // fresh device: reset local streams, clear stale buffers, seed sync state

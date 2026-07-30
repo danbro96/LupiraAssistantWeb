@@ -2,7 +2,7 @@ import type { Db } from '../data/db/db';
 import * as fixesRepo from '../data/db/pending-fixes-repo';
 import * as syncState from '../data/db/sync-state-repo';
 import * as collectorMeta from '../data/db/collector-meta-repo';
-import * as ingest from '../data/api/ingest';
+import { postIngestLocation } from '../data/api/generated/location-ingest/ingest/ingest';
 import { applyReceipt } from '../domain/receipt-apply';
 import { selectBatch, type BatchItem } from '../domain/batcher';
 import { utf8ByteLength } from '../domain/ndjson';
@@ -40,7 +40,7 @@ export async function runLocationUpload(db: Db, deviceId: string): Promise<Uploa
 
   let receipt;
   try {
-    receipt = await ingest.postLocation(deviceId, body);
+    receipt = (await postIngestLocation(body)).data;
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e);
     await syncState.setError(db, deviceId, 'location', error);
@@ -60,7 +60,7 @@ export async function runLocationUpload(db: Db, deviceId: string): Promise<Uploa
 
   await syncState.applyUploadResult(db, deviceId, 'location', {
     advanceTo: plan.advanceTo,
-    highWaterSeq: receipt.highWaterSeq,
+    highWaterSeq: receipt.highWaterSeq ?? null,
     receiptJson: JSON.stringify(receipt),
     at: new Date().toISOString(),
   });

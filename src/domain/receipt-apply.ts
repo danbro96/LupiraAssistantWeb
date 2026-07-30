@@ -1,4 +1,4 @@
-import type { IngestReceiptBase, LocationIngestReceipt } from './receipts';
+import type { IngestReceipt } from './receipts';
 import { isPermanentReject } from './reject-reasons';
 
 // inserted+duplicates are both server-confirmed (idempotent) → delete; permanent rejects → drop.
@@ -10,15 +10,8 @@ export interface ApplyPlan {
   batchTooLarge: boolean; // batch-level signal, not a per-row drop
 }
 
-function isLocationReceipt(r: IngestReceiptBase | LocationIngestReceipt): r is LocationIngestReceipt {
-  return 'paused' in r;
-}
-
-export function applyReceipt(
-  receipt: IngestReceiptBase | LocationIngestReceipt,
-  sentSeqs: readonly number[],
-): ApplyPlan {
-  const paused = isLocationReceipt(receipt) ? receipt.paused : false;
+export function applyReceipt(receipt: IngestReceipt, sentSeqs: readonly number[]): ApplyPlan {
+  const paused = receipt.paused === true;
   if (paused) {
     // Body discarded server-side; keep buffered rows for upload on resume.
     return { deleteSeqs: [], dropRejectSeqs: [], advanceTo: null, paused: true, batchTooLarge: false };
@@ -31,7 +24,7 @@ export function applyReceipt(
       batchTooLarge = true;
       continue;
     }
-    if (r.seq !== null) rejectBySeq.set(r.seq, r.reason);
+    if (r.seq != null) rejectBySeq.set(r.seq, r.reason);
   }
 
   const deleteSeqs: number[] = [];
