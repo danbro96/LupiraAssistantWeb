@@ -18,6 +18,8 @@ const config: ExpoConfig = {
   version: '0.1.0',
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
+  // Fingerprint: a JS-only change keeps the runtime version and ships OTA; a native change needs a build.
+  runtimeVersion: { policy: 'fingerprint' },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.lupira.assistant',

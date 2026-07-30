@@ -2,8 +2,8 @@ import boundaries from 'eslint-plugin-boundaries';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
-/** v6 object-selector helper: `to('domain','config')` → [{ to: { type: 'domain' } }, …]. */
-const to = (...types) => types.map((t) => ({ to: { type: t } }));
+/** v7 object-selector helper: `to('domain','config')` → [{ to: { element: { type: 'domain' } } }, …]. */
+const to = (...types) => types.map((t) => ({ to: { element: { type: t } } }));
 
 // One job: enforce the layered architecture (see the plan / ARCHITECTURE). Only the import-boundary
 // rule + hook correctness are on; this is a structural gate, not a style overhaul. The dependency
@@ -49,17 +49,17 @@ export default [
     rules: {
       'boundaries/dependencies': ['error', {
         default: 'disallow',
-        rules: [
-          { from: { type: 'domain' }, allow: to('domain') },
-          { from: { type: 'data' }, allow: to('data', 'domain', 'config', 'debug', 'feedback') },
-          { from: { type: 'collector' }, allow: to('collector', 'data', 'domain', 'config', 'debug', 'feedback') },
-          { from: { type: 'sync' }, allow: to('sync', 'data', 'domain', 'config', 'debug', 'feedback') },
-          { from: { type: 'state' }, allow: to('state', 'sync', 'collector', 'data', 'domain', 'config', 'debug', 'feedback') },
-          { from: { type: 'ui' }, allow: to('ui', 'state', 'sync', 'collector', 'data', 'domain', 'config', 'debug', 'feedback') },
-          { from: { type: 'config' }, allow: to('config') },
-          { from: { type: 'debug' }, allow: to('debug') },
-          { from: { type: 'feedback' }, allow: to('feedback') },
-          { from: { type: 'polyfills' }, allow: to('polyfills') },
+        policies: [
+          { from: { element: { type: 'domain' } }, allow: to('domain') },
+          { from: { element: { type: 'data' } }, allow: to('data', 'domain', 'config', 'debug', 'feedback') },
+          { from: { element: { type: 'collector' } }, allow: to('collector', 'data', 'domain', 'config', 'debug', 'feedback') },
+          { from: { element: { type: 'sync' } }, allow: to('sync', 'data', 'domain', 'config', 'debug', 'feedback') },
+          { from: { element: { type: 'state' } }, allow: to('state', 'sync', 'collector', 'data', 'domain', 'config', 'debug', 'feedback') },
+          { from: { element: { type: 'ui' } }, allow: to('ui', 'state', 'sync', 'collector', 'data', 'domain', 'config', 'debug', 'feedback') },
+          { from: { element: { type: 'config' } }, allow: to('config') },
+          { from: { element: { type: 'debug' } }, allow: to('debug') },
+          { from: { element: { type: 'feedback' } }, allow: to('feedback') },
+          { from: { element: { type: 'polyfills' } }, allow: to('polyfills') },
         ],
       }],
       'react-hooks/rules-of-hooks': 'error',
