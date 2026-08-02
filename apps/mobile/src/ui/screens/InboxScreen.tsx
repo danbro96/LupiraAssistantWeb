@@ -3,7 +3,7 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { useInbox, type GrantStatus } from '../../state/inbox-store';
 import { useAuth } from '../../state/auth-store';
 import { launchConnect } from '../../data/auth/connect';
-import type { InboxItemView } from '../../domain/assistant/inbox-item';
+import type { InboxItemView } from '@lupira/assistant-domain/inbox-item';
 import { Button } from '../components/Button';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';

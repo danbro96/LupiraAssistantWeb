@@ -9,7 +9,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '..');
+const appRoot = path.resolve(__dirname, '..');
+// Sibling API repos live beside the workspace root (apps/mobile/scripts → three levels up).
+const workspaceRoot = path.resolve(__dirname, '../../..');
 
 const SPECS = [
   { api: 'LupiraLocationApi', out: 'backend-location-openapi.json' },
@@ -20,8 +22,8 @@ const SPECS = [
 let failed = false;
 
 for (const { api, out } of SPECS) {
-  const src = path.resolve(repoRoot, '..', api, 'openapi', `${api}.json`);
-  const dest = path.join(repoRoot, out);
+  const src = path.resolve(workspaceRoot, '..', api, 'openapi', `${api}.json`);
+  const dest = path.join(appRoot, out);
   try {
     const json = JSON.parse(await fs.readFile(src, 'utf-8'));
     await fs.writeFile(dest, JSON.stringify(json, null, 2) + '\n');

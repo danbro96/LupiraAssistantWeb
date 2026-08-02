@@ -1,63 +1,27 @@
 {
-  "name": "lupiraassistantmobile",
-  "version": "0.1.0",
-  "main": "index.ts",
+  "name": "lupira-assistant-workspace",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "prebuild": "expo prebuild",
-    "typecheck": "tsc --noEmit",
-    "fetch:openapi": "node scripts/fetch-openapi.mjs",
-    "gen:api": "orval --config ./orval.config.ts",
-    "lint": "eslint .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "build:preview": "eas build --profile preview --platform android",
-    "build:android": "eas build --profile production --platform android"
+    "start": "npm run start -w apps/mobile",
+    "fetch:openapi": "npm run fetch:openapi -w apps/mobile",
+    "gen:api": "npm run gen:api -w apps/mobile",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
-  "dependencies": {
-    "@expo/vector-icons": "^15.0.2",
-    "@react-native-community/netinfo": "12.0.1",
-    "@react-navigation/native": "^7.2.5",
-    "@react-navigation/native-stack": "^7.16.0",
-    "@sentry/react-native": "~7.11.0",
-    "babel-preset-expo": "~57.0.0",
-    "expo": "~57.0.8",
-    "expo-auth-session": "~57.0.5",
-    "expo-background-task": "~57.0.6",
-    "expo-battery": "~57.0.1",
-    "expo-crypto": "~57.0.1",
-    "expo-dev-client": "~57.0.8",
-    "expo-device": "~57.0.1",
-    "expo-font": "~57.0.1",
-    "expo-haptics": "~57.0.1",
-    "expo-location": "~57.0.6",
-    "expo-secure-store": "~57.0.1",
-    "expo-sensors": "~57.0.2",
-    "expo-sqlite": "~57.0.1",
-    "expo-status-bar": "~57.0.1",
-    "expo-task-manager": "~57.0.6",
-    "expo-updates": "~57.0.9",
-    "expo-web-browser": "~57.0.2",
-    "react": "19.2.3",
-    "react-native": "0.86.0",
-    "react-native-gesture-handler": "~2.32.0",
-    "react-native-safe-area-context": "~5.7.0",
-    "react-native-screens": "~4.26.0",
-    "uuid": "^14.0.0",
-    "zustand": "^5.0.14"
+  "overrides": {
+    "react": "19.2.3"
   },
   "devDependencies": {
-    "@types/react": "19.2.17",
     "eslint": "^10.4.1",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-boundaries": "^7.1.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "orval": "^8.23.0",
     "typescript": "6.0.3",
     "typescript-eslint": "^8.65.0",
     "vitest": "4.1.10"
-  },
-  "private": true
+  }
 }

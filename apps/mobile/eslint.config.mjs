@@ -15,6 +15,8 @@ const to = (...types) => types.map((t) => ({ to: { element: { type: t } } }));
 //   state → sync/collector/data/domain
 //   ui → everything below it
 // The cross-cutting leaves (config, debug, feedback) may be imported by anyone but import no app layer.
+// The shared @lupira/assistant-domain package arrives as an external import, allowed everywhere (it is
+// the bottom layer; its purity is enforced by its own eslint config in packages/domain).
 export default [
   {
     ignores: [

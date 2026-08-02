@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getDb } from '../data/db/db';
 import { getCache, clearCache } from '../data/db/inbox-cache-repo';
-import { parseCachedInbox, type InboxItemView } from '../domain/assistant/inbox-item';
+import { parseCachedInbox, type InboxItemView } from '@lupira/assistant-domain/inbox-item';
 import { logDebug } from '../debug/log';
 
 // The assistant surface store. P0 is read-only: it renders the last cached feed and the on-behalf-of
