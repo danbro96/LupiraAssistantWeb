@@ -6,6 +6,15 @@ export type InboxItemKind = 'proposal' | 'question';
 
 const KINDS: readonly InboxItemKind[] = ['proposal', 'question'];
 
+/** The proposal behind an approval card, kept for the edit form (payload records passthrough). */
+export interface ProposalView {
+  actionKind: string;
+  event?: Record<string, unknown> | null;
+  contact?: Record<string, unknown> | null;
+  task?: Record<string, unknown> | null;
+  place?: Record<string, unknown> | null;
+}
+
 export interface InboxItemView {
   id: string;
   kind: InboxItemKind;
@@ -16,6 +25,8 @@ export interface InboxItemView {
   createdAt: string;
   /** ISO 8601; questions may expire. */
   expiresAt?: string | null;
+  /** Present on proposals with a typed payload — what the edit form works on. */
+  proposal?: ProposalView | null;
 }
 
 function isKind(v: unknown): v is InboxItemKind {
@@ -35,6 +46,7 @@ function toItem(raw: unknown): InboxItemView | null {
     summary: typeof r.summary === 'string' ? r.summary : null,
     createdAt: r.createdAt,
     expiresAt: typeof r.expiresAt === 'string' ? r.expiresAt : null,
+    proposal: toProposalView(r.proposal),
   };
 }
 
@@ -71,6 +83,20 @@ function mapWireItem(raw: unknown): InboxItemView | null {
     summary: kind === 'proposal' ? proposalSummary(r.proposal) : null,
     createdAt: r.createdAt,
     expiresAt: typeof r.expiresAt === 'string' ? r.expiresAt : null,
+    proposal: toProposalView(r.proposal),
+  };
+}
+
+/** Structural pick of the editable parts of a wire/cached proposal; null when absent or shapeless. */
+function toProposalView(raw: unknown): ProposalView | null {
+  const p = asRecord(raw);
+  if (!p || typeof p.actionKind !== 'string') return null;
+  return {
+    actionKind: p.actionKind,
+    event: asRecord(p.event),
+    contact: asRecord(p.contact),
+    task: asRecord(p.task),
+    place: asRecord(p.place),
   };
 }
 

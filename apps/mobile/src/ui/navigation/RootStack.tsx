@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RegisterDeviceScreen } from '../screens/RegisterDeviceScreen';
 import { InboxScreen } from '../screens/InboxScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { EditProposalScreen } from '../screens/EditProposalScreen';
 import { useDevice } from '../../state/device-store';
 import { HIT_SLOP, useColors } from '../theme';
 import type { RootStackParamList } from './types';
@@ -38,6 +39,7 @@ export function RootStack() {
             })}
           />
           <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
+          <Stack.Screen name="EditProposal" component={EditProposalScreen} options={{ title: 'Edit proposal' }} />
         </>
       ) : (
         <Stack.Screen name="RegisterDevice" component={RegisterDeviceScreen} options={{ headerShown: false }} />

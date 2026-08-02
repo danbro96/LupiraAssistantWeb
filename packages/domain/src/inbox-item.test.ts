@@ -8,6 +8,7 @@ const item: InboxItemView = {
   summary: 'Tue 14:00, from Telegram',
   createdAt: '2026-06-28T10:00:00.000Z',
   expiresAt: null,
+  proposal: null,
 };
 
 describe('parseCachedInbox', () => {
@@ -67,6 +68,13 @@ describe('mapInboxResponse', () => {
         summary: 'Create event · 2026-08-07 19:00 · Café Pascal',
         createdAt: '2026-08-01T18:00:00+00:00',
         expiresAt: null,
+        proposal: {
+          actionKind: 'CreateEvent',
+          event: { title: 'Dinner', startsAt: '2026-08-07T19:00:00+02:00', location: 'Café Pascal' },
+          contact: null,
+          task: null,
+          place: null,
+        },
       },
       {
         id: 'q1',
@@ -75,6 +83,7 @@ describe('mapInboxResponse', () => {
         summary: null,
         createdAt: '2026-08-02T08:00:00+00:00',
         expiresAt: '2026-08-03T08:00:00+00:00',
+        proposal: null,
       },
     ]);
   });

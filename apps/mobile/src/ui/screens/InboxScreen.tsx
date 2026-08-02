@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useInbox, type GrantStatus } from '../../state/inbox-store';
 import { useAuth } from '../../state/auth-store';
 import { launchConnect } from '../../data/auth/connect';
 import type { InboxItemView } from '@lupira/assistant-domain/inbox-item';
+import { payloadSlotFor } from '@lupira/assistant-domain/edit-spec';
+import type { RootStackParamList } from '../navigation/types';
 import { Button } from '../components/Button';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
@@ -100,6 +104,8 @@ function ItemHeader({ item, c }: { item: InboxItemView; c: Palette }) {
 
 function ProposalCard({ item, c }: { item: InboxItemView; c: Palette }) {
   const styles = useMemo(() => makeStyles(c), [c]);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const editable = item.proposal != null && payloadSlotFor(item.proposal.actionKind) !== null;
   return (
     <View style={styles.card}>
       <ItemHeader item={item} c={c} />
@@ -109,6 +115,14 @@ function ProposalCard({ item, c }: { item: InboxItemView; c: Palette }) {
           onPress={() => void useInbox.getState().resolve(item.id, { action: 'Approve' })}
           style={styles.actionBtn}
         />
+        {editable ? (
+          <Button
+            title="Edit"
+            variant="secondary"
+            onPress={() => navigation.navigate('EditProposal', { itemId: item.id })}
+            style={styles.actionBtn}
+          />
+        ) : null}
         <Button
           title="Dismiss"
           variant="destructive"
