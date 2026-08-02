@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { getDb } from '../data/db/db';
-import { getCache, clearCache } from '../data/db/inbox-cache-repo';
+import { getCache, setCache, clearCache } from '../data/db/inbox-cache-repo';
 import { getAuthStatus } from '../data/api/generated/assistant/auth/auth';
-import { parseCachedInbox, type InboxItemView } from '@lupira/assistant-domain/inbox-item';
+import { getInbox } from '../data/api/generated/assistant/inbox/inbox';
+import { mapInboxResponse, parseCachedInbox, type InboxItemView } from '@lupira/assistant-domain/inbox-item';
 import { logDebug } from '../debug/log';
 
 // The assistant surface store: the last cached feed plus the on-behalf-of grant status (live via the
@@ -50,8 +51,17 @@ export const useInbox = create<InboxState & InboxActions>((set) => ({
   },
 
   refresh: async () => {
-    // TODO(hub-spec): GET /inbox via the generated assistant client → map DTOs → setCache → set items.
-    logDebug('inbox:refresh', 'skipped — assistant-api OpenAPI not published yet');
+    try {
+      const res = await getInbox();
+      const items = mapInboxResponse(res.data);
+      const fetchedAt = Date.now();
+      set({ loaded: true, items, fetchedAt });
+      const db = await getDb();
+      await setCache(db, JSON.stringify(items), fetchedAt);
+    } catch (e) {
+      // Offline: the cached feed stays on screen.
+      logDebug('inbox:refresh-error', e instanceof Error ? e.message : String(e));
+    }
   },
 
   refreshGrant: async () => {

@@ -128,6 +128,68 @@
         ]
       }
     },
+    "/inbox": {
+      "get": {
+        "tags": [
+          "Inbox"
+        ],
+        "summary": "The caller's feed: pending approvals + open questions (default), or resolved history.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/auth/status": {
       "get": {
         "tags": [
@@ -256,6 +318,36 @@
           }
         }
       },
+      "BillDetail": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "payee": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "invoiceNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CalendarClass": {
         "enum": [
           "Agenda",
@@ -275,6 +367,177 @@
           "FoodPlan",
           "Generic"
         ]
+      },
+      "CalendarTarget": {
+        "enum": [
+          "Personal",
+          "Group"
+        ]
+      },
+      "ContactProposal": {
+        "type": "object",
+        "properties": {
+          "givenName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "familyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nickname": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emails": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "phones": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "birthday": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "tags": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DeliveryDetail": {
+        "type": "object",
+        "properties": {
+          "carrier": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "trackingNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "trackingUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "orderReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "EventProposal": {
+        "type": "object",
+        "properties": {
+          "targetCalendar": {
+            "$ref": "#/components/schemas/CalendarTarget"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "location": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "placeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "isAllDay": {
+            "type": "boolean"
+          },
+          "startsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "startDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "kind": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tags": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "FallbackMode": {
         "enum": [
@@ -411,6 +674,74 @@
               {
                 "$ref": "#/components/schemas/InboundSource"
               }
+            ]
+          }
+        }
+      },
+      "InboxItemDto": {
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/InboxItemKind"
+          },
+          "title": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "proposal": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProposalDetailDto"
+              }
+            ]
+          }
+        }
+      },
+      "InboxItemKind": {
+        "enum": [
+          "Proposal",
+          "Question"
+        ]
+      },
+      "InboxResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InboxItemDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
             ]
           }
         }
@@ -557,6 +888,49 @@
           }
         }
       },
+      "PlaceProposal": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "kind": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "latitude": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "formattedAddress": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -660,6 +1034,111 @@
           "AskUser"
         ]
       },
+      "ProposalDetailDto": {
+        "required": [
+          "proposedActionId",
+          "runId",
+          "actionKind",
+          "confidence"
+        ],
+        "type": "object",
+        "properties": {
+          "proposedActionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "runId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actionKind": {
+            "$ref": "#/components/schemas/ProposedActionKind"
+          },
+          "target": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "format": "double"
+          },
+          "sources": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "event": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EventProposal"
+              }
+            ]
+          },
+          "contact": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContactProposal"
+              }
+            ]
+          },
+          "task": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TaskProposal"
+              }
+            ]
+          },
+          "place": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PlaceProposal"
+              }
+            ]
+          }
+        }
+      },
+      "ProposedActionKind": {
+        "enum": [
+          "CreateEvent",
+          "UpdateEvent",
+          "CreateContact",
+          "UpdateContact",
+          "CreateTask",
+          "UpdateTask",
+          "CreatePlace",
+          "UpdatePlace",
+          "CreateRelation",
+          "CreateCareerEntry",
+          "CreatePrompt",
+          "SendCheckIn",
+          "Report"
+        ]
+      },
       "Ref": {
         "required": [
           "kind",
@@ -694,6 +1173,23 @@
           "Place",
           "External"
         ]
+      },
+      "ReplyDetail": {
+        "type": "object",
+        "properties": {
+          "counterparty": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ask": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
       },
       "RoutingResponse": {
         "required": [
@@ -767,6 +1263,64 @@
           }
         }
       },
+      "TaskProposal": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dueAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bill": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BillDetail"
+              }
+            ]
+          },
+          "delivery": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DeliveryDetail"
+              }
+            ]
+          },
+          "reply": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReplyDetail"
+              }
+            ]
+          }
+        }
+      },
       "TopicMessage": {
         "required": [
           "sender",
@@ -816,6 +1370,9 @@
     },
     {
       "name": "Intake"
+    },
+    {
+      "name": "Inbox"
     },
     {
       "name": "Auth"

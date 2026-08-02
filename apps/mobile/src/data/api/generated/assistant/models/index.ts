@@ -7,6 +7,23 @@
  */
 
 export * from './authStatusResponse';
+export * from './billDetail';
+export * from './calendarTarget';
+export * from './contactProposal';
+export * from './deliveryDetail';
+export * from './eventProposal';
+export * from './getInboxParams';
+export * from './inboxItemDto';
+export * from './inboxItemKind';
+export * from './inboxResponse';
+export * from './placeProposal';
 export * from './profileResponse';
+export * from './proposalDetailDto';
+export * from './proposalDetailDtoSources';
+export * from './proposedActionKind';
+export * from './ref';
+export * from './refKind';
+export * from './replyDetail';
 export * from './routingResponse';
 export * from './routingUpdateRequest';
+export * from './taskProposal';

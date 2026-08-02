@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useInbox, type GrantStatus } from '../../state/inbox-store';
 import { useAuth } from '../../state/auth-store';
@@ -28,6 +28,12 @@ export function InboxScreen() {
     setRefreshing(true);
     await useInbox.getState().refresh();
     setRefreshing(false);
+  }, []);
+
+  // Pull-on-open freshness (until push lands): the cached feed renders instantly, then updates.
+  useEffect(() => {
+    void useInbox.getState().refresh();
+    void useInbox.getState().refreshGrant();
   }, []);
 
   async function onConnect() {

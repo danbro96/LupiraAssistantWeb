@@ -37,7 +37,7 @@ export default defineConfig({
   },
   // The assistant surface rides the BFF: one origin, the /api/assistant prefix picks the upstream.
   assistant: {
-    input: { target: './backend-assistant-openapi.json', filters: { tags: ['Auth', 'Profile'] } },
+    input: { target: './backend-assistant-openapi.json', filters: { tags: ['Auth', 'Profile', 'Inbox'] } },
     output: output('assistant', 'apiFetchAssistant', '/api/assistant'),
   },
 });
