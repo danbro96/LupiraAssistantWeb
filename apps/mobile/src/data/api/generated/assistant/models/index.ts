@@ -6,6 +6,8 @@
  * OpenAPI spec version: v1
  */
 
+export * from './ackResponse';
+export * from './answerCheckInRequest';
 export * from './authStatusResponse';
 export * from './billDetail';
 export * from './calendarTarget';
@@ -16,6 +18,7 @@ export * from './getInboxParams';
 export * from './inboxItemDto';
 export * from './inboxItemKind';
 export * from './inboxResponse';
+export * from './jsonElement';
 export * from './placeProposal';
 export * from './profileResponse';
 export * from './proposalDetailDto';
@@ -24,6 +27,8 @@ export * from './proposedActionKind';
 export * from './ref';
 export * from './refKind';
 export * from './replyDetail';
+export * from './resolutionAction';
+export * from './resolveProposalRequest';
 export * from './routingResponse';
 export * from './routingUpdateRequest';
 export * from './taskProposal';

@@ -3,6 +3,7 @@ import { AppState } from 'react-native';
 import { getDb } from '../data/db/db';
 import { getDeviceId } from '../data/secure/device-credentials';
 import { runLocationUpload } from './uploader';
+import { runAckUpload } from './ack-uploader';
 import { resumeFromCursor } from './cursor-resume';
 import { pollTrackingState } from './pause-poll';
 import { refreshSyncStatus, useSyncStatus } from './sync-status';
@@ -46,6 +47,11 @@ export async function kickSync(opts: KickOptions = {}): Promise<void> {
     status.setUploading(true);
     for (;;) {
       const out = await runLocationUpload(db, deviceId);
+      if (out.status === 'uploaded' && out.more) continue;
+      break;
+    }
+    for (;;) {
+      const out = await runAckUpload(db);
       if (out.status === 'uploaded' && out.more) continue;
       break;
     }

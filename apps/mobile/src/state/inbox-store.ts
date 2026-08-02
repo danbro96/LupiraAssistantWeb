@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 import { getDb } from '../data/db/db';
 import { getCache, setCache, clearCache } from '../data/db/inbox-cache-repo';
+import { enqueueAck } from '../data/db/pending-acks-repo';
 import { getAuthStatus } from '../data/api/generated/assistant/auth/auth';
 import { getInbox } from '../data/api/generated/assistant/inbox/inbox';
+import { kickSync } from '../sync/sync-engine';
 import { mapInboxResponse, parseCachedInbox, type InboxItemView } from '@lupira/assistant-domain/inbox-item';
+import type { AnswerPayload, ResolvePayload } from '@lupira/assistant-domain/ack';
 import { logDebug } from '../debug/log';
 
 // The assistant surface store: the last cached feed plus the on-behalf-of grant status (live via the
@@ -22,14 +25,38 @@ interface InboxState {
 interface InboxActions {
   /** Hydrate from the local cache so the screen renders offline at launch. */
   loadFromCache: () => Promise<void>;
-  /** Re-fetch the feed from assistant-api. TODO(hub-spec): wire to the generated client. */
+  /** Re-fetch the feed from the hub via the BFF. */
   refresh: () => Promise<void>;
-  /** Re-read grant status from GET /me. TODO(hub-spec): wire to the generated client. */
+  /** Re-read grant status from GET /auth/status. */
   refreshGrant: () => Promise<void>;
+  /** Approve/edit/dismiss a proposal: optimistic remove + offline-safe enqueue on the acks stream. */
+  resolve: (id: string, payload: ResolvePayload) => Promise<void>;
+  /** Answer or skip a question: optimistic remove + offline-safe enqueue on the acks stream. */
+  answer: (id: string, payload: AnswerPayload) => Promise<void>;
   clear: () => Promise<void>;
 }
 
-export const useInbox = create<InboxState & InboxActions>((set) => ({
+/** Optimistically drop the item, persist the shrunken cache, queue the gesture, kick the sync. */
+async function applyGesture(
+  set: (partial: Partial<InboxState>) => void,
+  get: () => InboxState,
+  kind: 'resolve' | 'answer',
+  id: string,
+  payload: ResolvePayload | AnswerPayload,
+): Promise<void> {
+  const items = get().items.filter((i) => i.id !== id);
+  set({ items });
+  try {
+    const db = await getDb();
+    await setCache(db, JSON.stringify(items), get().fetchedAt ?? Date.now());
+    await enqueueAck(db, kind, id, crypto.randomUUID(), payload, Date.now());
+  } catch (e) {
+    logDebug('inbox:gesture-enqueue-error', e instanceof Error ? e.message : String(e));
+  }
+  void kickSync();
+}
+
+export const useInbox = create<InboxState & InboxActions>((set, get) => ({
   loaded: false,
   grantStatus: 'unknown',
   items: [],
@@ -74,6 +101,10 @@ export const useInbox = create<InboxState & InboxActions>((set) => ({
       logDebug('inbox:refresh-grant-error', e instanceof Error ? e.message : String(e));
     }
   },
+
+  resolve: async (id, payload) => applyGesture(set, get, 'resolve', id, payload),
+
+  answer: async (id, payload) => applyGesture(set, get, 'answer', id, payload),
 
   clear: async () => {
     const db = await getDb();

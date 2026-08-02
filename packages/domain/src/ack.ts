@@ -1,0 +1,55 @@
+// The acks stream: inbox gestures (resolve a proposal / answer a question) queued offline and
+// replayed against the hub, which dedups on clientActionId. Pure types + result classification.
+
+export type AckKind = 'resolve' | 'answer';
+
+export type ResolveAction = 'Approve' | 'Edit' | 'Dismiss';
+
+export interface ResolvePayload {
+  action: ResolveAction;
+  /** Full edited proposal payload; required when action is Edit. */
+  edits?: unknown;
+}
+
+export interface AnswerPayload {
+  answer?: string;
+  skip?: boolean;
+}
+
+export interface AckRequest {
+  kind: AckKind;
+  targetId: string;
+  clientActionId: string;
+  payload: ResolvePayload | AnswerPayload;
+}
+
+export type AckUploadResult = 'accepted' | 'permanent' | 'transient';
+
+/**
+ * Classify an upload outcome. 2xx applied (or replayed) → accepted. Other 4xx → permanent: the
+ * gesture is moot server-side (resolved elsewhere, expired, malformed) — drop it and let the next
+ * inbox refresh show the truth. 401/408/429/5xx/network → transient, keep for retry.
+ */
+export function classifyAckStatus(httpStatus: number): AckUploadResult {
+  if (httpStatus >= 200 && httpStatus < 300) return 'accepted';
+  if (httpStatus === 401 || httpStatus === 408 || httpStatus === 429) return 'transient';
+  if (httpStatus >= 400 && httpStatus < 500) return 'permanent';
+  return 'transient';
+}
+
+/** Defensive parse of a stored payload_json; null = unreadable (treat as permanent). */
+export function parseAckPayload(kind: AckKind, json: string): ResolvePayload | AnswerPayload | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    return null;
+  }
+  if (typeof parsed !== 'object' || parsed === null) return null;
+  if (kind === 'resolve') {
+    const action = (parsed as Record<string, unknown>).action;
+    if (action !== 'Approve' && action !== 'Edit' && action !== 'Dismiss') return null;
+    return parsed as ResolvePayload;
+  }
+  return parsed as AnswerPayload;
+}

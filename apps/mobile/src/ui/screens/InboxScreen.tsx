@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useInbox, type GrantStatus } from '../../state/inbox-store';
 import { useAuth } from '../../state/auth-store';
 import { launchConnect } from '../../data/auth/connect';
@@ -70,24 +70,84 @@ export function InboxScreen() {
           <Text style={styles.emptyHint}>When the assistant has something for you, it shows up here.</Text>
         </View>
       ) : (
-        items.map((item) => <ItemCard key={item.id} item={item} c={c} />)
+        items.map((item) =>
+          item.kind === 'question' ? (
+            <QuestionCard key={item.id} item={item} c={c} />
+          ) : (
+            <ProposalCard key={item.id} item={item} c={c} />
+          ),
+        )
       )}
 
-      <Text style={styles.footnote}>Approve, edit, or dismiss in Telegram.</Text>
+      <Text style={styles.footnote}>Gestures queue offline and sync when connected.</Text>
     </ScrollView>
   );
 }
 
-function ItemCard({ item, c }: { item: InboxItemView; c: Palette }) {
+function ItemHeader({ item, c }: { item: InboxItemView; c: Palette }) {
   const styles = useMemo(() => makeStyles(c), [c]);
   return (
-    <View style={styles.card}>
+    <>
       <View style={styles.itemHeader}>
         <Text style={styles.kind}>{item.kind.toUpperCase()}</Text>
         <Text style={styles.when}>{new Date(item.createdAt).toLocaleString()}</Text>
       </View>
       <Text style={styles.title}>{item.title}</Text>
       {item.summary ? <Text style={styles.summary}>{item.summary}</Text> : null}
+    </>
+  );
+}
+
+function ProposalCard({ item, c }: { item: InboxItemView; c: Palette }) {
+  const styles = useMemo(() => makeStyles(c), [c]);
+  return (
+    <View style={styles.card}>
+      <ItemHeader item={item} c={c} />
+      <View style={styles.actions}>
+        <Button
+          title="Approve"
+          onPress={() => void useInbox.getState().resolve(item.id, { action: 'Approve' })}
+          style={styles.actionBtn}
+        />
+        <Button
+          title="Dismiss"
+          variant="destructive"
+          onPress={() => void useInbox.getState().resolve(item.id, { action: 'Dismiss' })}
+          style={styles.actionBtn}
+        />
+      </View>
+    </View>
+  );
+}
+
+function QuestionCard({ item, c }: { item: InboxItemView; c: Palette }) {
+  const styles = useMemo(() => makeStyles(c), [c]);
+  const [answer, setAnswer] = useState('');
+  return (
+    <View style={styles.card}>
+      <ItemHeader item={item} c={c} />
+      <TextInput
+        style={styles.answerInput}
+        value={answer}
+        onChangeText={setAnswer}
+        placeholder="Your answer…"
+        placeholderTextColor={c.textMuted}
+        multiline
+      />
+      <View style={styles.actions}>
+        <Button
+          title="Answer"
+          disabled={answer.trim().length === 0}
+          onPress={() => void useInbox.getState().answer(item.id, { answer: answer.trim() })}
+          style={styles.actionBtn}
+        />
+        <Button
+          title="Skip"
+          variant="secondary"
+          onPress={() => void useInbox.getState().answer(item.id, { skip: true })}
+          style={styles.actionBtn}
+        />
+      </View>
     </View>
   );
 }
@@ -108,6 +168,16 @@ const makeStyles = (c: Palette) => {
     when: { ...t.mono },
     title: { ...t.body, fontWeight: '600' },
     summary: { ...t.small },
+    actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
+    actionBtn: { flex: 1 },
+    answerInput: {
+      ...t.body,
+      backgroundColor: c.bg,
+      borderRadius: radii.md,
+      padding: spacing.sm,
+      minHeight: 44,
+      color: c.text,
+    },
     footnote: { ...t.hint, textAlign: 'center', marginTop: spacing.md },
   });
 };

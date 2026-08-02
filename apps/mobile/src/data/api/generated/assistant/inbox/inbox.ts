@@ -6,8 +6,11 @@
  * OpenAPI spec version: v1
  */
 import type {
+  AckResponse,
+  AnswerCheckInRequest,
   GetInboxParams,
-  InboxResponse
+  InboxResponse,
+  ResolveProposalRequest
 } from '../models';
 
 import { apiFetchAssistant } from '../../../mutators';
@@ -62,6 +65,122 @@ export const getInbox = async (params?: GetInboxParams, options?: Parameters<typ
     method: 'GET'
 
 
+  }
+);}
+
+
+export type postProposalsIdResolveResponse200 = {
+  data: AckResponse
+  status: 200
+}
+
+export type postProposalsIdResolveResponse400 = {
+  data: string
+  status: 400
+}
+
+export type postProposalsIdResolveResponse401 = {
+  data: void
+  status: 401
+}
+
+export type postProposalsIdResolveResponse404 = {
+  data: void
+  status: 404
+}
+
+export type postProposalsIdResolveResponse409 = {
+  data: void
+  status: 409
+}
+
+export type postProposalsIdResolveResponseSuccess = (postProposalsIdResolveResponse200) & {
+  headers: Headers;
+};
+export type postProposalsIdResolveResponseError = (postProposalsIdResolveResponse400 | postProposalsIdResolveResponse401 | postProposalsIdResolveResponse404 | postProposalsIdResolveResponse409) & {
+  headers: Headers;
+};
+
+export type postProposalsIdResolveResponse = (postProposalsIdResolveResponseSuccess | postProposalsIdResolveResponseError)
+
+export const getPostProposalsIdResolveUrl = (id: string,) => {
+
+
+
+
+  return `/api/assistant/proposals/${id}/resolve`
+}
+
+/**
+ * @summary Approve, edit, or dismiss a pending proposal. Idempotent on clientActionId.
+ */
+export const postProposalsIdResolve = async (id: string,
+    resolveProposalRequest: ResolveProposalRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postProposalsIdResolveResponse> => {
+
+  return apiFetchAssistant<postProposalsIdResolveResponse>(getPostProposalsIdResolveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(resolveProposalRequest)
+  }
+);}
+
+
+export type postCheckinsIdAnswerResponse200 = {
+  data: AckResponse
+  status: 200
+}
+
+export type postCheckinsIdAnswerResponse400 = {
+  data: string
+  status: 400
+}
+
+export type postCheckinsIdAnswerResponse401 = {
+  data: void
+  status: 401
+}
+
+export type postCheckinsIdAnswerResponse404 = {
+  data: void
+  status: 404
+}
+
+export type postCheckinsIdAnswerResponse409 = {
+  data: void
+  status: 409
+}
+
+export type postCheckinsIdAnswerResponseSuccess = (postCheckinsIdAnswerResponse200) & {
+  headers: Headers;
+};
+export type postCheckinsIdAnswerResponseError = (postCheckinsIdAnswerResponse400 | postCheckinsIdAnswerResponse401 | postCheckinsIdAnswerResponse404 | postCheckinsIdAnswerResponse409) & {
+  headers: Headers;
+};
+
+export type postCheckinsIdAnswerResponse = (postCheckinsIdAnswerResponseSuccess | postCheckinsIdAnswerResponseError)
+
+export const getPostCheckinsIdAnswerUrl = (id: string,) => {
+
+
+
+
+  return `/api/assistant/checkins/${id}/answer`
+}
+
+/**
+ * @summary Answer or skip an open question. Idempotent on clientActionId.
+ */
+export const postCheckinsIdAnswer = async (id: string,
+    answerCheckInRequest: AnswerCheckInRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postCheckinsIdAnswerResponse> => {
+
+  return apiFetchAssistant<postCheckinsIdAnswerResponse>(getPostCheckinsIdAnswerUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(answerCheckInRequest)
   }
 );}
 

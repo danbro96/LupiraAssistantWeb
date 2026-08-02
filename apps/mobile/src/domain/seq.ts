@@ -1,7 +1,8 @@
-// Three independent telemetry streams, each with its own monotonic seq.
-export type Stream = 'location' | 'ring' | 'summaries';
+// Independent offline streams, each with its own monotonic seq: three telemetry uploads plus the
+// inbox acks queue (resolve/answer gestures).
+export type Stream = 'location' | 'ring' | 'summaries' | 'acks';
 
-export const STREAMS: readonly Stream[] = ['location', 'ring', 'summaries'];
+export const STREAMS: readonly Stream[] = ['location', 'ring', 'summaries', 'acks'];
 
 // seq is gap-tolerant server-side, so simple increment is enough.
 export function nextSeq(current: number): number {

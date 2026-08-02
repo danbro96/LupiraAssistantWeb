@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS seq_counter (
   stream   TEXT PRIMARY KEY,
   last_seq INTEGER NOT NULL DEFAULT 0
 );
-INSERT OR IGNORE INTO seq_counter (stream, last_seq) VALUES ('location', 0), ('ring', 0), ('summaries', 0);
+INSERT OR IGNORE INTO seq_counter (stream, last_seq) VALUES ('location', 0), ('ring', 0), ('summaries', 0), ('acks', 0);
 
 -- Location buffer. seq == the device-assigned monotonic seq (also the local PK).
 CREATE TABLE IF NOT EXISTS pending_fixes (
@@ -81,6 +81,17 @@ CREATE TABLE IF NOT EXISTS sync_state (
 CREATE TABLE IF NOT EXISTS collector_meta (
   k TEXT PRIMARY KEY,
   v TEXT NOT NULL
+);
+
+-- Inbox gesture queue (acks stream): resolve/answer actions replayed to the hub, which dedups on
+-- client_action_id. Accepted and permanently-rejected rows are deleted; transients stay for retry.
+CREATE TABLE IF NOT EXISTS pending_acks (
+  seq              INTEGER PRIMARY KEY,
+  kind             TEXT    NOT NULL,        -- 'resolve' | 'answer'
+  target_id        TEXT    NOT NULL,        -- approval / check-in id
+  client_action_id TEXT    NOT NULL,
+  payload_json     TEXT    NOT NULL,
+  created_at       INTEGER NOT NULL
 );
 
 -- Read-only Inbox cache: the whole last assistant-api feed stored as one JSON blob so the screen renders offline.
