@@ -8,12 +8,12 @@ import { defineConfig } from 'orval';
  * the `Ingest` tags authenticate with the device key, everything else with the OIDC bearer, and Orval
  * binds one mutator per target. Specs come from `npm run fetch:openapi`.
  */
-const output = (dir: string, mutator: string) => ({
+const output = (dir: string, mutator: string, baseUrl = '') => ({
   target: `./src/data/api/generated/${dir}/api.ts`,
   schemas: `./src/data/api/generated/${dir}/models`,
   client: 'fetch' as const,
   mode: 'tags-split' as const,
-  baseUrl: '',
+  baseUrl,
   clean: true,
   override: { mutator: { path: './src/data/api/mutators.ts', name: mutator } },
 });
@@ -35,8 +35,9 @@ export default defineConfig({
     input: { target: './backend-health-openapi.json', filters: { tags: ['Me', 'HealthRecords'] } },
     output: output('health', 'apiFetchHealth'),
   },
+  // The assistant surface rides the BFF: one origin, the /api/assistant prefix picks the upstream.
   assistant: {
     input: { target: './backend-assistant-openapi.json', filters: { tags: ['Auth', 'Profile'] } },
-    output: output('assistant', 'apiFetchAssistant'),
+    output: output('assistant', 'apiFetchAssistant', '/api/assistant'),
   },
 });

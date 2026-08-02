@@ -5,10 +5,14 @@
  * The assistant hub/brain for Lupira: fire intake, agent runs, consent, and on-behalf-of writes. Authenticate with a Bearer token issued by Authentik.
  * OpenAPI spec version: v1
  */
+import type {
+  AuthStatusResponse
+} from '../models';
+
 import { apiFetchAssistant } from '../../../mutators';
 
 export type getAuthStatusResponse200 = {
-  data: void
+  data: AuthStatusResponse
   status: 200
 }
 
@@ -24,7 +28,7 @@ export const getGetAuthStatusUrl = () => {
 
 
 
-  return `/auth/status`
+  return `/api/assistant/auth/status`
 }
 
 export const getAuthStatus = async ( options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getAuthStatusResponse> => {

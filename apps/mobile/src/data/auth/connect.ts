@@ -11,10 +11,11 @@ import { logDebug } from '../../debug/log';
 /** Return deep link the hub redirects to when enrollment completes. */
 export const CONNECT_RETURN_URL = `${OIDC_SCHEME}://connected`;
 
-// TODO(hub-spec): finalize the /connect path + query contract (return_uri name, state/PKCE) with assistant-api.
+// The hub's hosted enrollment, reached through the BFF. return_uri must be on the hub's allowlist
+// (Auth:Offline:AllowedReturnUris); /auth/done 302s back to it when the grant is captured.
 function connectUrl(assistantApiUrl: string): string {
   const ret = encodeURIComponent(CONNECT_RETURN_URL);
-  return `${joinUrl(assistantApiUrl, '/connect')}?return_uri=${ret}`;
+  return `${joinUrl(assistantApiUrl, '/api/assistant/auth/login')}?return_uri=${ret}`;
 }
 
 export type ConnectResult = 'returned' | 'dismissed';

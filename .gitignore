@@ -5,9 +5,13 @@ node_modules/
 .expo/
 dist/
 web-build/
-/android
-/ios
+apps/mobile/android/
+apps/mobile/ios/
 expo-env.d.ts
+
+# .NET
+bin/
+obj/
 
 # Native
 *.orig.*

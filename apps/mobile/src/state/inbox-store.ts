@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 import { getDb } from '../data/db/db';
 import { getCache, clearCache } from '../data/db/inbox-cache-repo';
+import { getAuthStatus } from '../data/api/generated/assistant/auth/auth';
 import { parseCachedInbox, type InboxItemView } from '@lupira/assistant-domain/inbox-item';
 import { logDebug } from '../debug/log';
 
-// The assistant surface store. P0 is read-only: it renders the last cached feed and the on-behalf-of
-// grant status. The live fetch (refresh/refreshGrant) is wired against the generated assistant-api
-// client once the hub publishes its OpenAPI — see TODO(hub-spec) below.
+// The assistant surface store: the last cached feed plus the on-behalf-of grant status (live via the
+// BFF). The feed fetch is wired against the hub's /inbox — see refresh().
 
-/** Server-truth, read via GET /me; `unknown` until that endpoint exists. */
+/** Server-truth, read via GET /auth/status; `unknown` until the first successful read. */
 export type GrantStatus = 'connected' | 'reauth-needed' | 'unknown';
 
 interface InboxState {
@@ -55,8 +55,14 @@ export const useInbox = create<InboxState & InboxActions>((set) => ({
   },
 
   refreshGrant: async () => {
-    // TODO(hub-spec): GET /me via the generated assistant client → set grantStatus.
-    logDebug('inbox:refresh-grant', 'skipped — assistant-api OpenAPI not published yet');
+    try {
+      const res = await getAuthStatus();
+      const grant = res.data;
+      set({ grantStatus: grant.hasGrant && grant.status === 'Active' ? 'connected' : 'reauth-needed' });
+    } catch (e) {
+      // Offline or unauthenticated: keep the last known status rather than flashing the reconnect card.
+      logDebug('inbox:refresh-grant-error', e instanceof Error ? e.message : String(e));
+    }
   },
 
   clear: async () => {

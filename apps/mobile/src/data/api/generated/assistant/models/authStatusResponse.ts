@@ -6,7 +6,9 @@
  * OpenAPI spec version: v1
  */
 
-export * from './authStatusResponse';
-export * from './profileResponse';
-export * from './routingResponse';
-export * from './routingUpdateRequest';
+export interface AuthStatusResponse {
+  hasGrant: boolean;
+  /** @nullable */
+  status?: string | null;
+  audiences: string[];
+}

@@ -1,0 +1,24 @@
+# Genericized public example — the authoritative deploy config lives in the DevOps repo
+# (WebApps/lupira-assistant-web). No LAN addresses here; point the clusters at your own hosts.
+services:
+  assistant-web:
+    image: danbro96/lupira-assistant-web:${IMAGE_TAG:-latest}
+    container_name: lupira-assistant-web
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Auth__Bearer__Authority: ${AUTH_AUTHORITY:?required}          # e.g. https://auth.example.com/application/o/assistant/
+      Auth__Bearer__Audience: ${AUTH_AUDIENCE:-lupira-assistant}
+      ReverseProxy__Clusters__assistant-api__Destinations__primary__Address: ${ASSISTANT_API_BASE_URL:?required}
+      ReverseProxy__Clusters__comms-api__Destinations__primary__Address: ${COMMS_API_BASE_URL:?required}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-http/protobuf}
+      OTEL_METRIC_EXPORT_INTERVAL: ${OTEL_METRIC_EXPORT_INTERVAL:-300000}
+      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_RESOURCE_ATTRIBUTES:-deployment.environment=prod}
+    ports:
+      - "${ASSISTANT_WEB_PORT:-8080}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/livez || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped

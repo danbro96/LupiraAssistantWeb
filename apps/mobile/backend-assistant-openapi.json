@@ -6,6 +6,32 @@
     "version": "v1"
   },
   "paths": {
+    "/pingz": {
+      "get": {
+        "tags": [
+          "Ping"
+        ],
+        "summary": "Authenticated claims echo for dependency probes; resolves nothing, writes nothing.",
+        "operationId": "Ping",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/fires": {
       "post": {
         "tags": [
@@ -109,7 +135,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStatusResponse"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -198,6 +231,30 @@
           "RunJob",
           "Rescore"
         ]
+      },
+      "AuthStatusResponse": {
+        "required": [
+          "hasGrant",
+          "audiences"
+        ],
+        "type": "object",
+        "properties": {
+          "hasGrant": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "audiences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "CalendarClass": {
         "enum": [
@@ -476,6 +533,30 @@
           "None"
         ]
       },
+      "PingDto": {
+        "required": [
+          "subject",
+          "audiences"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "audiences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -730,6 +811,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Ping"
+    },
     {
       "name": "Intake"
     },

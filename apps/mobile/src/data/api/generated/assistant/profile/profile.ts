@@ -36,7 +36,7 @@ export const getGetMeProfileUrl = () => {
 
 
 
-  return `/me/profile`
+  return `/api/assistant/me/profile`
 }
 
 /**
@@ -78,7 +78,7 @@ export const getPutMeProfileRoutingUrl = () => {
 
 
 
-  return `/me/profile/routing`
+  return `/api/assistant/me/profile/routing`
 }
 
 /**
