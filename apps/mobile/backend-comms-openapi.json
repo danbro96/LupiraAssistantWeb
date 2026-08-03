@@ -1,0 +1,925 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Lupira Comms API",
+    "description": "The comms substrate for Lupira: message ingestion, a per-user corpus, semantic topic segmentation, and closed-topic delivery to the assistant. Authenticate with a Bearer token issued by Authentik (owner surface) or service auth (internal hops).",
+    "version": "v1"
+  },
+  "paths": {
+    "/pingz": {
+      "get": {
+        "tags": [
+          "Ping"
+        ],
+        "summary": "Authenticated claims echo for dependency probes; resolves nothing, writes nothing.",
+        "operationId": "Ping",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/ingest": {
+      "post": {
+        "tags": [
+          "Ingest"
+        ],
+        "summary": "Accept a captured message from a connector sidecar (accept-then-own).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestAcceptedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/search": {
+      "get": {
+        "tags": [
+          "Archive"
+        ],
+        "summary": "Hybrid research search over the corpus (semantic + full-text, reranked).",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/MessageSource"
+            }
+          },
+          {
+            "name": "participant",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversationId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "principalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArchiveSearchHitDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/topics": {
+      "get": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "List topics by status (poll alternative to closed-topic push).",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "principalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TopicSummaryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/topics/{id}": {
+      "get": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "Get a topic with its ordered message window (open-topic tail).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "principalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/conversations": {
+      "get": {
+        "tags": [
+          "Archive"
+        ],
+        "summary": "List conversations, newest activity first (title filter, cursor-paged).",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/MessageSource"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "principalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/conversations/{id}/messages": {
+      "get": {
+        "tags": [
+          "Archive"
+        ],
+        "summary": "A chat-style thread page: latest, before/after an anchor, or around one (search-hit jump).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "around",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "principalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationMessagesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ArchiveSearchHitDto": {
+        "required": [
+          "messageId",
+          "conversationId",
+          "timestamp",
+          "source",
+          "text",
+          "score"
+        ],
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "conversationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "conversationTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "$ref": "#/components/schemas/MessageSource"
+          },
+          "text": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ConversationMessageDto": {
+        "required": [
+          "id",
+          "fromPrincipal",
+          "timestamp",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fromPrincipal": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "ConversationMessagesResponse": {
+        "required": [
+          "conversationId",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversationMessageDto"
+            }
+          }
+        }
+      },
+      "ConversationsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversationSummaryDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "ConversationSummaryDto": {
+        "required": [
+          "id",
+          "source",
+          "lastMessageAt",
+          "messageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "$ref": "#/components/schemas/MessageSource"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "messageCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "IngestAcceptedResponse": {
+        "required": [
+          "messageId",
+          "duplicate"
+        ],
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "duplicate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IngestMessageRequest": {
+        "required": [
+          "principalId",
+          "source",
+          "sourceRef",
+          "text",
+          "timestamp",
+          "conversationRef"
+        ],
+        "type": "object",
+        "properties": {
+          "principalId": {
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/MessageSource"
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "conversationRef": {
+            "type": "string"
+          },
+          "conversationTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "senderRef": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "senderName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fromPrincipal": {
+            "type": "boolean"
+          },
+          "importBatch": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "attachmentPath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "MessageSource": {
+        "enum": [
+          "Telegram",
+          "Facebook",
+          "Email"
+        ]
+      },
+      "PingDto": {
+        "required": [
+          "subject",
+          "audiences"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "audiences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TopicDetailDto": {
+        "required": [
+          "id",
+          "label",
+          "status",
+          "lastActivity",
+          "messages"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TopicStatus"
+          },
+          "lastActivity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopicMessageDto"
+            }
+          }
+        }
+      },
+      "TopicMessageDto": {
+        "required": [
+          "id",
+          "timestamp",
+          "text",
+          "sourceRef"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fromPrincipal": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          }
+        }
+      },
+      "TopicStatus": {
+        "enum": [
+          "Open",
+          "Closed",
+          "Released"
+        ]
+      },
+      "TopicSummaryDto": {
+        "required": [
+          "id",
+          "label",
+          "status",
+          "lastActivity",
+          "messageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TopicStatus"
+          },
+          "lastActivity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "messageCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "releasedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "OIDC bearer token. Send as `Authorization: Bearer <token>`.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Ping"
+    },
+    {
+      "name": "Ingest"
+    },
+    {
+      "name": "Archive"
+    },
+    {
+      "name": "Topics"
+    }
+  ]
+}

@@ -17,6 +17,7 @@ const SPECS = [
   { api: 'LupiraLocationApi', out: 'backend-location-openapi.json' },
   { api: 'LupiraHealthApi', out: 'backend-health-openapi.json' },
   { api: 'LupiraAssistantApi', out: 'backend-assistant-openapi.json' },
+  { api: 'LupiraCommsApi', out: 'backend-comms-openapi.json' },
 ];
 
 let failed = false;

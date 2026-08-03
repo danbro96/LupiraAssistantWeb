@@ -1,6 +1,16 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
+/** The tabs the user lives in: the assistant's queue, and the comms archive. */
+export type TabParamList = {
+  InboxTab: undefined;
+  ArchiveTab: undefined;
+};
+
 export type RootStackParamList = {
   RegisterDevice: undefined;
-  Inbox: undefined;
+  Tabs: NavigatorScreenParams<TabParamList>;
   Settings: undefined;
   EditProposal: { itemId: string };
+  Conversations: undefined;
+  Thread: { conversationId: string; aroundMessageId?: string };
 };

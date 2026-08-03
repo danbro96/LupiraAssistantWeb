@@ -35,9 +35,13 @@ export default defineConfig({
     input: { target: './backend-health-openapi.json', filters: { tags: ['Me', 'HealthRecords'] } },
     output: output('health', 'apiFetchHealth'),
   },
-  // The assistant surface rides the BFF: one origin, the /api/assistant prefix picks the upstream.
+  // The assistant + comms surfaces ride one BFF origin; the path prefix picks the upstream.
   assistant: {
     input: { target: './backend-assistant-openapi.json', filters: { tags: ['Auth', 'Profile', 'Inbox'] } },
     output: output('assistant', 'apiFetchAssistant', '/api/assistant'),
+  },
+  comms: {
+    input: { target: './backend-comms-openapi.json', filters: { tags: ['Archive', 'Topics'] } },
+    output: output('comms', 'apiFetchAssistant', '/api/comms'),
   },
 });
