@@ -409,6 +409,81 @@
           }
         ]
       }
+    },
+    "/push-tokens": {
+      "post": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Register this device's Expo push token (idempotent on the token).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPushTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/push-tokens/{token}": {
+      "delete": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Drop a push token (logout).",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1306,6 +1381,12 @@
           "Report"
         ]
       },
+      "PushPlatform": {
+        "enum": [
+          "Android",
+          "Ios"
+        ]
+      },
       "Ref": {
         "required": [
           "kind",
@@ -1340,6 +1421,27 @@
           "Place",
           "External"
         ]
+      },
+      "RegisterPushTokenRequest": {
+        "required": [
+          "token",
+          "platform"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "platform": {
+            "$ref": "#/components/schemas/PushPlatform"
+          }
+        }
       },
       "ReplyDetail": {
         "type": "object",
@@ -1579,6 +1681,9 @@
     },
     {
       "name": "Profile"
+    },
+    {
+      "name": "Push"
     }
   ]
 }

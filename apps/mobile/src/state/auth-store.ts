@@ -4,6 +4,7 @@ import { DEFAULT_HEALTH_API_URL, DEFAULT_LOCATION_API_URL, DEFAULT_ASSISTANT_API
 import { SECURE_KEYS } from '../config/secure-keys';
 import { setOidcAuthPort, setDeviceKeyPort, type ApiBase } from '../data/api/auth-ports';
 import { refreshTokens, RefreshError } from '../data/auth/oidc';
+import { dropPushRegistration } from '../data/push/push-session';
 import { getApiKey } from '../data/secure/device-credentials';
 import { logDebug } from '../debug/log';
 import { toast } from '../feedback/toast';
@@ -120,6 +121,9 @@ export const useAuth = create<AuthState & AuthActions>((set, get) => ({
 
   clearSession: async (opts) => {
     if (opts?.reason === 'expired') toast('Session expired — please sign in again.');
+    // Drop the push token before the bearer goes: the hub call needs it, and a stale registry row
+    // would otherwise keep waking a signed-out device.
+    await dropPushRegistration();
     await Promise.all([
       SecureStore.deleteItemAsync(SECURE_KEYS.oidcToken),
       SecureStore.deleteItemAsync(SECURE_KEYS.oidcRefresh),

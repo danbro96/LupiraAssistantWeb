@@ -6,6 +6,9 @@ import * as Sentry from '@sentry/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme, DarkTheme, type Theme } from '@react-navigation/native';
 import { RootStack } from './src/ui/navigation/RootStack';
+import { navigationRef } from './src/ui/navigation/notification-routing';
+import { startNotificationHandling, handleLaunchNotice } from './src/ui/notifications';
+import { registerPushToken } from './src/data/push/push-registration';
 import { ToastHost } from './src/ui/components/ToastHost';
 import { useAuth } from './src/state/auth-store';
 import { useDevice } from './src/state/device-store';
@@ -63,9 +66,16 @@ function App() {
       await useCollector.getState().hydrate();
       await registerUploadTask();
       void kickSync({ resume: true, poll: true });
+      // Signed in → keep the hub's push registry current, then honor a cold-start notice tap.
+      if (useAuth.getState().isAuthenticated()) void registerPushToken();
+      void handleLaunchNotice();
     })();
     const stopTriggers = startSyncTriggers();
-    return stopTriggers;
+    const stopNotifications = startNotificationHandling();
+    return () => {
+      stopTriggers();
+      stopNotifications();
+    };
   }, []);
 
   if (!authLoaded || !deviceLoaded) return null;
@@ -76,7 +86,7 @@ function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <Sentry.ErrorBoundary fallback={<ErrorFallback palette={palette} />}>
-          <NavigationContainer theme={navTheme(scheme)}>
+          <NavigationContainer ref={navigationRef} theme={navTheme(scheme)}>
             <RootStack />
           </NavigationContainer>
         </Sentry.ErrorBoundary>

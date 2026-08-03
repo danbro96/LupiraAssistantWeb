@@ -37,7 +37,7 @@ export default defineConfig({
   },
   // The assistant + comms surfaces ride one BFF origin; the path prefix picks the upstream.
   assistant: {
-    input: { target: './backend-assistant-openapi.json', filters: { tags: ['Auth', 'Profile', 'Inbox'] } },
+    input: { target: './backend-assistant-openapi.json', filters: { tags: ['Auth', 'Profile', 'Inbox', 'Push'] } },
     output: output('assistant', 'apiFetchAssistant', '/api/assistant'),
   },
   comms: {
