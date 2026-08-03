@@ -7,12 +7,14 @@
  */
 
 export * from './archiveSearchHitDto';
+export * from './connectorStatusDto';
 export * from './conversationMessageDto';
 export * from './conversationMessagesResponse';
 export * from './conversationsResponse';
 export * from './conversationSummaryDto';
 export * from './getConversationsIdMessagesParams';
 export * from './getConversationsParams';
+export * from './getMeConnectorsParams';
 export * from './getSearchParams';
 export * from './getTopicsIdParams';
 export * from './getTopicsParams';

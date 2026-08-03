@@ -475,6 +475,80 @@
         ]
       }
     },
+    "/me/preferences": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Get delivery preferences (per-item vs digest, quiet hours).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Set delivery preferences. Quiet hours suppress the push only — items still land in the inbox.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/push-tokens": {
       "post": {
         "tags": [
@@ -765,6 +839,12 @@
             ]
           }
         }
+      },
+      "DeliveryMode": {
+        "enum": [
+          "PerItem",
+          "Digest"
+        ]
       },
       "EventProposal": {
         "type": "object",
@@ -1238,6 +1318,68 @@
             "format": "double"
           },
           "formattedAddress": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PreferencesResponse": {
+        "required": [
+          "mode"
+        ],
+        "type": "object",
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/DeliveryMode"
+          },
+          "quietHoursStart": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quietHoursEnd": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PreferencesUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DeliveryMode"
+              }
+            ]
+          },
+          "quietHoursStart": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quietHoursEnd": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "timeZone": {
             "type": [
               "null",
               "string"

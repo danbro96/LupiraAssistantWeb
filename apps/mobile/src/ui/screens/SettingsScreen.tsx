@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { useDevice } from '../../state/device-store';
 import { useCollector } from '../../state/collector-store';
 import { useSyncStatus, refreshSyncStatus } from '../../sync/sync-status';
@@ -15,6 +18,7 @@ import { toast } from '../../feedback/toast';
 export function SettingsScreen() {
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const device = useDevice();
   const collector = useCollector();
@@ -140,6 +144,18 @@ export function SettingsScreen() {
           variant="secondary"
           onPress={() => void onConnect()}
           loading={connecting}
+          style={styles.btn}
+        />
+        <Button
+          title="Notifications"
+          variant="secondary"
+          onPress={() => navigation.navigate('Preferences')}
+          style={styles.btn}
+        />
+        <Button
+          title="Sources"
+          variant="secondary"
+          onPress={() => navigation.navigate('Connectors')}
           style={styles.btn}
         />
       </View>

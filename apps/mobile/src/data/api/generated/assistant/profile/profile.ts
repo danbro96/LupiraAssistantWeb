@@ -6,6 +6,8 @@
  * OpenAPI spec version: v1
  */
 import type {
+  PreferencesResponse,
+  PreferencesUpdateRequest,
   ProfileResponse,
   RoutingUpdateRequest
 } from '../models';
@@ -92,6 +94,95 @@ export const putMeProfileRouting = async (routingUpdateRequest: RoutingUpdateReq
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(routingUpdateRequest)
+  }
+);}
+
+
+export type getMePreferencesResponse200 = {
+  data: PreferencesResponse
+  status: 200
+}
+
+export type getMePreferencesResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getMePreferencesResponseSuccess = (getMePreferencesResponse200) & {
+  headers: Headers;
+};
+export type getMePreferencesResponseError = (getMePreferencesResponse401) & {
+  headers: Headers;
+};
+
+export type getMePreferencesResponse = (getMePreferencesResponseSuccess | getMePreferencesResponseError)
+
+export const getGetMePreferencesUrl = () => {
+
+
+
+
+  return `/api/assistant/me/preferences`
+}
+
+/**
+ * @summary Get delivery preferences (per-item vs digest, quiet hours).
+ */
+export const getMePreferences = async ( options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getMePreferencesResponse> => {
+
+  return apiFetchAssistant<getMePreferencesResponse>(getGetMePreferencesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type putMePreferencesResponse200 = {
+  data: PreferencesResponse
+  status: 200
+}
+
+export type putMePreferencesResponse400 = {
+  data: string
+  status: 400
+}
+
+export type putMePreferencesResponse401 = {
+  data: void
+  status: 401
+}
+
+export type putMePreferencesResponseSuccess = (putMePreferencesResponse200) & {
+  headers: Headers;
+};
+export type putMePreferencesResponseError = (putMePreferencesResponse400 | putMePreferencesResponse401) & {
+  headers: Headers;
+};
+
+export type putMePreferencesResponse = (putMePreferencesResponseSuccess | putMePreferencesResponseError)
+
+export const getPutMePreferencesUrl = () => {
+
+
+
+
+  return `/api/assistant/me/preferences`
+}
+
+/**
+ * @summary Set delivery preferences. Quiet hours suppress the push only — items still land in the inbox.
+ */
+export const putMePreferences = async (preferencesUpdateRequest: PreferencesUpdateRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<putMePreferencesResponse> => {
+
+  return apiFetchAssistant<putMePreferencesResponse>(getPutMePreferencesUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(preferencesUpdateRequest)
   }
 );}
 

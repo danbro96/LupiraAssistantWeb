@@ -9,6 +9,8 @@ import { EditProposalScreen } from '../screens/EditProposalScreen';
 import { ArchiveSearchScreen } from '../screens/ArchiveSearchScreen';
 import { ConversationsScreen } from '../screens/ConversationsScreen';
 import { ThreadScreen } from '../screens/ThreadScreen';
+import { ConnectorsScreen } from '../screens/ConnectorsScreen';
+import { PreferencesScreen } from '../screens/PreferencesScreen';
 import { useDevice } from '../../state/device-store';
 import { HIT_SLOP, useColors } from '../theme';
 import type { RootStackParamList, TabParamList } from './types';
@@ -30,6 +32,8 @@ export function RootStack() {
           <Stack.Screen name="EditProposal" component={EditProposalScreen} options={{ title: 'Edit proposal' }} />
           <Stack.Screen name="Conversations" component={ConversationsScreen} options={{ title: 'Conversations' }} />
           <Stack.Screen name="Thread" component={ThreadScreen} options={{ title: 'Thread' }} />
+          <Stack.Screen name="Connectors" component={ConnectorsScreen} options={{ title: 'Sources' }} />
+          <Stack.Screen name="Preferences" component={PreferencesScreen} options={{ title: 'Notifications' }} />
         </>
       ) : (
         <Stack.Screen name="RegisterDevice" component={RegisterDeviceScreen} options={{ headerShown: false }} />

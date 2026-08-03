@@ -13,4 +13,6 @@ export type RootStackParamList = {
   EditProposal: { itemId: string };
   Conversations: undefined;
   Thread: { conversationId: string; aroundMessageId?: string };
+  Connectors: undefined;
+  Preferences: undefined;
 };

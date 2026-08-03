@@ -193,6 +193,53 @@
         ]
       }
     },
+    "/me/connectors": {
+      "get": {
+        "tags": [
+          "Archive"
+        ],
+        "summary": "Capture status per source: granted connectors, message count, last arrival.",
+        "parameters": [
+          {
+            "name": "principalId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/topics": {
       "get": {
         "tags": [
@@ -528,6 +575,36 @@
           "score": {
             "type": "number",
             "format": "double"
+          }
+        }
+      },
+      "ConnectorStatusDto": {
+        "required": [
+          "source",
+          "connectors",
+          "messageCount"
+        ],
+        "type": "object",
+        "properties": {
+          "source": {
+            "$ref": "#/components/schemas/MessageSource"
+          },
+          "connectors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "messageCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastMessageAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },

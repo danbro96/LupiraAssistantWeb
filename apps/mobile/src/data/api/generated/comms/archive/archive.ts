@@ -7,10 +7,12 @@
  */
 import type {
   ArchiveSearchHitDto,
+  ConnectorStatusDto,
   ConversationMessagesResponse,
   ConversationsResponse,
   GetConversationsIdMessagesParams,
   GetConversationsParams,
+  GetMeConnectorsParams,
   GetSearchParams,
   ProblemDetails
 } from '../models';
@@ -62,6 +64,55 @@ export const getGetSearchUrl = (params?: GetSearchParams,) => {
 export const getSearch = async (params?: GetSearchParams, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getSearchResponse> => {
 
   return apiFetchAssistant<getSearchResponse>(getGetSearchUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type getMeConnectorsResponse200 = {
+  data: ConnectorStatusDto[]
+  status: 200
+}
+
+export type getMeConnectorsResponse400 = {
+  data: ProblemDetails
+  status: 400
+}
+
+export type getMeConnectorsResponseSuccess = (getMeConnectorsResponse200) & {
+  headers: Headers;
+};
+export type getMeConnectorsResponseError = (getMeConnectorsResponse400) & {
+  headers: Headers;
+};
+
+export type getMeConnectorsResponse = (getMeConnectorsResponseSuccess | getMeConnectorsResponseError)
+
+export const getGetMeConnectorsUrl = (params?: GetMeConnectorsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/comms/me/connectors?${stringifiedParams}` : `/api/comms/me/connectors`
+}
+
+/**
+ * @summary Capture status per source: granted connectors, message count, last arrival.
+ */
+export const getMeConnectors = async (params?: GetMeConnectorsParams, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getMeConnectorsResponse> => {
+
+  return apiFetchAssistant<getMeConnectorsResponse>(getGetMeConnectorsUrl(params),
   {
     ...options,
     method: 'GET'
