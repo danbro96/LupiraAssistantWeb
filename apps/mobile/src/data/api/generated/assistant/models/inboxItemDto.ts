@@ -15,5 +15,7 @@ export interface InboxItemDto {
   createdAt: string;
   /** @nullable */
   expiresAt?: string | null;
+  /** @nullable */
+  body?: string | null;
   proposal?: null | ProposalDetailDto;
 }

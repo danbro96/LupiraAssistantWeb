@@ -10,6 +10,7 @@ import type {
   AnswerCheckInRequest,
   GetInboxParams,
   InboxResponse,
+  ReadNoticeRequest,
   ResolveProposalRequest
 } from '../models';
 
@@ -181,6 +182,64 @@ export const postCheckinsIdAnswer = async (id: string,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(answerCheckInRequest)
+  }
+);}
+
+
+export type postNoticesIdReadResponse200 = {
+  data: AckResponse
+  status: 200
+}
+
+export type postNoticesIdReadResponse400 = {
+  data: string
+  status: 400
+}
+
+export type postNoticesIdReadResponse401 = {
+  data: void
+  status: 401
+}
+
+export type postNoticesIdReadResponse404 = {
+  data: void
+  status: 404
+}
+
+export type postNoticesIdReadResponse409 = {
+  data: void
+  status: 409
+}
+
+export type postNoticesIdReadResponseSuccess = (postNoticesIdReadResponse200) & {
+  headers: Headers;
+};
+export type postNoticesIdReadResponseError = (postNoticesIdReadResponse400 | postNoticesIdReadResponse401 | postNoticesIdReadResponse404 | postNoticesIdReadResponse409) & {
+  headers: Headers;
+};
+
+export type postNoticesIdReadResponse = (postNoticesIdReadResponseSuccess | postNoticesIdReadResponseError)
+
+export const getPostNoticesIdReadUrl = (id: string,) => {
+
+
+
+
+  return `/api/assistant/notices/${id}/read`
+}
+
+/**
+ * @summary Mark a notice read. Idempotent on clientActionId.
+ */
+export const postNoticesIdRead = async (id: string,
+    readNoticeRequest: ReadNoticeRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postNoticesIdReadResponse> => {
+
+  return apiFetchAssistant<postNoticesIdReadResponse>(getPostNoticesIdReadUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(readNoticeRequest)
   }
 );}
 

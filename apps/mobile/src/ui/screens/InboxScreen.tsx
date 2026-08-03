@@ -74,13 +74,11 @@ export function InboxScreen() {
           <Text style={styles.emptyHint}>When the assistant has something for you, it shows up here.</Text>
         </View>
       ) : (
-        items.map((item) =>
-          item.kind === 'question' ? (
-            <QuestionCard key={item.id} item={item} c={c} />
-          ) : (
-            <ProposalCard key={item.id} item={item} c={c} />
-          ),
-        )
+        items.map((item) => {
+          if (item.kind === 'question') return <QuestionCard key={item.id} item={item} c={c} />;
+          if (item.kind === 'notice') return <NoticeCard key={item.id} item={item} c={c} />;
+          return <ProposalCard key={item.id} item={item} c={c} />;
+        })
       )}
 
       <Text style={styles.footnote}>Gestures queue offline and sync when connected.</Text>
@@ -127,6 +125,23 @@ function ProposalCard({ item, c }: { item: InboxItemView; c: Palette }) {
           title="Dismiss"
           variant="destructive"
           onPress={() => void useInbox.getState().resolve(item.id, { action: 'Dismiss' })}
+          style={styles.actionBtn}
+        />
+      </View>
+    </View>
+  );
+}
+
+function NoticeCard({ item, c }: { item: InboxItemView; c: Palette }) {
+  const styles = useMemo(() => makeStyles(c), [c]);
+  return (
+    <View style={styles.card}>
+      <ItemHeader item={item} c={c} />
+      <View style={styles.actions}>
+        <Button
+          title="Got it"
+          variant="secondary"
+          onPress={() => void useInbox.getState().markRead(item.id)}
           style={styles.actionBtn}
         />
       </View>

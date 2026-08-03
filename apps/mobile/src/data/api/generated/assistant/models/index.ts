@@ -25,6 +25,7 @@ export * from './proposalDetailDto';
 export * from './proposalDetailDtoSources';
 export * from './proposedActionKind';
 export * from './pushPlatform';
+export * from './readNoticeRequest';
 export * from './ref';
 export * from './refKind';
 export * from './registerPushTokenRequest';

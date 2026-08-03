@@ -1,7 +1,7 @@
 // The acks stream: inbox gestures (resolve a proposal / answer a question) queued offline and
 // replayed against the hub, which dedups on clientActionId. Pure types + result classification.
 
-export type AckKind = 'resolve' | 'answer';
+export type AckKind = 'resolve' | 'answer' | 'read';
 
 export type ResolveAction = 'Approve' | 'Edit' | 'Dismiss';
 
@@ -16,11 +16,14 @@ export interface AnswerPayload {
   skip?: boolean;
 }
 
+/** Marking a notice read carries no fields of its own — the target id and action id say everything. */
+export type ReadPayload = Record<string, never>;
+
 export interface AckRequest {
   kind: AckKind;
   targetId: string;
   clientActionId: string;
-  payload: ResolvePayload | AnswerPayload;
+  payload: ResolvePayload | AnswerPayload | ReadPayload;
 }
 
 export type AckUploadResult = 'accepted' | 'permanent' | 'transient';
@@ -38,7 +41,10 @@ export function classifyAckStatus(httpStatus: number): AckUploadResult {
 }
 
 /** Defensive parse of a stored payload_json; null = unreadable (treat as permanent). */
-export function parseAckPayload(kind: AckKind, json: string): ResolvePayload | AnswerPayload | null {
+export function parseAckPayload(
+  kind: AckKind,
+  json: string,
+): ResolvePayload | AnswerPayload | ReadPayload | null {
   let parsed: unknown;
   try {
     parsed = JSON.parse(json);
@@ -51,5 +57,5 @@ export function parseAckPayload(kind: AckKind, json: string): ResolvePayload | A
     if (action !== 'Approve' && action !== 'Edit' && action !== 'Dismiss') return null;
     return parsed as ResolvePayload;
   }
-  return parsed as AnswerPayload;
+  return parsed as AnswerPayload | ReadPayload;
 }

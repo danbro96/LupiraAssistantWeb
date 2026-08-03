@@ -1,7 +1,10 @@
 import type { Db } from '../data/db/db';
 import { deleteAck, fetchPendingAcks } from '../data/db/pending-acks-repo';
-import { postProposalsIdResolve } from '../data/api/generated/assistant/inbox/inbox';
-import { postCheckinsIdAnswer } from '../data/api/generated/assistant/inbox/inbox';
+import {
+  postProposalsIdResolve,
+  postCheckinsIdAnswer,
+  postNoticesIdRead,
+} from '../data/api/generated/assistant/inbox/inbox';
 import type { ResolveProposalRequest, AnswerCheckInRequest } from '../data/api/generated/assistant/models';
 import { classifyAckStatus, parseAckPayload, type AnswerPayload, type ResolvePayload } from '@lupira/assistant-domain/ack';
 import { ApiError } from '../domain/api-error';
@@ -41,7 +44,7 @@ export async function runAckUpload(db: Db): Promise<AckUploadOutcome> {
           clientActionId: row.clientActionId,
         };
         await postProposalsIdResolve(row.targetId, body);
-      } else {
+      } else if (row.kind === 'answer') {
         const p = payload as AnswerPayload;
         const body: AnswerCheckInRequest = {
           answer: p.answer,
@@ -49,6 +52,8 @@ export async function runAckUpload(db: Db): Promise<AckUploadOutcome> {
           clientActionId: row.clientActionId,
         };
         await postCheckinsIdAnswer(row.targetId, body);
+      } else {
+        await postNoticesIdRead(row.targetId, { clientActionId: row.clientActionId });
       }
       await deleteAck(db, row.seq);
     } catch (e) {

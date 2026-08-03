@@ -2,9 +2,9 @@
 // directly; the cache stores already-mapped view-models. mapInboxResponse reads the hub's /inbox wire
 // shape defensively (structural, no generated types — this package stays dependency-free).
 
-export type InboxItemKind = 'proposal' | 'question';
+export type InboxItemKind = 'proposal' | 'question' | 'notice';
 
-const KINDS: readonly InboxItemKind[] = ['proposal', 'question'];
+const KINDS: readonly InboxItemKind[] = ['proposal', 'question', 'notice'];
 
 /** The proposal behind an approval card, kept for the edit form (payload records passthrough). */
 export interface ProposalView {
@@ -79,8 +79,9 @@ function mapWireItem(raw: unknown): InboxItemView | null {
   return {
     id: r.id,
     kind,
+    // A notice's body IS its detail; a proposal's is a digest of the payload.
+    summary: kind === 'proposal' ? proposalSummary(r.proposal) : typeof r.body === 'string' ? r.body : null,
     title: r.title,
-    summary: kind === 'proposal' ? proposalSummary(r.proposal) : null,
     createdAt: r.createdAt,
     expiresAt: typeof r.expiresAt === 'string' ? r.expiresAt : null,
     proposal: toProposalView(r.proposal),

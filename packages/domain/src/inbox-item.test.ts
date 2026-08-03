@@ -122,3 +122,36 @@ describe('proposalSummary', () => {
     expect(proposalSummary(undefined)).toBeNull();
   });
 });
+
+describe('notices', () => {
+  it('carries the body as the summary and needs no proposal', () => {
+    const [notice] = mapInboxResponse({
+      items: [
+        {
+          id: 'n1',
+          kind: 'Notice',
+          title: 'Leave in 20 minutes',
+          body: 'Dentist at 14:00 — 18 min drive.',
+          createdAt: '2026-08-02T13:40:00+00:00',
+        },
+      ],
+    });
+
+    expect(notice).toEqual({
+      id: 'n1',
+      kind: 'notice',
+      title: 'Leave in 20 minutes',
+      summary: 'Dentist at 14:00 — 18 min drive.',
+      createdAt: '2026-08-02T13:40:00+00:00',
+      expiresAt: null,
+      proposal: null,
+    });
+  });
+
+  it('survives a bodyless notice', () => {
+    const [notice] = mapInboxResponse({
+      items: [{ id: 'n2', kind: 'Notice', title: 'Package arrived', createdAt: '2026-08-02T13:40:00+00:00' }],
+    });
+    expect(notice.summary).toBeNull();
+  });
+});

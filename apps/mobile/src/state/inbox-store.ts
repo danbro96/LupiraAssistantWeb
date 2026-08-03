@@ -33,6 +33,8 @@ interface InboxActions {
   resolve: (id: string, payload: ResolvePayload) => Promise<void>;
   /** Answer or skip a question: optimistic remove + offline-safe enqueue on the acks stream. */
   answer: (id: string, payload: AnswerPayload) => Promise<void>;
+  /** Dismiss a notice (mark read): same optimistic + queued path. */
+  markRead: (id: string) => Promise<void>;
   clear: () => Promise<void>;
 }
 
@@ -40,9 +42,9 @@ interface InboxActions {
 async function applyGesture(
   set: (partial: Partial<InboxState>) => void,
   get: () => InboxState,
-  kind: 'resolve' | 'answer',
+  kind: 'resolve' | 'answer' | 'read',
   id: string,
-  payload: ResolvePayload | AnswerPayload,
+  payload: ResolvePayload | AnswerPayload | Record<string, never>,
 ): Promise<void> {
   const items = get().items.filter((i) => i.id !== id);
   set({ items });
@@ -105,6 +107,8 @@ export const useInbox = create<InboxState & InboxActions>((set, get) => ({
   resolve: async (id, payload) => applyGesture(set, get, 'resolve', id, payload),
 
   answer: async (id, payload) => applyGesture(set, get, 'answer', id, payload),
+
+  markRead: async (id) => applyGesture(set, get, 'read', id, {}),
 
   clear: async () => {
     const db = await getDb();

@@ -6,11 +6,6 @@
  * OpenAPI spec version: v1
  */
 
-export type InboxItemKind = typeof InboxItemKind[keyof typeof InboxItemKind];
-
-
-export const InboxItemKind = {
-  Proposal: 'Proposal',
-  Question: 'Question',
-  Notice: 'Notice',
-} as const;
+export interface ReadNoticeRequest {
+  clientActionId: string;
+}
