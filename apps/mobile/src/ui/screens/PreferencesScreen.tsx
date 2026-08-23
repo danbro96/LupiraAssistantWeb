@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Switch } from 'react-native-paper';
 import { useSettings } from '../../state/settings-store';
 import { Button } from '../components/Button';
+import { TextField } from '../components/TextField';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 
@@ -61,28 +63,14 @@ export function PreferencesScreen() {
           Notifications stay silent inside this window; items still arrive in the inbox. Leave blank for none.
         </Text>
         <View style={styles.row}>
-          <TextInput
-            style={[styles.input, styles.grow]}
-            value={start}
-            onChangeText={setStart}
-            placeholder="22:00"
-            placeholderTextColor={c.textMuted}
-          />
-          <Text style={styles.to}>to</Text>
-          <TextInput
-            style={[styles.input, styles.grow]}
-            value={end}
-            onChangeText={setEnd}
-            placeholder="07:00"
-            placeholderTextColor={c.textMuted}
-          />
+          <TextField style={styles.grow} label="From" placeholder="22:00" value={start} onChangeText={setStart} />
+          <TextField style={styles.grow} label="To" placeholder="07:00" value={end} onChangeText={setEnd} />
         </View>
-        <TextInput
-          style={styles.input}
+        <TextField
+          label="Time zone"
+          placeholder="Europe/Stockholm"
           value={zone}
           onChangeText={setZone}
-          placeholder="Europe/Stockholm"
-          placeholderTextColor={c.textMuted}
           autoCapitalize="none"
         />
       </View>
@@ -104,14 +92,6 @@ const makeStyles = (c: Palette) => {
     label: { ...t.body },
     hint: { ...t.small },
     sectionLabel: { ...t.sectionLabel, marginTop: spacing.md },
-    to: { ...t.small },
-    input: {
-      ...t.body,
-      backgroundColor: c.bg,
-      borderRadius: radii.md,
-      padding: spacing.sm,
-      color: c.text,
-    },
     save: { marginTop: spacing.md },
   });
 };

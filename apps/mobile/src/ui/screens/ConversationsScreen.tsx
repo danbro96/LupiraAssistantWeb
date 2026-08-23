@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useArchive } from '../../state/archive-store';
+import { TextField } from '../components/TextField';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -24,12 +25,11 @@ export function ConversationsScreen() {
 
   return (
     <View style={styles.screen}>
-      <TextInput
-        style={styles.input}
+      <TextField
+        style={styles.filter}
+        label="Filter by title"
         value={q}
         onChangeText={setQ}
-        placeholder="Filter by title…"
-        placeholderTextColor={c.textMuted}
         autoCapitalize="none"
         returnKeyType="search"
         onSubmitEditing={() => void useArchive.getState().loadConversations({ q: q.trim() || undefined })}
@@ -80,15 +80,7 @@ const makeStyles = (c: Palette) => {
   const t = makeType(c);
   return StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
-    input: {
-      ...t.body,
-      backgroundColor: c.surface,
-      borderRadius: radii.md,
-      padding: spacing.sm,
-      margin: spacing.lg,
-      marginBottom: spacing.sm,
-      color: c.text,
-    },
+    filter: { margin: spacing.lg, marginBottom: spacing.sm },
     list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },

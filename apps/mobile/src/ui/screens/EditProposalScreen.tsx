@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Switch } from 'react-native-paper';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useInbox } from '../../state/inbox-store';
 import {
@@ -13,7 +14,8 @@ import {
   type FieldSpec,
 } from '@lupira/assistant-domain/edit-spec';
 import { Button } from '../components/Button';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { TextField } from '../components/TextField';
+import { makeType, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -82,20 +84,22 @@ export function EditProposalScreen() {
         const k = key(f);
         return (
           <View key={k} style={styles.field}>
-            <Text style={styles.label}>{f.label}</Text>
             {f.type === 'boolean' ? (
-              <Switch
-                value={getField(payload, f.path) === true}
-                onValueChange={(v) => setPayload((p) => applyEdit(p, f.path, v))}
-              />
+              <>
+                <Text style={styles.label}>{f.label}</Text>
+                <Switch
+                  value={getField(payload, f.path) === true}
+                  onValueChange={(v) => setPayload((p) => applyEdit(p, f.path, v))}
+                />
+              </>
             ) : (
-              <TextInput
-                style={[styles.input, f.type === 'multiline' && styles.multiline]}
+              <TextField
+                label={f.label}
                 value={draftFor(f)}
                 onChangeText={(t) => setDrafts((d) => ({ ...d, [k]: t }))}
                 multiline={f.type === 'multiline'}
                 autoCapitalize="none"
-                placeholderTextColor={c.textMuted}
+                error={!!errors[k]}
               />
             )}
             {errors[k] ? <Text style={styles.error}>{errors[k]}</Text> : null}
@@ -116,14 +120,6 @@ const makeStyles = (c: Palette) => {
     title: { ...t.body, fontWeight: '600', marginBottom: spacing.xs },
     field: { gap: spacing.xs },
     label: { ...t.sectionLabel },
-    input: {
-      ...t.body,
-      backgroundColor: c.surface,
-      borderRadius: radii.md,
-      padding: spacing.sm,
-      color: c.text,
-    },
-    multiline: { minHeight: 72, textAlignVertical: 'top' },
     error: { ...t.small, color: c.danger },
     empty: { ...t.body },
     save: { marginTop: spacing.md },

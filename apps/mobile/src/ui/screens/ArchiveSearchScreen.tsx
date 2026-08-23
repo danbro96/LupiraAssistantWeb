@@ -1,10 +1,11 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useArchive } from '../../state/archive-store';
 import type { ArchiveSearchHitDto } from '../../data/api/generated/comms/models';
 import { Button } from '../components/Button';
+import { TextField } from '../components/TextField';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -43,22 +44,19 @@ export function ArchiveSearchScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.controls}>
-        <TextInput
-          style={styles.input}
+        <TextField
+          label="Search messages"
           value={q}
           onChangeText={setQ}
-          placeholder="Search messages…"
-          placeholderTextColor={c.textMuted}
           autoCapitalize="none"
           returnKeyType="search"
           onSubmitEditing={onSearch}
         />
-        <TextInput
-          style={styles.input}
+        <TextField
+          label="From"
+          placeholder="sender name, optional"
           value={participant}
           onChangeText={setParticipant}
-          placeholder="From (sender name, optional)"
-          placeholderTextColor={c.textMuted}
           autoCapitalize="none"
         />
         <View style={styles.row}>
@@ -121,13 +119,6 @@ const makeStyles = (c: Palette) => {
     controls: { padding: spacing.lg, gap: spacing.sm },
     row: { flexDirection: 'row', gap: spacing.sm },
     grow: { flex: 1 },
-    input: {
-      ...t.body,
-      backgroundColor: c.surface,
-      borderRadius: radii.md,
-      padding: spacing.sm,
-      color: c.text,
-    },
     list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     hitHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Switch } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
@@ -12,6 +13,8 @@ import { useInbox } from '../../state/inbox-store';
 import { launchConnect } from '../../data/auth/connect';
 import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
+import { TextField } from '../components/TextField';
+import { useConfirm } from '../components/ConfirmDialog';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 
@@ -21,6 +24,7 @@ export function SettingsScreen() {
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const confirm = useConfirm();
 
   const device = useDevice();
   const collector = useCollector();
@@ -96,21 +100,17 @@ export function SettingsScreen() {
     setConnecting(false);
   }
 
-  function onReRegister() {
-    Alert.alert('Re-register device?', 'This clears the local key and buffered fixes. You will register again.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Re-register',
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            await useCollector.getState().stop();
-            await useDevice.getState().clear();
-            await useAuth.getState().clearSession();
-          })();
-        },
-      },
-    ]);
+  async function onReRegister() {
+    const ok = await confirm({
+      title: 'Re-register device?',
+      message: 'This clears the local key and buffered fixes. You will register again.',
+      confirmLabel: 'Re-register',
+      destructive: true,
+    });
+    if (!ok) return;
+    await useCollector.getState().stop();
+    await useDevice.getState().clear();
+    await useAuth.getState().clearSession();
   }
 
   return (
@@ -175,41 +175,35 @@ export function SettingsScreen() {
       </View>
 
       <Text style={styles.section}>SERVERS</Text>
-      <View style={styles.card}>
-        <Text style={styles.rowLabel}>Location API URL</Text>
-        <TextInput
+      <View style={[styles.card, styles.serversCard]}>
+        <TextField
+          label="Location API URL"
           value={locationUrlDraft}
           onChangeText={setLocationUrlDraft}
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
-          style={styles.input}
-          placeholderTextColor={c.textSubtle}
         />
-        <Text style={[styles.rowLabel, { marginTop: spacing.sm }]}>Health API URL</Text>
-        <TextInput
+        <TextField
+          label="Health API URL"
           value={healthUrlDraft}
           onChangeText={setHealthUrlDraft}
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
-          style={styles.input}
-          placeholderTextColor={c.textSubtle}
         />
-        <Text style={[styles.rowLabel, { marginTop: spacing.sm }]}>Assistant API URL</Text>
-        <TextInput
+        <TextField
+          label="Assistant API URL"
           value={assistantUrlDraft}
           onChangeText={setAssistantUrlDraft}
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
-          style={styles.input}
-          placeholderTextColor={c.textSubtle}
         />
         <Button title="Save URLs" variant="secondary" onPress={() => void onSaveUrls()} style={styles.btn} />
       </View>
 
-      <Button title="Re-register device" variant="destructive" onPress={onReRegister} style={styles.btn} />
+      <Button title="Re-register device" variant="destructive" onPress={() => void onReRegister()} style={styles.btn} />
     </ScrollView>
   );
 }
@@ -242,6 +236,8 @@ const makeStyles = (c: Palette) => {
     content: { padding: spacing.lg, gap: spacing.sm },
     section: { ...t.sectionLabel, marginTop: spacing.md, marginBottom: spacing.xs },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+    // Outlined fields carry a floating label on the border, so they need more air than info rows.
+    serversCard: { gap: spacing.sm },
     toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     rowLabel: { ...t.body },
     infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
@@ -250,16 +246,6 @@ const makeStyles = (c: Palette) => {
     infoValueMono: { ...t.mono, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
     warn: { ...t.small, color: c.warning, marginTop: spacing.xs },
     error: { ...t.small, color: c.danger, marginTop: spacing.xs },
-    input: {
-      borderWidth: 1,
-      borderColor: c.border,
-      borderRadius: radii.md,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      color: c.text,
-      fontSize: 15,
-      marginTop: spacing.xs,
-    },
     btn: { marginTop: spacing.sm },
   });
 };

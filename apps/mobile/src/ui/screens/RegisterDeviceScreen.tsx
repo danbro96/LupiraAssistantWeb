@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Device from 'expo-device';
@@ -14,7 +14,8 @@ import { decodeJwt, exchangeAuthCode } from '../../data/auth/oidc';
 import { useAuth } from '../../state/auth-store';
 import { useDevice } from '../../state/device-store';
 import { Button } from '../components/Button';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { TextField } from '../components/TextField';
+import { makeType, spacing, useColors, type Palette } from '../theme';
 import { logDebug } from '../../debug/log';
 
 // Dismisses the in-app browser when the auth redirect returns.
@@ -114,13 +115,11 @@ export function RegisterDeviceScreen() {
         <>
           <Text style={styles.step}>Step 2 — register this phone</Text>
           <Text style={styles.signedIn}>Signed in as {userEmail}</Text>
-          <Text style={styles.fieldLabel}>Device label</Text>
-          <TextInput
+          <TextField
+            label="Device label"
+            placeholder="My phone"
             value={label}
             onChangeText={setLabel}
-            placeholder="My phone"
-            placeholderTextColor={c.textSubtle}
-            style={styles.input}
             autoCapitalize="words"
           />
           <Button title="Register this phone" onPress={() => void handleRegister()} loading={busy} />
@@ -141,16 +140,6 @@ const makeStyles = (c: Palette) => {
     subtitle: { ...t.small, textAlign: 'center', marginBottom: spacing.lg },
     step: { ...t.sectionLabel, marginTop: spacing.md },
     signedIn: { ...t.small },
-    fieldLabel: { ...t.sectionLabel, marginTop: spacing.sm },
-    input: {
-      borderWidth: 1,
-      borderColor: c.border,
-      borderRadius: radii.md,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.sm,
-      color: c.text,
-      fontSize: 16,
-    },
     spinner: { marginTop: spacing.md },
     error: { color: c.danger, textAlign: 'center', marginTop: spacing.md },
   });

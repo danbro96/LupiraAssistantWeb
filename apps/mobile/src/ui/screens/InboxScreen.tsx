@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useInbox, type GrantStatus } from '../../state/inbox-store';
@@ -9,6 +9,7 @@ import type { InboxItemView } from '@lupira/assistant-domain/inbox-item';
 import { payloadSlotFor } from '@lupira/assistant-domain/edit-spec';
 import type { RootStackParamList } from '../navigation/types';
 import { Button } from '../components/Button';
+import { TextField } from '../components/TextField';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 
@@ -62,19 +63,13 @@ export function InboxScreen() {
     ({ item }: { item: InboxItemView }) => {
       if (item.kind === 'question') {
         return (
-          <QuestionCard
-            item={item}
-            answer={answers[item.id] ?? ''}
-            onAnswerChange={onAnswerChange}
-            styles={styles}
-            palette={c}
-          />
+          <QuestionCard item={item} answer={answers[item.id] ?? ''} onAnswerChange={onAnswerChange} styles={styles} />
         );
       }
       if (item.kind === 'notice') return <NoticeCard item={item} styles={styles} />;
       return <ProposalCard item={item} styles={styles} />;
     },
-    [answers, onAnswerChange, styles, c],
+    [answers, onAnswerChange, styles],
   );
 
   return (
@@ -174,19 +169,16 @@ interface QuestionCardProps {
   answer: string;
   onAnswerChange: (id: string, text: string) => void;
   styles: Styles;
-  palette: Palette;
 }
 
-const QuestionCard = memo(function QuestionCard({ item, answer, onAnswerChange, styles, palette }: QuestionCardProps) {
+const QuestionCard = memo(function QuestionCard({ item, answer, onAnswerChange, styles }: QuestionCardProps) {
   return (
     <View style={styles.card}>
       <ItemHeader item={item} styles={styles} />
-      <TextInput
-        style={styles.answerInput}
+      <TextField
+        label="Your answer"
         value={answer}
         onChangeText={(text) => onAnswerChange(item.id, text)}
-        placeholder="Your answer…"
-        placeholderTextColor={palette.textMuted}
         multiline
       />
       <View style={styles.actions}>
@@ -225,14 +217,6 @@ const makeStyles = (c: Palette) => {
     summary: { ...t.small },
     actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
     actionBtn: { flex: 1 },
-    answerInput: {
-      ...t.body,
-      backgroundColor: c.bg,
-      borderRadius: radii.md,
-      padding: spacing.sm,
-      minHeight: 44,
-      color: c.text,
-    },
     footnote: { ...t.hint, textAlign: 'center', marginTop: spacing.md },
   });
 };
