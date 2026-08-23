@@ -1,5 +1,5 @@
 import { Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RegisterDeviceScreen } from '../screens/RegisterDeviceScreen';
@@ -56,7 +56,7 @@ function TabLayout() {
             accessibilityRole="button"
             accessibilityLabel="Settings"
           >
-            <Ionicons name="settings-outline" size={22} color={c.text} />
+            <MaterialCommunityIcons name="cog-outline" size={22} color={c.text} />
           </Pressable>
         ),
       })}
@@ -67,7 +67,7 @@ function TabLayout() {
         options={{
           title: 'Inbox',
           headerTitle: 'Lupira Assistant',
-          tabBarIcon: ({ color, size }) => <Ionicons name="mail-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="email-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -76,7 +76,7 @@ function TabLayout() {
         options={{
           title: 'Archive',
           headerTitle: 'Archive',
-          tabBarIcon: ({ color, size }) => <Ionicons name="search-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="magnify" size={size} color={color} />,
         }}
       />
     </Tabs.Navigator>

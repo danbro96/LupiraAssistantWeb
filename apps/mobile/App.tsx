@@ -11,6 +11,7 @@ import { navigationRef } from './src/ui/navigation/notification-routing';
 import { startNotificationHandling, handleLaunchNotice } from './src/ui/notifications';
 import { registerPushToken } from './src/data/push/push-registration';
 import { ToastHost } from './src/ui/components/ToastHost';
+import { ConfirmDialogHost } from './src/ui/components/ConfirmDialog';
 import { useAuth } from './src/state/auth-store';
 import { useDevice } from './src/state/device-store';
 import { useInbox } from './src/state/inbox-store';
@@ -79,9 +80,11 @@ function App() {
       <SafeAreaProvider>
         <PaperProvider theme={scheme === 'dark' ? paperDark : paperLight}>
           <Sentry.ErrorBoundary fallback={<ErrorFallback palette={palette} />}>
-            <NavigationContainer ref={navigationRef} theme={scheme === 'dark' ? navDark : navLight}>
-              <RootStack />
-            </NavigationContainer>
+            <ConfirmDialogHost>
+              <NavigationContainer ref={navigationRef} theme={scheme === 'dark' ? navDark : navLight}>
+                <RootStack />
+              </NavigationContainer>
+            </ConfirmDialogHost>
           </Sentry.ErrorBoundary>
           <ToastHost />
           <StatusBar style="auto" />
