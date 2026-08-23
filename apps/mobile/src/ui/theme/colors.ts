@@ -1,16 +1,8 @@
-export interface Palette {
-  bg: string;
-  surface: string;
-  primary: string;
-  onPrimary: string;
-  border: string;
-  divider: string;
-  text: string;
-  textMuted: string;
-  textSubtle: string;
-  textDisabled: string;
+import { DARK, LIGHT, type ColorScheme } from '@lupira/assistant-tokens/color';
+
+/** The shared estate core plus the assistant's own status/banner/toast semantics. */
+export interface Palette extends ColorScheme {
   onAccent: string;
-  danger: string;
   warning: string;
   success: string;
   pending: string;
@@ -23,51 +15,31 @@ export interface Palette {
 }
 
 export const lightColors: Palette = {
-  bg: '#ffffff',
-  surface: '#f5f6f8',
-  primary: '#0b6e4f',
-  onPrimary: '#ffffff',
-  border: '#d4d8e0',
-  divider: '#e3e6ec',
-  text: '#1c2230',
-  textMuted: '#6e7686',
-  textSubtle: '#8a909c',
-  textDisabled: '#9aa0ac',
+  ...LIGHT,
   onAccent: '#ffffff',
-  danger: '#b3261e',
   warning: '#5b4b18',
   success: '#1f7a4d',
   pending: '#d8a200',
   failed: '#b3261e',
   bannerOffline: '#5b4b18',
   bannerUnreachable: '#7a1f1f',
-  bannerSyncing: '#0b6e4f',
+  bannerSyncing: '#0f766e',
   toastBg: '#2b2f36',
-  toastAction: '#6ee7a8',
+  toastAction: '#2dd4bf',
 };
 
 export const darkColors: Palette = {
-  bg: '#14171c',
-  surface: '#1e232b',
-  primary: '#3fb986',
-  onPrimary: '#0d1117',
-  border: '#2c333d',
-  divider: '#252b33',
-  text: '#e6e9ee',
-  textMuted: '#9aa3b2',
-  textSubtle: '#7c8492',
-  textDisabled: '#5b626e',
+  ...DARK,
   onAccent: '#ffffff',
-  danger: '#f2675e',
   warning: '#d8b24a',
   success: '#5fd49b',
   pending: '#d8a200',
   failed: '#f2675e',
   bannerOffline: '#5b4b18',
   bannerUnreachable: '#7a1f1f',
-  bannerSyncing: '#1f6b4d',
+  bannerSyncing: '#115e59',
   toastBg: '#2b2f36',
-  toastAction: '#6ee7a8',
+  toastAction: '#2dd4bf',
 };
 
 /** Fallback palette for non-component contexts that can't use the hook. */
