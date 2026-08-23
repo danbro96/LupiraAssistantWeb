@@ -41,6 +41,3 @@ export const darkColors: Palette = {
   toastBg: '#2b2f36',
   toastAction: '#2dd4bf',
 };
-
-/** Fallback palette for non-component contexts that can't use the hook. */
-export const colors = lightColors;

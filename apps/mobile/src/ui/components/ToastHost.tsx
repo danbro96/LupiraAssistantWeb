@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, radii, spacing } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import { useToast } from '../../feedback/toast';
+
+// The imperative toast API + store live in feedback/toast (a cross-cutting leaf, so non-UI layers can
+// call `toast()` without importing the UI). This file is just the visual host.
 
 /** Mount once near the app root, inside SafeAreaProvider. */
 export function ToastHost() {
@@ -12,6 +15,8 @@ export function ToastHost() {
   const nonce = useToast(s => s.nonce);
   const hide = useToast(s => s.hide);
   const insets = useSafeAreaInsets();
+  const c = useColors();
+  const styles = useMemo(() => makeStyles(c), [c]);
 
   useEffect(() => {
     if (!message) return;
@@ -43,19 +48,21 @@ export function ToastHost() {
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center', paddingHorizontal: spacing.xl },
-  toast: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
-    backgroundColor: colors.toastBg,
-    borderRadius: radii.lg,
-    paddingVertical: 10,
-    paddingHorizontal: spacing.lg,
-    maxWidth: '100%',
-  },
-  text: { color: '#fff', fontSize: 14, flexShrink: 1 },
-  textCentered: { textAlign: 'center' },
-  action: { color: colors.toastAction, fontSize: 14, fontWeight: '700' },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    wrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center', paddingHorizontal: spacing.xl },
+    toast: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.lg,
+      backgroundColor: c.toastBg,
+      borderRadius: radii.lg,
+      paddingVertical: 10,
+      paddingHorizontal: spacing.lg,
+      maxWidth: '100%',
+    },
+    // The toast surface is dark in both schemes, so its label stays light.
+    text: { color: '#fff', fontSize: 14, flexShrink: 1 },
+    textCentered: { textAlign: 'center' },
+    action: { color: c.toastAction, fontSize: 14, fontWeight: '700' },
+  });
