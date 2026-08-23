@@ -1,17 +1,23 @@
 # Lupira Assistant Mobile
 
-A cross-platform (React Native / Expo) **background telemetry uploader**. GPS fixes + device registration go to
-[LupiraLocationApi](https://github.com/); the personal/family health record lives on
-[LupiraHealthApi](https://github.com/) (a .NET sibling of LupiraTasksApi).
+The **assistant surface** (React Native / Expo): an inbox of proposals the assistant wants approved,
+a read-only browser over the captured comms archive, and settings. It reaches the estate through the
+repo's own .NET BFF, which fronts assistant-api and comms-api.
 
-It collects GPS fixes in the background — even when the app is closed — buffers them locally while
-offline, and **store-and-forwards** them to the server in idempotent NDJSON batches when connectivity
-returns. Smart-ring data (Health Connect / HealthKit) is **phase 2**: the tables, serializers, and
-ingest stubs exist now and are wired up later.
+The same app is also the household's **telemetry collector**. It records GPS fixes in the background —
+even when closed — buffers them locally while offline, and **store-and-forwards** them to
+[LupiraLocationApi](https://github.com/) in idempotent NDJSON batches when connectivity returns; the
+personal/family health record lives on [LupiraHealthApi](https://github.com/). Smart-ring data
+(Health Connect / HealthKit) is **phase 2**: the tables, serializers, and ingest stubs exist now and
+are wired up later.
 
-Architecture and conventions mirror the sibling app **LupiraTasksMobile** (Expo SDK 56, layered
+Architecture and conventions mirror the sibling app **LupiraTasksMobile** (Expo SDK 57, layered
 `domain → data → sync → state → ui` enforced by `eslint-plugin-boundaries`, Zustand, `expo-sqlite`,
 `expo-secure-store`, OIDC via `expo-auth-session`).
+
+UI stack: **react-native-paper 5 (MD3)**, themed in `src/ui/theme/paperTheme.ts` from
+`@lupira/assistant-tokens`. See the repo root's `CLAUDE.md` for the conventions that keep the three
+Lupira frontends coherent.
 
 ---
 
@@ -25,7 +31,7 @@ Architecture and conventions mirror the sibling app **LupiraTasksMobile** (Expo 
 ## Setup
 
 ```bash
-npm install
+npm install         # at the REPO ROOT — this app is an npm workspace
 
 # Verify the pure logic (no native runtime needed):
 npm run typecheck
@@ -92,15 +98,22 @@ The iOS bundle id / Android package (`com.lupira.assistant`) and `scheme` (`lupi
 src/
   domain/      pure logic (PURE, vitest-tested): wire mapping, motion/sampling, NDJSON, batching,
                receipt application, cursor-drop, seq, reject classification, DTOs
-  data/        expo-sqlite repos (buffer, seq, sync-state, collector-meta), secure-store creds,
-               HTTP core, OIDC + DeviceKey auth ports, registration + ingest clients
+  data/        expo-sqlite repos (fix buffer, seq, sync-state, collector-meta, inbox cache,
+               pending acks), secure-store creds, HTTP core, OIDC + DeviceKey auth ports,
+               generated API clients (orval — never hand-edited), push registration
   collector/   the background location task + start/stop/reconfigure, permissions, battery probe
-  sync/        uploader, single-flight sync-engine + triggers, cursor-resume, pause-poll,
-               background-upload task, the UI-facing sync-status store
-  state/       Zustand: auth (OIDC), device (registration mirror), collector (start/stop/hydrate)
-  ui/          register + settings screens, theme, shared components
+  sync/        fix uploader and ack uploader, single-flight sync-engine + triggers, cursor-resume,
+               pause-poll, background-upload task, the UI-facing sync-status store
+  state/       Zustand: auth (OIDC), device (registration mirror), collector (start/stop/hydrate),
+               inbox (feed + grant), archive (conversations/threads/search), settings
+  ui/          screens (inbox, edit-proposal, conversations, thread, archive search, connectors,
+               preferences, settings, register), navigation, theme, shared components
   config/ debug/ feedback/   cross-cutting leaves (env + secure keys, redacting logger, toast/haptics)
 ```
+
+Assistant gestures (approve / edit / dismiss / answer) apply optimistically, persist to the inbox
+cache, and queue on the acks stream — the same store-and-forward path the fix buffer uses, so the
+inbox works offline.
 
 The layered import graph is enforced by `eslint.config.mjs`. Notably, the background **collector**
 and the **sync** layer never import `state`/`ui`, keeping the headless background JS context's
@@ -112,11 +125,13 @@ dependency cone small.
 
 - **Unit (`npm test`)**: every pure `domain/` module — sampling table, motion classification +
   hysteresis, fix mapping (incl. a contract test asserting no `*_id` field ever leaks), NDJSON byte
-  math, batching caps, receipt application, cursor-drop, reject classification, seq, geo.
-- **Device (dev client)**: see the end-to-end checklist in the plan — register → walk/drive with the
-  app backgrounded then killed → buffer offline → reconnect flush → cursor-resume → pause/resume →
-  idempotent re-upload. Background delivery after a kill, foreground-service notification, and
-  cross-context SQLite writes can only be verified on real hardware.
+  math, batching caps, receipt application, cursor-drop, reject classification, seq, geo, and the
+  assistant's inbox mapping / edit-spec logic. Node env, `*.test.ts` — pure logic only, no UI tests.
+- **Device (dev client)**: the collector path — register → walk/drive with the app backgrounded then
+  killed → buffer offline → reconnect flush → cursor-resume → pause/resume → idempotent re-upload.
+  Background delivery after a kill, foreground-service notification, and cross-context SQLite writes
+  can only be verified on real hardware. The assistant path: inbox approve/edit/dismiss round-trip,
+  thread scroll + jump-to-message, EditProposal across all payload kinds, light↔dark.
 
 ## Phase 2 — smart ring
 
