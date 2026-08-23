@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSettings } from '../../state/settings-store';
 import type { ConnectorStatusDto } from '../../data/api/generated/comms/models';
@@ -6,6 +6,8 @@ import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 
 // Read-only capture status per source. Connectors are enrolled server-side (ops CLI), so there is
 // nothing to toggle here — this answers "is my mail/Telegram still arriving?".
+
+type Styles = ReturnType<typeof makeStyles>;
 
 export function ConnectorsScreen() {
   const c = useColors();
@@ -37,7 +39,9 @@ export function ConnectorsScreen() {
           <Text style={styles.hint}>Capture status is unavailable.</Text>
         )
       ) : (
-        connectors.map((connector) => <ConnectorCard key={connector.source} connector={connector} c={c} />)
+        connectors.map((connector) => (
+          <ConnectorCard key={connector.source} connector={connector} styles={styles} />
+        ))
       )}
 
       <Text style={styles.footnote}>Sources are connected on the server; this view is read-only.</Text>
@@ -45,8 +49,13 @@ export function ConnectorsScreen() {
   );
 }
 
-function ConnectorCard({ connector, c }: { connector: ConnectorStatusDto; c: Palette }) {
-  const styles = useMemo(() => makeStyles(c), [c]);
+const ConnectorCard = memo(function ConnectorCard({
+  connector,
+  styles,
+}: {
+  connector: ConnectorStatusDto;
+  styles: Styles;
+}) {
   const connected = connector.connectors.length > 0;
   const last = connector.lastMessageAt ? new Date(connector.lastMessageAt).toLocaleString() : 'never';
   return (
@@ -63,7 +72,7 @@ function ConnectorCard({ connector, c }: { connector: ConnectorStatusDto; c: Pal
       {connected ? <Text style={styles.mono}>{connector.connectors.join(', ')}</Text> : null}
     </View>
   );
-}
+});
 
 const makeStyles = (c: Palette) => {
   const t = makeType(c);

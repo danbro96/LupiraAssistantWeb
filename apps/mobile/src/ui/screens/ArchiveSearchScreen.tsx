@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,6 +10,8 @@ import type { RootStackParamList } from '../navigation/types';
 
 // Research entry point: hybrid search over the whole corpus. A hit deep-links into its thread,
 // centred on the matched message.
+
+type Styles = ReturnType<typeof makeStyles>;
 
 export function ArchiveSearchScreen() {
   const c = useColors();
@@ -25,6 +27,18 @@ export function ArchiveSearchScreen() {
   function onSearch() {
     void useArchive.getState().search({ q, participant: participant.trim() || undefined });
   }
+
+  const onOpenHit = useCallback(
+    (hit: ArchiveSearchHitDto) => {
+      navigation.navigate('Thread', { conversationId: hit.conversationId, aroundMessageId: hit.messageId });
+    },
+    [navigation],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: ArchiveSearchHitDto }) => <HitRow hit={item} onPress={onOpenHit} styles={styles} />,
+    [onOpenHit, styles],
+  );
 
   return (
     <View style={styles.screen}>
@@ -73,27 +87,21 @@ export function ArchiveSearchScreen() {
             </Text>
           )
         }
-        renderItem={({ item }) => (
-          <HitRow
-            hit={item}
-            c={c}
-            onPress={() =>
-              navigation.navigate('Thread', {
-                conversationId: item.conversationId,
-                aroundMessageId: item.messageId,
-              })
-            }
-          />
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
 }
 
-function HitRow({ hit, c, onPress }: { hit: ArchiveSearchHitDto; c: Palette; onPress: () => void }) {
-  const styles = useMemo(() => makeStyles(c), [c]);
+interface HitRowProps {
+  hit: ArchiveSearchHitDto;
+  onPress: (hit: ArchiveSearchHitDto) => void;
+  styles: Styles;
+}
+
+const HitRow = memo(function HitRow({ hit, onPress, styles }: HitRowProps) {
   return (
-    <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
+    <Pressable onPress={() => onPress(hit)} style={styles.card} accessibilityRole="button">
       <View style={styles.hitHeader}>
         <Text style={styles.sender}>{hit.sender ?? 'Unknown'}</Text>
         <Text style={styles.when}>{new Date(hit.timestamp).toLocaleString()}</Text>
@@ -104,7 +112,7 @@ function HitRow({ hit, c, onPress }: { hit: ArchiveSearchHitDto; c: Palette; onP
       </Text>
     </Pressable>
   );
-}
+});
 
 const makeStyles = (c: Palette) => {
   const t = makeType(c);

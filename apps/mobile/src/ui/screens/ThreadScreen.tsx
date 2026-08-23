@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { useArchive } from '../../state/archive-store';
@@ -9,6 +9,8 @@ import type { RootStackParamList } from '../navigation/types';
 
 // Chat-style reader. Rendered oldest→newest with `inverted` so paging older messages (the natural
 // direction here) doesn't jump the scroll position; the highlighted row is the search hit we jumped to.
+
+type Styles = ReturnType<typeof makeStyles>;
 
 export function ThreadScreen() {
   const c = useColors();
@@ -26,6 +28,19 @@ export function ThreadScreen() {
 
   // `inverted` needs newest-first data; the store keeps the window chronological.
   const data = useMemo(() => [...messages].reverse(), [messages]);
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: ConversationMessageDto; index: number }) => (
+      <MessageRow
+        message={item}
+        // In inverted order the visually-preceding row is the next index.
+        previous={data[index + 1]}
+        highlighted={item.id === aroundMessageId}
+        styles={styles}
+      />
+    ),
+    [data, aroundMessageId, styles],
+  );
 
   return (
     <View style={styles.screen}>
@@ -46,32 +61,20 @@ export function ThreadScreen() {
         ListFooterComponent={
           loading && data.length > 0 ? <ActivityIndicator color={c.primary} style={styles.spinner} /> : null
         }
-        renderItem={({ item, index }) => (
-          <MessageRow
-            message={item}
-            // In inverted order the visually-preceding row is the next index.
-            previous={data[index + 1]}
-            highlighted={item.id === aroundMessageId}
-            c={c}
-          />
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
 }
 
-function MessageRow({
-  message,
-  previous,
-  highlighted,
-  c,
-}: {
+interface MessageRowProps {
   message: ConversationMessageDto;
   previous: ConversationMessageDto | undefined;
   highlighted: boolean;
-  c: Palette;
-}) {
-  const styles = useMemo(() => makeStyles(c), [c]);
+  styles: Styles;
+}
+
+const MessageRow = memo(function MessageRow({ message, previous, highlighted, styles }: MessageRowProps) {
   const dayLabel = dayBreakLabel(message, previous);
   return (
     <>
@@ -91,7 +94,7 @@ function MessageRow({
       </View>
     </>
   );
-}
+});
 
 const makeStyles = (c: Palette) => {
   const t = makeType(c);

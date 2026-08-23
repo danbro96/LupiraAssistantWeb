@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,6 +14,8 @@ import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
 import { makeType, radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
+
+type Styles = ReturnType<typeof makeStyles>;
 
 export function SettingsScreen() {
   const c = useColors();
@@ -115,10 +117,10 @@ export function SettingsScreen() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.section}>DEVICE</Text>
       <View style={styles.card}>
-        <Row label="Label" value={device.label ?? '—'} c={c} />
-        <Row label="Kind" value={device.kind ?? '—'} c={c} />
-        <Row label="Record" value={device.recordSlug ?? '—'} c={c} />
-        <Row label="Key id" value={device.keyId ?? '—'} c={c} mono />
+        <Row label="Label" value={device.label ?? '—'} styles={styles} />
+        <Row label="Kind" value={device.kind ?? '—'} styles={styles} />
+        <Row label="Record" value={device.recordSlug ?? '—'} styles={styles} />
+        <Row label="Key id" value={device.keyId ?? '—'} styles={styles} mono />
       </View>
 
       <Text style={styles.section}>COLLECTION</Text>
@@ -127,7 +129,7 @@ export function SettingsScreen() {
           <Text style={styles.rowLabel}>Record location</Text>
           <Switch value={collector.collecting} onValueChange={(v) => void onToggleCollecting(v)} disabled={collector.starting} />
         </View>
-        <Row label="Permission" value={collector.permissionStage} c={c} />
+        <Row label="Permission" value={collector.permissionStage} styles={styles} />
         {collector.permissionStage !== 'background' ? (
           <Text style={styles.warn}>Background ("Always") location is required to record while the app is closed.</Text>
         ) : null}
@@ -138,7 +140,7 @@ export function SettingsScreen() {
 
       <Text style={styles.section}>ASSISTANT</Text>
       <View style={styles.card}>
-        <Row label="Grant" value={grantStatus} c={c} />
+        <Row label="Grant" value={grantStatus} styles={styles} />
         <Button
           title={grantStatus === 'connected' ? 'Reconnect assistant' : 'Connect assistant'}
           variant="secondary"
@@ -162,12 +164,12 @@ export function SettingsScreen() {
 
       <Text style={styles.section}>UPLOAD STATUS</Text>
       <View style={styles.card}>
-        <Row label="Connectivity" value={status.online ? 'online' : 'offline'} c={c} />
-        <Row label="Uploading" value={status.uploading ? 'yes' : 'no'} c={c} />
-        <Row label="Buffered fixes" value={String(status.pendingCount)} c={c} mono />
-        <Row label="Last uploaded seq" value={String(status.lastUploadedSeq)} c={c} mono />
-        <Row label="Server high-water" value={status.highWaterSeq === null ? '—' : String(status.highWaterSeq)} c={c} mono />
-        <Row label="Last upload" value={status.lastUploadAt ? new Date(status.lastUploadAt).toLocaleString() : 'never'} c={c} />
+        <Row label="Connectivity" value={status.online ? 'online' : 'offline'} styles={styles} />
+        <Row label="Uploading" value={status.uploading ? 'yes' : 'no'} styles={styles} />
+        <Row label="Buffered fixes" value={String(status.pendingCount)} styles={styles} mono />
+        <Row label="Last uploaded seq" value={String(status.lastUploadedSeq)} styles={styles} mono />
+        <Row label="Server high-water" value={status.highWaterSeq === null ? '—' : String(status.highWaterSeq)} styles={styles} mono />
+        <Row label="Last upload" value={status.lastUploadAt ? new Date(status.lastUploadAt).toLocaleString() : 'never'} styles={styles} />
         {status.lastError ? <Text style={styles.error}>Last error: {status.lastError}</Text> : null}
         <Button title="Upload now" onPress={onUploadNow} style={styles.btn} />
       </View>
@@ -212,17 +214,26 @@ export function SettingsScreen() {
   );
 }
 
-function Row({ label, value, c, mono }: { label: string; value: string; c: Palette; mono?: boolean }) {
-  const t = makeType(c);
+const Row = memo(function Row({
+  label,
+  value,
+  styles,
+  mono,
+}: {
+  label: string;
+  value: string;
+  styles: Styles;
+  mono?: boolean;
+}) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs }}>
-      <Text style={{ ...t.small }}>{label}</Text>
-      <Text style={[mono ? t.mono : t.body, { flexShrink: 1, textAlign: 'right', marginLeft: spacing.md }]} numberOfLines={1}>
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={mono ? styles.infoValueMono : styles.infoValue} numberOfLines={1}>
         {value}
       </Text>
     </View>
   );
-}
+});
 
 const makeStyles = (c: Palette) => {
   const t = makeType(c);
@@ -233,6 +244,10 @@ const makeStyles = (c: Palette) => {
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     rowLabel: { ...t.body },
+    infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
+    infoLabel: { ...t.small },
+    infoValue: { ...t.body, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
+    infoValueMono: { ...t.mono, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
     warn: { ...t.small, color: c.warning, marginTop: spacing.xs },
     error: { ...t.small, color: c.danger, marginTop: spacing.xs },
     input: {

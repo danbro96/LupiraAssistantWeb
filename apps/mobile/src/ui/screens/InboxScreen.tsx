@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useInbox, type GrantStatus } from '../../state/inbox-store';
@@ -18,6 +18,8 @@ const GRANT_TEXT: Record<GrantStatus, string> = {
   unknown: 'Connect the assistant so it can act on your behalf.',
 };
 
+type Styles = ReturnType<typeof makeStyles>;
+
 export function InboxScreen() {
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
@@ -27,6 +29,8 @@ export function InboxScreen() {
   const assistantApiUrl = useAuth((s) => s.assistantApiUrl);
   const [refreshing, setRefreshing] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  // Drafts live here, not in the card: the list virtualizes, and an unmounted card would lose them.
+  const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -50,44 +54,62 @@ export function InboxScreen() {
     setConnecting(false);
   }
 
+  const onAnswerChange = useCallback((id: string, text: string) => {
+    setAnswers((prev) => ({ ...prev, [id]: text }));
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }: { item: InboxItemView }) => {
+      if (item.kind === 'question') {
+        return (
+          <QuestionCard
+            item={item}
+            answer={answers[item.id] ?? ''}
+            onAnswerChange={onAnswerChange}
+            styles={styles}
+            palette={c}
+          />
+        );
+      }
+      if (item.kind === 'notice') return <NoticeCard item={item} styles={styles} />;
+      return <ProposalCard item={item} styles={styles} />;
+    },
+    [answers, onAnswerChange, styles, c],
+  );
+
   return (
-    <ScrollView
+    <FlatList
       style={styles.screen}
       contentContainerStyle={styles.content}
+      data={items}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void onRefresh()} tintColor={c.primary} />}
-    >
-      <View style={[styles.card, styles.grantCard]}>
-        <Text style={styles.grantText}>{GRANT_TEXT[grantStatus]}</Text>
-        {grantStatus !== 'connected' ? (
-          <Button
-            title="Connect assistant"
-            onPress={() => void onConnect()}
-            loading={connecting}
-            style={styles.btn}
-          />
-        ) : null}
-      </View>
-
-      {items.length === 0 ? (
+      ListHeaderComponent={
+        <View style={[styles.card, styles.grantCard]}>
+          <Text style={styles.grantText}>{GRANT_TEXT[grantStatus]}</Text>
+          {grantStatus !== 'connected' ? (
+            <Button
+              title="Connect assistant"
+              onPress={() => void onConnect()}
+              loading={connecting}
+              style={styles.btn}
+            />
+          ) : null}
+        </View>
+      }
+      ListEmptyComponent={
         <View style={styles.card}>
           <Text style={styles.empty}>No suggestions yet.</Text>
           <Text style={styles.emptyHint}>When the assistant has something for you, it shows up here.</Text>
         </View>
-      ) : (
-        items.map((item) => {
-          if (item.kind === 'question') return <QuestionCard key={item.id} item={item} c={c} />;
-          if (item.kind === 'notice') return <NoticeCard key={item.id} item={item} c={c} />;
-          return <ProposalCard key={item.id} item={item} c={c} />;
-        })
-      )}
-
-      <Text style={styles.footnote}>Gestures queue offline and sync when connected.</Text>
-    </ScrollView>
+      }
+      ListFooterComponent={<Text style={styles.footnote}>Gestures queue offline and sync when connected.</Text>}
+    />
   );
 }
 
-function ItemHeader({ item, c }: { item: InboxItemView; c: Palette }) {
-  const styles = useMemo(() => makeStyles(c), [c]);
+const ItemHeader = memo(function ItemHeader({ item, styles }: { item: InboxItemView; styles: Styles }) {
   return (
     <>
       <View style={styles.itemHeader}>
@@ -98,15 +120,14 @@ function ItemHeader({ item, c }: { item: InboxItemView; c: Palette }) {
       {item.summary ? <Text style={styles.summary}>{item.summary}</Text> : null}
     </>
   );
-}
+});
 
-function ProposalCard({ item, c }: { item: InboxItemView; c: Palette }) {
-  const styles = useMemo(() => makeStyles(c), [c]);
+const ProposalCard = memo(function ProposalCard({ item, styles }: { item: InboxItemView; styles: Styles }) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const editable = item.proposal != null && payloadSlotFor(item.proposal.actionKind) !== null;
   return (
     <View style={styles.card}>
-      <ItemHeader item={item} c={c} />
+      <ItemHeader item={item} styles={styles} />
       <View style={styles.actions}>
         <Button
           title="Approve"
@@ -130,13 +151,12 @@ function ProposalCard({ item, c }: { item: InboxItemView; c: Palette }) {
       </View>
     </View>
   );
-}
+});
 
-function NoticeCard({ item, c }: { item: InboxItemView; c: Palette }) {
-  const styles = useMemo(() => makeStyles(c), [c]);
+const NoticeCard = memo(function NoticeCard({ item, styles }: { item: InboxItemView; styles: Styles }) {
   return (
     <View style={styles.card}>
-      <ItemHeader item={item} c={c} />
+      <ItemHeader item={item} styles={styles} />
       <View style={styles.actions}>
         <Button
           title="Got it"
@@ -147,20 +167,26 @@ function NoticeCard({ item, c }: { item: InboxItemView; c: Palette }) {
       </View>
     </View>
   );
+});
+
+interface QuestionCardProps {
+  item: InboxItemView;
+  answer: string;
+  onAnswerChange: (id: string, text: string) => void;
+  styles: Styles;
+  palette: Palette;
 }
 
-function QuestionCard({ item, c }: { item: InboxItemView; c: Palette }) {
-  const styles = useMemo(() => makeStyles(c), [c]);
-  const [answer, setAnswer] = useState('');
+const QuestionCard = memo(function QuestionCard({ item, answer, onAnswerChange, styles, palette }: QuestionCardProps) {
   return (
     <View style={styles.card}>
-      <ItemHeader item={item} c={c} />
+      <ItemHeader item={item} styles={styles} />
       <TextInput
         style={styles.answerInput}
         value={answer}
-        onChangeText={setAnswer}
+        onChangeText={(text) => onAnswerChange(item.id, text)}
         placeholder="Your answer…"
-        placeholderTextColor={c.textMuted}
+        placeholderTextColor={palette.textMuted}
         multiline
       />
       <View style={styles.actions}>
@@ -179,7 +205,7 @@ function QuestionCard({ item, c }: { item: InboxItemView; c: Palette }) {
       </View>
     </View>
   );
-}
+});
 
 const makeStyles = (c: Palette) => {
   const t = makeType(c);
