@@ -21,9 +21,15 @@
   not react-query — assistant reads come from the BFF and the inbox cache.
 - **UI stack**: react-native-paper 5 (MD3), themed in `ui/theme/paperTheme.ts` from
   `@lupira/assistant-tokens`; React Navigation themes come from `adaptNavigationTheme`. Paper covers
-  the MD3-expressible colors; the app's own semantics (`pending`, `failed`, `banner*`, `toast*`) stay
-  on `useColors()`, the app's only color hook (never Paper's `useTheme()`). Components use
-  `const c = useColors(); const styles = useMemo(() => makeStyles(c), [c])`.
+  the MD3-expressible colors, and the whole palette — including the app's own semantics (`pending`,
+  `failed`, `banner*`, `toast*`) — rides on the Paper theme, with `useColors()` a typed accessor over
+  `useTheme()`. It stays the app's only color hook: **call `useColors()`, never Paper's `useTheme()`
+  directly**, so there is one name for the palette. It must keep returning a module-level object
+  (`paperLight.colors`) — components do
+  `const c = useColors(); const styles = useMemo(() => makeStyles(c), [c])`, and a fresh object per
+  render would defeat that. `useColors` is imported only from `ui/`, which is what keeps Paper out of
+  the headless cone. Deriving the palette from `useColorScheme()` instead is what this replaced: it
+  was a second source that could disagree with the theme `PaperProvider` holds.
   Icons are MaterialCommunityIcons (Paper's set). Confirms use `useConfirm()`
   (`ui/components/ConfirmDialog.tsx`); text inputs use `ui/components/TextField.tsx`.
   Tokens mirror the other repos' copies — see DevOps `Guides/design-tokens.md` and its drift check.
