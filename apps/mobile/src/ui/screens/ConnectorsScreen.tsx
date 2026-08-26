@@ -1,8 +1,9 @@
 import { memo, useEffect, useMemo } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { useSettings } from '../../state/settings-store';
 import type { ConnectorStatusDto } from '../../data/api/generated/comms/models';
-import { radii, spacing, useColors, type Palette } from '../theme';
+import { cardSurface, spacing, type Palette, useColors } from '../theme';
 
 // Read-only capture status per source. Connectors are enrolled server-side (ops CLI), so there is
 // nothing to toggle here — this answers "is my mail/Telegram still arriving?".
@@ -34,7 +35,7 @@ export function ConnectorsScreen() {
     >
       {connectors.length === 0 ? (
         loading ? (
-          <ActivityIndicator color={c.primary} style={styles.spinner} />
+          <ActivityIndicator style={styles.spinner} />
         ) : (
           <Text style={styles.hint}>Capture status is unavailable.</Text>
         )
@@ -78,7 +79,7 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
-    card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+    card: cardSurface(c),
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     source: { fontSize: 16, color: c.text, fontWeight: '600' },
     badge: { fontSize: 11, color: c.textSubtle, fontWeight: '700' },

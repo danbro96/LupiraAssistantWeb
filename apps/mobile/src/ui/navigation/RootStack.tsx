@@ -1,4 +1,3 @@
-import { Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -12,8 +11,9 @@ import { ThreadScreen } from '../screens/ThreadScreen';
 import { ConnectorsScreen } from '../screens/ConnectorsScreen';
 import { PreferencesScreen } from '../screens/PreferencesScreen';
 import { useDevice } from '../../state/device-store';
-import { HIT_SLOP, useColors } from '../theme';
+import { useColors } from '../theme';
 import type { RootStackParamList, TabParamList } from './types';
+import { IconButton } from '../components/IconButton';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
@@ -50,14 +50,13 @@ function TabLayout() {
         tabBarActiveTintColor: c.primary,
         tabBarInactiveTintColor: c.textMuted,
         headerRight: () => (
-          <Pressable
+          <IconButton
+            name="cog-outline"
+            size={22}
+            color={c.text}
             onPress={() => navigation.getParent()?.navigate('Settings')}
-            hitSlop={HIT_SLOP}
-            accessibilityRole="button"
             accessibilityLabel="Settings"
-          >
-            <MaterialCommunityIcons name="cog-outline" size={22} color={c.text} />
-          </Pressable>
+          />
         ),
       })}
     >

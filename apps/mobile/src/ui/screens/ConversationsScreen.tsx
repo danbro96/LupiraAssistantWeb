@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useArchive } from '../../state/archive-store';
 import { TextField } from '../components/TextField';
-import { radii, spacing, useColors, type Palette } from '../theme';
+import { cardSurface, spacing, type Palette, useColors } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
 // The thread list: every captured conversation, newest activity first, cursor-paged.
@@ -47,13 +47,13 @@ export function ConversationsScreen() {
         }}
         ListEmptyComponent={
           loading ? (
-            <ActivityIndicator color={c.primary} style={styles.spinner} />
+            <ActivityIndicator style={styles.spinner} />
           ) : (
             <Text variant="bodySmall" style={styles.empty}>No conversations captured yet.</Text>
           )
         }
         ListFooterComponent={
-          loading && conversations.length > 0 ? <ActivityIndicator color={c.primary} style={styles.spinner} /> : null
+          loading && conversations.length > 0 ? <ActivityIndicator style={styles.spinner} /> : null
         }
         renderItem={({ item }) => (
           <Pressable
@@ -82,7 +82,7 @@ const makeStyles = (c: Palette) =>
     screen: { flex: 1, backgroundColor: c.bg },
     filter: { margin: spacing.lg, marginBottom: spacing.sm },
     list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, gap: spacing.sm },
-    card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+    card: cardSurface(c),
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
     title: { fontWeight: '600', flexShrink: 1 },
     when: { color: c.textMuted, fontVariant: ['tabular-nums'] },

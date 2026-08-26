@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native-paper';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Device from 'expo-device';
@@ -127,7 +127,7 @@ export function RegisterDeviceScreen() {
         </>
       )}
 
-      {busy && !authed ? <ActivityIndicator style={styles.spinner} color={c.primary} /> : null}
+      {busy && !authed ? <ActivityIndicator style={styles.spinner} /> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );

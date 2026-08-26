@@ -15,7 +15,7 @@ import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
 import { useConfirm } from '../components/ConfirmDialog';
-import { radii, spacing, useColors, type Palette } from '../theme';
+import { cardSurface, spacing, type Palette, useColors } from '../theme';
 import { toast } from '../../feedback/toast';
 
 type Styles = ReturnType<typeof makeStyles>;
@@ -234,7 +234,7 @@ const makeStyles = (c: Palette) =>
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
     section: { fontSize: 12, fontWeight: '700', color: c.textSubtle, marginTop: spacing.md, marginBottom: spacing.xs },
-    card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+    card: cardSurface(c),
     // Outlined fields carry a floating label on the border, so they need more air than info rows.
     serversCard: { gap: spacing.sm },
     toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import { useArchive } from '../../state/archive-store';
 import type { ConversationMessageDto } from '../../data/api/generated/comms/models';
@@ -53,13 +54,13 @@ export function ThreadScreen() {
         onEndReached={() => void useArchive.getState().loadOlder()}
         ListEmptyComponent={
           loading ? (
-            <ActivityIndicator color={c.primary} style={styles.spinner} />
+            <ActivityIndicator style={styles.spinner} />
           ) : (
             <Text style={styles.empty}>No messages in this thread.</Text>
           )
         }
         ListFooterComponent={
-          loading && data.length > 0 ? <ActivityIndicator color={c.primary} style={styles.spinner} /> : null
+          loading && data.length > 0 ? <ActivityIndicator style={styles.spinner} /> : null
         }
         renderItem={renderItem}
       />

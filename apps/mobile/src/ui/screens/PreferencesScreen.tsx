@@ -4,7 +4,7 @@ import { Switch, Text } from 'react-native-paper';
 import { useSettings } from '../../state/settings-store';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { radii, spacing, useColors, type Palette } from '../theme';
+import { cardSurface, spacing, type Palette, useColors } from '../theme';
 import { toast } from '../../feedback/toast';
 
 // Delivery preferences: how the assistant may interrupt. Quiet hours hold back the push only — items
@@ -84,7 +84,7 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
-    card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.sm },
+    card: { ...cardSurface(c), gap: spacing.sm },
     row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
     rowText: { flex: 1, gap: 2 },
     grow: { flex: 1 },

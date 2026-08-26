@@ -10,7 +10,7 @@ import { payloadSlotFor } from '@lupira/assistant-domain/edit-spec';
 import type { RootStackParamList } from '../navigation/types';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { radii, spacing, useColors, type Palette } from '../theme';
+import { cardSurface, spacing, type Palette, useColors } from '../theme';
 import { toast } from '../../feedback/toast';
 
 const GRANT_TEXT: Record<GrantStatus, string> = {
@@ -203,7 +203,7 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
-    card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+    card: cardSurface(c),
     grantCard: { gap: spacing.sm },
     grantText: { fontSize: 16, color: c.text },
     btn: { marginTop: spacing.xs },

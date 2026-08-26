@@ -1,12 +1,13 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useArchive } from '../../state/archive-store';
 import type { ArchiveSearchHitDto } from '../../data/api/generated/comms/models';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { radii, spacing, useColors, type Palette } from '../theme';
+import { cardSurface, spacing, type Palette, useColors } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
 // Research entry point: hybrid search over the whole corpus. A hit deep-links into its thread,
@@ -78,7 +79,7 @@ export function ArchiveSearchScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           searching ? (
-            <ActivityIndicator color={c.primary} style={styles.spinner} />
+            <ActivityIndicator style={styles.spinner} />
           ) : (
             <Text style={styles.empty}>
               {q.trim() ? 'No matches.' : 'Search your captured messages by meaning or keywords.'}
@@ -119,7 +120,7 @@ const makeStyles = (c: Palette) =>
     row: { flexDirection: 'row', gap: spacing.sm },
     grow: { flex: 1 },
     list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, gap: spacing.sm },
-    card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
+    card: cardSurface(c),
     hitHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     sender: { fontSize: 16, color: c.text, fontWeight: '600' },
     when: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'] },
