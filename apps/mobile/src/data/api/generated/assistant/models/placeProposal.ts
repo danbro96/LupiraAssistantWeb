@@ -7,8 +7,7 @@
  */
 
 export interface PlaceProposal {
-  /** @nullable */
-  name?: string | null;
+  name: string;
   /** @nullable */
   kind?: string | null;
   /** @nullable */

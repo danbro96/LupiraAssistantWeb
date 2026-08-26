@@ -10,8 +10,7 @@ import type { DeliveryDetail } from './deliveryDetail';
 import type { ReplyDetail } from './replyDetail';
 
 export interface TaskProposal {
-  /** @nullable */
-  title?: string | null;
+  title: string;
   /** @nullable */
   dueAt?: string | null;
   priority?: number;

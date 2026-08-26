@@ -847,16 +847,16 @@
         ]
       },
       "EventProposal": {
+        "required": [
+          "title"
+        ],
         "type": "object",
         "properties": {
           "targetCalendar": {
             "$ref": "#/components/schemas/CalendarTarget"
           },
           "title": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "description": {
             "type": [
@@ -1283,13 +1283,13 @@
         }
       },
       "PlaceProposal": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "kind": {
             "type": [
@@ -1792,13 +1792,13 @@
         }
       },
       "TaskProposal": {
+        "required": [
+          "title"
+        ],
         "type": "object",
         "properties": {
           "title": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "dueAt": {
             "type": [

@@ -9,8 +9,7 @@ import type { CalendarTarget } from './calendarTarget';
 
 export interface EventProposal {
   targetCalendar?: CalendarTarget;
-  /** @nullable */
-  title?: string | null;
+  title: string;
   /** @nullable */
   description?: string | null;
   /** @nullable */
