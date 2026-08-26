@@ -33,14 +33,16 @@
   Icons are MaterialCommunityIcons (Paper's set). Confirms use `useConfirm()`
   (`ui/components/ConfirmDialog.tsx`); text inputs use `ui/components/TextField.tsx`.
   Tokens mirror the other repos' copies — see DevOps `Guides/design-tokens.md` and its drift check.
+- **`Button`, `ConfirmDialog`, `TextField` and `ToastHost` are byte-identical to
+  tasks-mobile's copies** — change both, or neither.
 - **Row components take `styles` as a prop and are `memo`'d** — never a per-row `useMemo(makeStyles)`,
   and never Paper's `useTheme()` per row; that is what keeps list renders cheap.
 - **`ui/screens/ThreadScreen.tsx` bubbles stay bespoke `View`s.** No `Card`/`Surface`: the list is
   `inverted`, where elevation renders wrong, and the day-break/`previous`-row coupling and
   `maxWidth: '85%'` alignment are load-bearing.
-- **ToastHost stays bespoke** (not Paper's `Snackbar`): it is driven by an imperative zustand store
-  callable from `sync`/`state`, carries a `nonce` re-arm plus haptics, and mounts outside the nav tree.
-  Its `'#fff'` label is deliberate — the toast surface is dark in both schemes.
+- **ToastHost is Paper's `Snackbar`**, keyed by the store's `nonce` so an identical repeat message
+  remounts and re-arms the timer. The imperative zustand store (callable from `sync`/`state`, haptics
+  included) stays in `feedback/toast.ts`; the host only renders it.
 - Headers are declarative in `ui/navigation/RootStack.tsx` — no `setOptions` pattern here (unlike
   tasks-mobile).
 - No reanimated, and don't add it — this app has no gestures to animate and it would move the Expo

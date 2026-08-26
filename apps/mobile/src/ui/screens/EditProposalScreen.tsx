@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Switch } from 'react-native-paper';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Switch, Text } from 'react-native-paper';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useInbox } from '../../state/inbox-store';
 import {
@@ -15,7 +15,7 @@ import {
 } from '@lupira/assistant-domain/edit-spec';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { makeType, spacing, useColors, type Palette } from '../theme';
+import { spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -42,7 +42,7 @@ export function EditProposalScreen() {
   if (!item || !spec || !initial) {
     return (
       <View style={[styles.screen, styles.center]}>
-        <Text style={styles.empty}>This proposal is no longer editable.</Text>
+        <Text variant="bodyLarge">This proposal is no longer editable.</Text>
       </View>
     );
   }
@@ -79,14 +79,14 @@ export function EditProposalScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{item.title}</Text>
+      <Text variant="bodyLarge" style={styles.title}>{item.title}</Text>
       {fields.map((f) => {
         const k = key(f);
         return (
           <View key={k} style={styles.field}>
             {f.type === 'boolean' ? (
               <>
-                <Text style={styles.label}>{f.label}</Text>
+                <Text variant="labelMedium" style={styles.label}>{f.label}</Text>
                 <Switch
                   value={getField(payload, f.path) === true}
                   onValueChange={(v) => setPayload((p) => applyEdit(p, f.path, v))}
@@ -102,7 +102,7 @@ export function EditProposalScreen() {
                 error={!!errors[k]}
               />
             )}
-            {errors[k] ? <Text style={styles.error}>{errors[k]}</Text> : null}
+            {errors[k] ? <Text variant="bodySmall" style={styles.error}>{errors[k]}</Text> : null}
           </View>
         );
       })}
@@ -111,17 +111,14 @@ export function EditProposalScreen() {
   );
 }
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     center: { alignItems: 'center', justifyContent: 'center' },
     content: { padding: spacing.lg, gap: spacing.sm },
-    title: { ...t.body, fontWeight: '600', marginBottom: spacing.xs },
+    title: { fontWeight: '600', marginBottom: spacing.xs },
     field: { gap: spacing.xs },
-    label: { ...t.sectionLabel },
-    error: { ...t.small, color: c.danger },
-    empty: { ...t.body },
+    label: { color: c.textSubtle },
+    error: { color: c.danger },
     save: { marginTop: spacing.md },
   });
-};

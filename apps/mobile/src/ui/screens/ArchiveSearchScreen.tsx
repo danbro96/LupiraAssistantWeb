@@ -6,7 +6,7 @@ import { useArchive } from '../../state/archive-store';
 import type { ArchiveSearchHitDto } from '../../data/api/generated/comms/models';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
 // Research entry point: hybrid search over the whole corpus. A hit deep-links into its thread,
@@ -112,9 +112,8 @@ const HitRow = memo(function HitRow({ hit, onPress, styles }: HitRowProps) {
   );
 });
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     controls: { padding: spacing.lg, gap: spacing.sm },
     row: { flexDirection: 'row', gap: spacing.sm },
@@ -122,12 +121,11 @@ const makeStyles = (c: Palette) => {
     list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     hitHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    sender: { ...t.body, fontWeight: '600' },
-    when: { ...t.mono },
-    thread: { ...t.hint },
-    text: { ...t.small, color: c.text },
-    empty: { ...t.small, textAlign: 'center', marginTop: spacing.lg },
-    error: { ...t.small, color: c.danger, textAlign: 'center' },
+    sender: { fontSize: 16, color: c.text, fontWeight: '600' },
+    when: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'] },
+    thread: { fontSize: 11, color: c.textSubtle },
+    text: { fontSize: 13, color: c.text },
+    empty: { fontSize: 13, color: c.textMuted, textAlign: 'center', marginTop: spacing.lg },
+    error: { fontSize: 13, color: c.danger, textAlign: 'center' },
     spinner: { marginTop: spacing.lg },
   });
-};

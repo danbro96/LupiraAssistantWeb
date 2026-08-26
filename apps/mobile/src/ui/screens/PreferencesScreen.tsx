@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Switch } from 'react-native-paper';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Switch, Text } from 'react-native-paper';
 import { useSettings } from '../../state/settings-store';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 
 // Delivery preferences: how the assistant may interrupt. Quiet hours hold back the push only — items
@@ -50,16 +50,16 @@ export function PreferencesScreen() {
       <View style={styles.card}>
         <View style={styles.row}>
           <View style={styles.rowText}>
-            <Text style={styles.label}>Batch into a digest</Text>
-            <Text style={styles.hint}>Off = notify me per item.</Text>
+            <Text variant="bodyLarge">Batch into a digest</Text>
+            <Text variant="bodySmall" style={styles.hint}>Off = notify me per item.</Text>
           </View>
           <Switch value={digest} onValueChange={setDigest} />
         </View>
       </View>
 
-      <Text style={styles.sectionLabel}>QUIET HOURS</Text>
+      <Text variant="labelMedium" style={styles.sectionLabel}>QUIET HOURS</Text>
       <View style={styles.card}>
-        <Text style={styles.hint}>
+        <Text variant="bodySmall" style={styles.hint}>
           Notifications stay silent inside this window; items still arrive in the inbox. Leave blank for none.
         </Text>
         <View style={styles.row}>
@@ -80,18 +80,15 @@ export function PreferencesScreen() {
   );
 }
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.sm },
     row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
     rowText: { flex: 1, gap: 2 },
     grow: { flex: 1 },
-    label: { ...t.body },
-    hint: { ...t.small },
-    sectionLabel: { ...t.sectionLabel, marginTop: spacing.md },
+    hint: { color: c.textMuted },
+    sectionLabel: { color: c.textSubtle, marginTop: spacing.md },
     save: { marginTop: spacing.md },
   });
-};

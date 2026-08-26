@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSettings } from '../../state/settings-store';
 import type { ConnectorStatusDto } from '../../data/api/generated/comms/models';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 
 // Read-only capture status per source. Connectors are enrolled server-side (ops CLI), so there is
 // nothing to toggle here — this answers "is my mail/Telegram still arriving?".
@@ -74,20 +74,18 @@ const ConnectorCard = memo(function ConnectorCard({
   );
 });
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    source: { ...t.body, fontWeight: '600' },
-    badge: { ...t.hint, fontWeight: '700' },
+    source: { fontSize: 16, color: c.text, fontWeight: '600' },
+    badge: { fontSize: 11, color: c.textSubtle, fontWeight: '700' },
     connected: { color: c.success },
     idle: { color: c.textSubtle },
-    hint: { ...t.small },
-    mono: { ...t.mono },
-    footnote: { ...t.hint, textAlign: 'center', marginTop: spacing.md },
+    hint: { fontSize: 13, color: c.textMuted },
+    mono: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'] },
+    footnote: { fontSize: 11, color: c.textSubtle, textAlign: 'center', marginTop: spacing.md },
     spinner: { marginTop: spacing.lg },
   });
-};

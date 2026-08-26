@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useArchive } from '../../state/archive-store';
 import { TextField } from '../components/TextField';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
 // The thread list: every captured conversation, newest activity first, cursor-paged.
@@ -48,7 +49,7 @@ export function ConversationsScreen() {
           loading ? (
             <ActivityIndicator color={c.primary} style={styles.spinner} />
           ) : (
-            <Text style={styles.empty}>No conversations captured yet.</Text>
+            <Text variant="bodySmall" style={styles.empty}>No conversations captured yet.</Text>
           )
         }
         ListFooterComponent={
@@ -61,12 +62,12 @@ export function ConversationsScreen() {
             onPress={() => navigation.navigate('Thread', { conversationId: item.id })}
           >
             <View style={styles.header}>
-              <Text style={styles.title} numberOfLines={1}>
+              <Text variant="bodyLarge" style={styles.title} numberOfLines={1}>
                 {item.title ?? 'Untitled thread'}
               </Text>
-              <Text style={styles.when}>{new Date(item.lastMessageAt).toLocaleDateString()}</Text>
+              <Text variant="bodySmall" style={styles.when}>{new Date(item.lastMessageAt).toLocaleDateString()}</Text>
             </View>
-            <Text style={styles.meta}>
+            <Text variant="labelSmall" style={styles.meta}>
               {item.source} · {item.messageCount} message{item.messageCount === 1 ? '' : 's'}
             </Text>
           </Pressable>
@@ -76,18 +77,16 @@ export function ConversationsScreen() {
   );
 }
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     filter: { margin: spacing.lg, marginBottom: spacing.sm },
     list: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
-    title: { ...t.body, fontWeight: '600', flexShrink: 1 },
-    when: { ...t.mono },
-    meta: { ...t.hint },
-    empty: { ...t.small, textAlign: 'center', marginTop: spacing.lg },
+    title: { fontWeight: '600', flexShrink: 1 },
+    when: { color: c.textMuted, fontVariant: ['tabular-nums'] },
+    meta: { color: c.textSubtle },
+    empty: { color: c.textMuted, textAlign: 'center', marginTop: spacing.lg },
     spinner: { marginVertical: spacing.md },
   });
-};

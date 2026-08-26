@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { Text } from 'react-native-paper';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Device from 'expo-device';
@@ -15,7 +16,7 @@ import { useAuth } from '../../state/auth-store';
 import { useDevice } from '../../state/device-store';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { makeType, spacing, useColors, type Palette } from '../theme';
+import { spacing, useColors, type Palette } from '../theme';
 import { logDebug } from '../../debug/log';
 
 // Dismisses the in-app browser when the auth redirect returns.
@@ -98,12 +99,12 @@ export function RegisterDeviceScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lupira Assistant</Text>
-      <Text style={styles.subtitle}>Set this phone up to record telemetry.</Text>
+      <Text variant="headlineSmall" style={styles.title}>Lupira Assistant</Text>
+      <Text variant="bodySmall" style={styles.subtitle}>Set this phone up to record telemetry.</Text>
 
       {!authed ? (
         <>
-          <Text style={styles.step}>Step 1 — sign in</Text>
+          <Text variant="labelMedium" style={styles.step}>Step 1 — sign in</Text>
           <Button
             title="Sign in with Authentik"
             onPress={() => void handleSignIn()}
@@ -113,8 +114,8 @@ export function RegisterDeviceScreen() {
         </>
       ) : (
         <>
-          <Text style={styles.step}>Step 2 — register this phone</Text>
-          <Text style={styles.signedIn}>Signed in as {userEmail}</Text>
+          <Text variant="labelMedium" style={styles.step}>Step 2 — register this phone</Text>
+          <Text variant="bodySmall" style={styles.signedIn}>Signed in as {userEmail}</Text>
           <TextField
             label="Device label"
             placeholder="My phone"
@@ -132,15 +133,13 @@ export function RegisterDeviceScreen() {
   );
 }
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', padding: spacing.xl, backgroundColor: c.bg, gap: spacing.md },
-    title: { ...t.title, textAlign: 'center' },
-    subtitle: { ...t.small, textAlign: 'center', marginBottom: spacing.lg },
-    step: { ...t.sectionLabel, marginTop: spacing.md },
-    signedIn: { ...t.small },
+    title: { textAlign: 'center' },
+    subtitle: { color: c.textMuted, textAlign: 'center', marginBottom: spacing.lg },
+    step: { color: c.textSubtle, marginTop: spacing.md },
+    signedIn: { color: c.textMuted },
     spinner: { marginTop: spacing.md },
     error: { color: c.danger, textAlign: 'center', marginTop: spacing.md },
   });
-};

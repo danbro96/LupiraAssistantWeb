@@ -15,7 +15,7 @@ import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
 import { useConfirm } from '../components/ConfirmDialog';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 
 type Styles = ReturnType<typeof makeStyles>;
@@ -229,23 +229,21 @@ const Row = memo(function Row({
   );
 });
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
-    section: { ...t.sectionLabel, marginTop: spacing.md, marginBottom: spacing.xs },
+    section: { fontSize: 12, fontWeight: '700', color: c.textSubtle, marginTop: spacing.md, marginBottom: spacing.xs },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     // Outlined fields carry a floating label on the border, so they need more air than info rows.
     serversCard: { gap: spacing.sm },
     toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    rowLabel: { ...t.body },
+    rowLabel: { fontSize: 16, color: c.text },
     infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
-    infoLabel: { ...t.small },
-    infoValue: { ...t.body, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
-    infoValueMono: { ...t.mono, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
-    warn: { ...t.small, color: c.warning, marginTop: spacing.xs },
-    error: { ...t.small, color: c.danger, marginTop: spacing.xs },
+    infoLabel: { fontSize: 13, color: c.textMuted },
+    infoValue: { fontSize: 16, color: c.text, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
+    infoValueMono: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'], flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
+    warn: { fontSize: 13, color: c.warning, marginTop: spacing.xs },
+    error: { fontSize: 13, color: c.danger, marginTop: spacing.xs },
     btn: { marginTop: spacing.sm },
   });
-};

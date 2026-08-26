@@ -10,7 +10,7 @@ import { payloadSlotFor } from '@lupira/assistant-domain/edit-spec';
 import type { RootStackParamList } from '../navigation/types';
 import { Button } from '../components/Button';
 import { TextField } from '../components/TextField';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import { toast } from '../../feedback/toast';
 
 const GRANT_TEXT: Record<GrantStatus, string> = {
@@ -199,24 +199,22 @@ const QuestionCard = memo(function QuestionCard({ item, answer, onAnswerChange, 
   );
 });
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, gap: spacing.sm },
     card: { backgroundColor: c.surface, borderRadius: radii.lg, padding: spacing.md, gap: spacing.xs },
     grantCard: { gap: spacing.sm },
-    grantText: { ...t.body },
+    grantText: { fontSize: 16, color: c.text },
     btn: { marginTop: spacing.xs },
-    empty: { ...t.bodyLg },
-    emptyHint: { ...t.small },
+    empty: { fontSize: 17, color: c.text },
+    emptyHint: { fontSize: 13, color: c.textMuted },
     itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    kind: { ...t.sectionLabel, color: c.primary },
-    when: { ...t.mono },
-    title: { ...t.body, fontWeight: '600' },
-    summary: { ...t.small },
+    kind: { fontSize: 12, fontWeight: '700', color: c.primary },
+    when: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'] },
+    title: { fontSize: 16, color: c.text, fontWeight: '600' },
+    summary: { fontSize: 13, color: c.textMuted },
     actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
     actionBtn: { flex: 1 },
-    footnote: { ...t.hint, textAlign: 'center', marginTop: spacing.md },
+    footnote: { fontSize: 11, color: c.textSubtle, textAlign: 'center', marginTop: spacing.md },
   });
-};

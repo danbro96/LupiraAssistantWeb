@@ -4,7 +4,7 @@ import { useRoute, type RouteProp } from '@react-navigation/native';
 import { useArchive } from '../../state/archive-store';
 import type { ConversationMessageDto } from '../../data/api/generated/comms/models';
 import { dayBreakLabel } from '@lupira/assistant-domain/thread-page';
-import { makeType, radii, spacing, useColors, type Palette } from '../theme';
+import { radii, spacing, useColors, type Palette } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
 // Chat-style reader. Rendered oldest→newest with `inverted` so paging older messages (the natural
@@ -96,21 +96,19 @@ const MessageRow = memo(function MessageRow({ message, previous, highlighted, st
   );
 });
 
-const makeStyles = (c: Palette) => {
-  const t = makeType(c);
-  return StyleSheet.create({
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
     list: { padding: spacing.lg, gap: spacing.sm },
     bubble: { maxWidth: '85%', borderRadius: radii.lg, padding: spacing.sm, gap: 2 },
     mine: { alignSelf: 'flex-end', backgroundColor: c.primary },
     theirs: { alignSelf: 'flex-start', backgroundColor: c.surface },
     highlighted: { borderWidth: 2, borderColor: c.pending },
-    sender: { ...t.hint, fontWeight: '700' },
-    text: { ...t.body },
+    sender: { fontSize: 11, color: c.textSubtle, fontWeight: '700' },
+    text: { fontSize: 16, color: c.text },
     onPrimary: { color: c.onPrimary },
-    when: { ...t.hint, alignSelf: 'flex-end' },
-    dayBreak: { ...t.hint, textAlign: 'center', marginTop: spacing.sm },
-    empty: { ...t.small, textAlign: 'center', marginTop: spacing.lg },
+    when: { fontSize: 11, color: c.textSubtle, alignSelf: 'flex-end' },
+    dayBreak: { fontSize: 11, color: c.textSubtle, textAlign: 'center', marginTop: spacing.sm },
+    empty: { fontSize: 13, color: c.textMuted, textAlign: 'center', marginTop: spacing.lg },
     spinner: { marginVertical: spacing.md },
   });
-};
