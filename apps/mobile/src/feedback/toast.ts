@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { hapticError } from './haptics';
 
+// The imperative half of the toast feature: a leaf with no app-layer dependencies, so any layer
+// may call `toast()` without reaching upward into the UI. The host is ui/components/ToastHost.tsx.
+// One message at a time; a new toast replaces the current one.
+
 export interface ToastAction {
   label: string;
   onPress: () => void;
@@ -37,7 +41,7 @@ export const useToast = create<ToastState>(set => ({
   hide: () => set({ message: null, action: null }),
 }));
 
-/** Safe to call outside React components. */
+/** Safe to call outside React components. `action` renders an inline button (e.g. Undo). */
 export function toast(message: string, opts?: ToastOptions): void {
   useToast.getState().show(message, opts);
 }
