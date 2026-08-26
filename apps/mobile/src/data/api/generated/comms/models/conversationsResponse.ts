@@ -9,6 +9,9 @@ import type { ConversationSummaryDto } from './conversationSummaryDto';
 
 export interface ConversationsResponse {
   items: ConversationSummaryDto[];
-  /** @nullable */
+  /**
+     * Present when more (older-activity) threads exist; pass back as `?cursor=`.
+     * @nullable
+     */
   nextCursor?: string | null;
 }

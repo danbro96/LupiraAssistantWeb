@@ -6,6 +6,11 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * A reply obligation: an unanswered message directed at the user, or the user's stated intent
+ *             to contact someone. Routes to the "Replies" list with a recurring nudge. The assistant tracks that a
+ *             reply is owed — it never drafts the reply text.
+ */
 export interface ReplyDetail {
   /** @nullable */
   counterparty?: string | null;

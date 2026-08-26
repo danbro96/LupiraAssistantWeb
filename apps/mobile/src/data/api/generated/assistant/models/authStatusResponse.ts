@@ -6,9 +6,15 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Whether the caller has a live offline grant (and for which downstream audiences).
+ */
 export interface AuthStatusResponse {
   hasGrant: boolean;
-  /** @nullable */
+  /**
+     * The grant lifecycle state (`Active`/`Revoked`/`Expired`), null without a grant.
+     * @nullable
+     */
   status?: string | null;
   audiences: string[];
 }

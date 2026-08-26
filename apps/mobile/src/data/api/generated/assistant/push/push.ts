@@ -6,36 +6,42 @@
  * OpenAPI spec version: v1
  */
 import type {
+  ProblemDetails,
   RegisterPushTokenRequest
 } from '../models';
 
 import { apiFetchAssistant } from '../../../mutators';
 
-export type postPushTokensResponse204 = {
+export type createPushTokenResponse204 = {
   data: void
   status: 204
 }
 
-export type postPushTokensResponse400 = {
+export type createPushTokenResponse400 = {
   data: string
   status: 400
 }
 
-export type postPushTokensResponse401 = {
-  data: void
+export type createPushTokenResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type postPushTokensResponseSuccess = (postPushTokensResponse204) & {
+export type createPushTokenResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type createPushTokenResponseSuccess = (createPushTokenResponse204) & {
   headers: Headers;
 };
-export type postPushTokensResponseError = (postPushTokensResponse400 | postPushTokensResponse401) & {
+export type createPushTokenResponseError = (createPushTokenResponse400 | createPushTokenResponse401 | createPushTokenResponse500) & {
   headers: Headers;
 };
 
-export type postPushTokensResponse = (postPushTokensResponseSuccess | postPushTokensResponseError)
+export type createPushTokenResponse = (createPushTokenResponseSuccess | createPushTokenResponseError)
 
-export const getPostPushTokensUrl = () => {
+export const getCreatePushTokenUrl = () => {
 
 
 
@@ -46,9 +52,9 @@ export const getPostPushTokensUrl = () => {
 /**
  * @summary Register this device's Expo push token (idempotent on the token).
  */
-export const postPushTokens = async (registerPushTokenRequest: RegisterPushTokenRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postPushTokensResponse> => {
+export const createPushToken = async (registerPushTokenRequest: RegisterPushTokenRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<createPushTokenResponse> => {
 
-  return apiFetchAssistant<postPushTokensResponse>(getPostPushTokensUrl(),
+  return apiFetchAssistant<createPushTokenResponse>(getCreatePushTokenUrl(),
   {
     ...options,
     method: 'POST',
@@ -58,31 +64,36 @@ export const postPushTokens = async (registerPushTokenRequest: RegisterPushToken
 );}
 
 
-export type deletePushTokensTokenResponse204 = {
+export type deletePushTokenResponse204 = {
   data: void
   status: 204
 }
 
-export type deletePushTokensTokenResponse401 = {
-  data: void
+export type deletePushTokenResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type deletePushTokensTokenResponse404 = {
-  data: void
+export type deletePushTokenResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type deletePushTokensTokenResponseSuccess = (deletePushTokensTokenResponse204) & {
+export type deletePushTokenResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type deletePushTokenResponseSuccess = (deletePushTokenResponse204) & {
   headers: Headers;
 };
-export type deletePushTokensTokenResponseError = (deletePushTokensTokenResponse401 | deletePushTokensTokenResponse404) & {
+export type deletePushTokenResponseError = (deletePushTokenResponse401 | deletePushTokenResponse404 | deletePushTokenResponse500) & {
   headers: Headers;
 };
 
-export type deletePushTokensTokenResponse = (deletePushTokensTokenResponseSuccess | deletePushTokensTokenResponseError)
+export type deletePushTokenResponse = (deletePushTokenResponseSuccess | deletePushTokenResponseError)
 
-export const getDeletePushTokensTokenUrl = (token: string,) => {
+export const getDeletePushTokenUrl = (token: string,) => {
 
 
 
@@ -93,9 +104,9 @@ export const getDeletePushTokensTokenUrl = (token: string,) => {
 /**
  * @summary Drop a push token (logout).
  */
-export const deletePushTokensToken = async (token: string, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<deletePushTokensTokenResponse> => {
+export const deletePushToken = async (token: string, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<deletePushTokenResponse> => {
 
-  return apiFetchAssistant<deletePushTokensTokenResponse>(getDeletePushTokensTokenUrl(token),
+  return apiFetchAssistant<deletePushTokenResponse>(getDeletePushTokenUrl(token),
   {
     ...options,
     method: 'DELETE'

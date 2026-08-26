@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import { postPushTokens, deletePushTokensToken } from '../api/generated/assistant/push/push';
+import { createPushToken, deletePushToken } from '../api/generated/assistant/push/push';
 import { getDeviceId } from '../secure/device-credentials';
 import { logDebug } from '../../debug/log';
 
@@ -32,7 +32,7 @@ export async function registerPushToken(): Promise<string | null> {
   const token = await obtainPushToken();
   if (!token) return null;
   try {
-    await postPushTokens({
+    await createPushToken({
       token,
       deviceId: await getDeviceId(),
       platform: Platform.OS === 'ios' ? 'Ios' : 'Android',
@@ -47,7 +47,7 @@ export async function registerPushToken(): Promise<string | null> {
 /** Drop the token server-side (logout / re-registration). */
 export async function unregisterPushToken(token: string): Promise<void> {
   try {
-    await deletePushTokensToken(token);
+    await deletePushToken(token);
   } catch (e) {
     logDebug('push:unregister-error', e instanceof Error ? e.message : String(e));
   }

@@ -7,15 +7,19 @@
  */
 
 /**
- * A parcel to receive. DateTimeOffset? TaskProposal.DueAt is the expected arrival.
+ * RFC 9457 problem details.
  */
-export interface DeliveryDetail {
+export interface ProblemDetails {
   /** @nullable */
-  carrier?: string | null;
+  type?: string | null;
   /** @nullable */
-  trackingNumber?: string | null;
+  title?: string | null;
   /** @nullable */
-  trackingUrl?: string | null;
+  status?: number | null;
   /** @nullable */
-  orderReference?: string | null;
+  detail?: string | null;
+  /** @nullable */
+  instance?: string | null;
+  /** @nullable */
+  traceId?: string | null;
 }

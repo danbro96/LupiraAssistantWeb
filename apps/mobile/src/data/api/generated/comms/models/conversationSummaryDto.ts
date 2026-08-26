@@ -7,6 +7,9 @@
  */
 import type { MessageSource } from './messageSource';
 
+/**
+ * A thread in the archive browser's conversation list, newest activity first.
+ */
 export interface ConversationSummaryDto {
   id: string;
   source: MessageSource;

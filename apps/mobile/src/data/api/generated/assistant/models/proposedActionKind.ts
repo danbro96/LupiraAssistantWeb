@@ -6,6 +6,12 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * What a ProposedAction would write. The agent run produces these; the M4 validator
+ * checks the kind against the prompt's contracted `OutputKind`, and Policy (M5) routes the
+ * write to free CRUD (agent scaffolding) or an ApprovalRequest (user records). The Writer (M6)
+ * dispatches by kind to cal-api / tasks-api / career-api.
+ */
 export type ProposedActionKind = typeof ProposedActionKind[keyof typeof ProposedActionKind];
 
 

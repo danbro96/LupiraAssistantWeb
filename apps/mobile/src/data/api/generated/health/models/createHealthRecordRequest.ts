@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Create a health record. The caller is granted `owner`.
+ */
 export interface CreateHealthRecordRequest {
   slug: string;
   /** @nullable */

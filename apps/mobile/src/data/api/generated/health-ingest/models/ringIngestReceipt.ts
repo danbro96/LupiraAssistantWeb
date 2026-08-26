@@ -7,6 +7,9 @@
  */
 import type { IngestReject } from './ingestReject';
 
+/**
+ * The outcome of a ring-sample (or device-summary) ingest batch. Idempotent re-uploads show as duplicates.
+ */
 export interface RingIngestReceipt {
   submitted: number;
   inserted: number;

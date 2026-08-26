@@ -9,4 +9,5 @@
 export * from './ingestReject';
 export * from './locationCursor';
 export * from './locationIngestReceipt';
+export * from './problemDetails';
 export * from './trackingStateDto';

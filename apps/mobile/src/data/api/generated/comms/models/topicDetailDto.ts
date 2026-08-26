@@ -8,6 +8,9 @@
 import type { TopicMessageDto } from './topicMessageDto';
 import type { TopicStatus } from './topicStatus';
 
+/**
+ * A topic with its message window — the open-topic tail (`GET /topics/{id}`).
+ */
 export interface TopicDetailDto {
   id: string;
   label: string;

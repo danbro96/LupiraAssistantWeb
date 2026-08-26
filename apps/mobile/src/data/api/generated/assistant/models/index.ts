@@ -23,6 +23,7 @@ export * from './jsonElement';
 export * from './placeProposal';
 export * from './preferencesResponse';
 export * from './preferencesUpdateRequest';
+export * from './problemDetails';
 export * from './profileResponse';
 export * from './proposalDetailDto';
 export * from './proposalDetailDtoSources';

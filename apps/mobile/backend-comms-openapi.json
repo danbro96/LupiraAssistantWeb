@@ -25,7 +25,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -41,6 +58,7 @@
           "Ingest"
         ],
         "summary": "Accept a captured message from a connector sidecar (accept-then-own).",
+        "operationId": "IngestMessages",
         "requestBody": {
           "content": {
             "application/json": {
@@ -73,7 +91,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -89,6 +124,7 @@
           "Archive"
         ],
         "summary": "Hybrid research search over the corpus (semantic + full-text, reranked).",
+        "operationId": "Search",
         "parameters": [
           {
             "name": "q",
@@ -175,6 +211,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "502": {
             "description": "Bad Gateway",
             "content": {
@@ -199,6 +255,7 @@
           "Archive"
         ],
         "summary": "Capture status per source: granted connectors, message count, last arrival.",
+        "operationId": "ListConnectors",
         "parameters": [
           {
             "name": "principalId",
@@ -231,6 +288,26 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -246,6 +323,7 @@
           "Topics"
         ],
         "summary": "List topics by status (poll alternative to closed-topic push).",
+        "operationId": "ListTopics",
         "parameters": [
           {
             "name": "status",
@@ -301,6 +379,26 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -316,6 +414,7 @@
           "Topics"
         ],
         "summary": "Get a topic with its ordered message window (open-topic tail).",
+        "operationId": "GetTopic",
         "parameters": [
           {
             "name": "id",
@@ -355,8 +454,35 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -372,6 +498,7 @@
           "Archive"
         ],
         "summary": "List conversations, newest activity first (title filter, cursor-paged).",
+        "operationId": "ListConversations",
         "parameters": [
           {
             "name": "q",
@@ -431,6 +558,26 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -446,6 +593,7 @@
           "Archive"
         ],
         "summary": "A chat-style thread page: latest, before/after an anchor, or around one (search-hit jump).",
+        "operationId": "ListMessages",
         "parameters": [
           {
             "name": "id",
@@ -517,8 +665,35 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -548,13 +723,15 @@
           },
           "conversationId": {
             "type": "string",
+            "description": "The thread the message belongs to — the jump target for the archive browser.",
             "format": "uuid"
           },
           "conversationTitle": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The thread the message belongs to, if titled."
           },
           "sender": {
             "type": [
@@ -574,9 +751,11 @@
           },
           "score": {
             "type": "number",
+            "description": "The cross-encoder relevance score from the rerank pass (higher = more relevant).",
             "format": "double"
           }
-        }
+        },
+        "description": "One corpus message returned by research search (`archive_search`), ordered by the\n            reranker's relevance. Read-only projection over the `comms` corpus — never a whole topic."
       },
       "ConnectorStatusDto": {
         "required": [
@@ -593,7 +772,8 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "The service identities granted ingest for this principal on this source."
           },
           "messageCount": {
             "type": "integer",
@@ -604,9 +784,11 @@
               "null",
               "string"
             ],
+            "description": "The newest captured message's timestamp; null when nothing has arrived yet.",
             "format": "date-time"
           }
-        }
+        },
+        "description": "What the owner can see about one capture source: is it granted, and is it still arriving. Read-only\nby design — connector grants and credentials are managed out-of-band via the ops CLI, never over HTTP."
       },
       "ConversationMessageDto": {
         "required": [
@@ -637,7 +819,8 @@
           "text": {
             "type": "string"
           }
-        }
+        },
+        "description": "One message in a thread page (chronological within the page)."
       },
       "ConversationMessagesResponse": {
         "required": [
@@ -662,7 +845,8 @@
               "$ref": "#/components/schemas/ConversationMessageDto"
             }
           }
-        }
+        },
+        "description": "A thread page. Page onwards using the first/last item ids as `before`/`after`."
       },
       "ConversationsResponse": {
         "required": [
@@ -681,6 +865,7 @@
               "null",
               "string"
             ],
+            "description": "Present when more (older-activity) threads exist; pass back as `?cursor=`.",
             "format": "date-time"
           }
         }
@@ -715,7 +900,8 @@
             "type": "integer",
             "format": "int32"
           }
-        }
+        },
+        "description": "A thread in the archive browser's conversation list, newest activity first."
       },
       "IngestAcceptedResponse": {
         "required": [
@@ -729,9 +915,11 @@
             "format": "uuid"
           },
           "duplicate": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "True when the message was already recorded (deduped on `source:sourceRef`)."
           }
-        }
+        },
+        "description": "The accept-then-own receipt: the corpus message id, and whether this was a redelivery."
       },
       "IngestMessageRequest": {
         "required": [
@@ -745,35 +933,41 @@
         "type": "object",
         "properties": {
           "principalId": {
-            "type": "string"
+            "type": "string",
+            "description": "The owner this message belongs to — relayed by the service caller, never inferred."
           },
           "source": {
             "$ref": "#/components/schemas/MessageSource"
           },
           "sourceRef": {
-            "type": "string"
+            "type": "string",
+            "description": "The platform message id (dedup identity within MessageSource IngestMessageRequest.Source)."
           },
           "text": {
             "type": "string"
           },
           "timestamp": {
             "type": "string",
+            "description": "When the message was sent on the platform.",
             "format": "date-time"
           },
           "conversationRef": {
-            "type": "string"
+            "type": "string",
+            "description": "The platform thread/chat id this message belongs to."
           },
           "conversationTitle": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Optional thread title (set when the conversation is first seen)."
           },
           "senderRef": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Optional platform sender id; resolves/creates a `Participant` when present."
           },
           "senderName": {
             "type": [
@@ -782,28 +976,33 @@
             ]
           },
           "fromPrincipal": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "True when the owner sent this message (the connector's direction bit). Defaults false, so\n            older/importer callers that don't set it are treated as received."
           },
           "importBatch": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Set by the historical importer to tag the import run; null for live ingest."
           },
           "attachmentPath": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Export-root-relative path of the message's media file, if any — the media import\n            phase uploads it and stamps the row's object key. Null for live ingest (sidecars skip media)."
           }
-        }
+        },
+        "description": "A normalised message from a connector sidecar (or the historical importer). The connector\nguarantees string IngestMessageRequest.SourceRef is unique within MessageSource IngestMessageRequest.Source for the principal — it\nis the dedup key. string IngestMessageRequest.ConversationRef groups messages into a thread; the sender fields\nresolve a `Participant`."
       },
       "MessageSource": {
         "enum": [
           "Telegram",
           "Facebook",
           "Email"
-        ]
+        ],
+        "description": "The connector/platform a message was captured from. Stored as a string (via\n`JsonStringEnumConverter` on the wire, `text` in the corpus) so the value is stable\nacross reordering. Extends as connectors land (email, etc.)."
       },
       "PingDto": {
         "required": [
@@ -827,7 +1026,8 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "The claims a caller's token resolved to, echoed for cross-service auth-seam probes.\n            Returning the audiences (not a bare 200) lets a failing consumer see which half of the seam\n            is misconfigured."
       },
       "ProblemDetails": {
         "type": "object",
@@ -862,8 +1062,15 @@
               "null",
               "string"
             ]
+          },
+          "traceId": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
-        }
+        },
+        "description": "RFC 9457 problem details."
       },
       "TopicDetailDto": {
         "required": [
@@ -895,7 +1102,8 @@
               "$ref": "#/components/schemas/TopicMessageDto"
             }
           }
-        }
+        },
+        "description": "A topic with its message window — the open-topic tail (`GET /topics/{id}`)."
       },
       "TopicMessageDto": {
         "required": [
@@ -917,7 +1125,8 @@
             ]
           },
           "fromPrincipal": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "True when the owner sent this message — the assistant's inbound-vs-outbound signal."
           },
           "timestamp": {
             "type": "string",
@@ -929,14 +1138,16 @@
           "sourceRef": {
             "type": "string"
           }
-        }
+        },
+        "description": "One message in a released topic window (ordered chronologically)."
       },
       "TopicStatus": {
         "enum": [
           "Open",
           "Closed",
           "Released"
-        ]
+        ],
+        "description": "The Topic lifecycle. `Open` accrues messages; the closer moves an idle topic to\n`Closed` then `Released` (handed to the assistant). A high-similarity hit on a\nrecently-released topic may reopen it (back to `Open`) rather than start a new one."
       },
       "TopicSummaryDto": {
         "required": [
@@ -973,7 +1184,8 @@
             ],
             "format": "date-time"
           }
-        }
+        },
+        "description": "A topic in a list response (the poll alternative — `GET /topics`)."
       }
     },
     "securitySchemes": {

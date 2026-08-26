@@ -1,9 +1,9 @@
 import type { Db } from '../data/db/db';
 import { deleteAck, fetchPendingAcks } from '../data/db/pending-acks-repo';
 import {
-  postProposalsIdResolve,
-  postCheckinsIdAnswer,
-  postNoticesIdRead,
+  resolveProposal,
+  answerCheckIn,
+  markNoticeRead,
 } from '../data/api/generated/assistant/inbox/inbox';
 import type { ResolveProposalRequest, AnswerCheckInRequest } from '../data/api/generated/assistant/models';
 import { classifyAckStatus, parseAckPayload, type AnswerPayload, type ResolvePayload } from '@lupira/assistant-domain/ack';
@@ -43,7 +43,7 @@ export async function runAckUpload(db: Db): Promise<AckUploadOutcome> {
           edits: (p.edits ?? undefined) as ResolveProposalRequest['edits'],
           clientActionId: row.clientActionId,
         };
-        await postProposalsIdResolve(row.targetId, body);
+        await resolveProposal(row.targetId, body);
       } else if (row.kind === 'answer') {
         const p = payload as AnswerPayload;
         const body: AnswerCheckInRequest = {
@@ -51,9 +51,9 @@ export async function runAckUpload(db: Db): Promise<AckUploadOutcome> {
           skip: p.skip ?? false,
           clientActionId: row.clientActionId,
         };
-        await postCheckinsIdAnswer(row.targetId, body);
+        await answerCheckIn(row.targetId, body);
       } else {
-        await postNoticesIdRead(row.targetId, { clientActionId: row.clientActionId });
+        await markNoticeRead(row.targetId, { clientActionId: row.clientActionId });
       }
       await deleteAck(db, row.seq);
     } catch (e) {

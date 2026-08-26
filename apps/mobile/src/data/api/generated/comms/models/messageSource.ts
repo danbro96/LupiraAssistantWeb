@@ -6,6 +6,11 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * The connector/platform a message was captured from. Stored as a string (via
+ * `JsonStringEnumConverter` on the wire, `text` in the corpus) so the value is stable
+ * across reordering. Extends as connectors land (email, etc.).
+ */
 export type MessageSource = typeof MessageSource[keyof typeof MessageSource];
 
 

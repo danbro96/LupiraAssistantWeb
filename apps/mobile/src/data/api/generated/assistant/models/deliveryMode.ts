@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Per-item = wake me for each item; digest = stay silent and let the digest carry them.
+ */
 export type DeliveryMode = typeof DeliveryMode[keyof typeof DeliveryMode];
 
 

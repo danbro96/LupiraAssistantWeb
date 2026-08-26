@@ -5,15 +5,7 @@
  * The comms substrate for Lupira: message ingestion, a per-user corpus, semantic topic segmentation, and closed-topic delivery to the assistant. Authenticate with a Bearer token issued by Authentik (owner surface) or service auth (internal hops).
  * OpenAPI spec version: v1
  */
-import type { MessageSource } from './messageSource';
 
-export type GetSearchParams = {
-q?: string;
-from?: string;
-to?: string;
-source?: MessageSource;
-participant?: string;
-conversationId?: string;
-limit?: number;
+export type ListConnectorsParams = {
 principalId?: string;
 };

@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * A bill to pay. DateTimeOffset? TaskProposal.DueAt is the payment due date.
+ */
 export interface BillDetail {
   /** @nullable */
   amount?: number | null;

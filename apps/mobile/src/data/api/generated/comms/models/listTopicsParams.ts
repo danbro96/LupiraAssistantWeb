@@ -6,10 +6,9 @@
  * OpenAPI spec version: v1
  */
 
-export type GetConversationsIdMessagesParams = {
-around?: string;
-before?: string;
-after?: string;
+export type ListTopicsParams = {
+status?: string;
+cursor?: string;
 limit?: number;
 principalId?: string;
 };

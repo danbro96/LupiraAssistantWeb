@@ -8,5 +8,6 @@
 
 export interface AckResponse {
   applied: boolean;
+  /** True when this client action id was already processed (a replay). */
   duplicate: boolean;
 }

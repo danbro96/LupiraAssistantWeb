@@ -7,15 +7,24 @@
  */
 import type { MessageSource } from './messageSource';
 
+/**
+ * One corpus message returned by research search (`archive_search`), ordered by the
+ *             reranker's relevance. Read-only projection over the `comms` corpus — never a whole topic.
+ */
 export interface ArchiveSearchHitDto {
   messageId: string;
+  /** The thread the message belongs to — the jump target for the archive browser. */
   conversationId: string;
-  /** @nullable */
+  /**
+     * The thread the message belongs to, if titled.
+     * @nullable
+     */
   conversationTitle?: string | null;
   /** @nullable */
   sender?: string | null;
   timestamp: string;
   source: MessageSource;
   text: string;
+  /** The cross-encoder relevance score from the rerank pass (higher = more relevant). */
   score: number;
 }

@@ -96,6 +96,7 @@ export const useInbox = create<InboxState & InboxActions>((set, get) => ({
   refreshGrant: async () => {
     try {
       const res = await getAuthStatus();
+      if (res.status !== 200) return;
       const grant = res.data;
       set({ grantStatus: grant.hasGrant && grant.status === 'Active' ? 'connected' : 'reauth-needed' });
     } catch (e) {

@@ -9,3 +9,4 @@
 export * from './createHealthRecordRequest';
 export * from './healthRecordDto';
 export * from './meDto';
+export * from './problemDetails';

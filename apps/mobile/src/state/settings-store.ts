@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { getMePreferences, putMePreferences } from '../data/api/generated/assistant/profile/profile';
-import { getMeConnectors } from '../data/api/generated/comms/archive/archive';
+import { getPreferences, setPreferences } from '../data/api/generated/assistant/profile/profile';
+import { listConnectors } from '../data/api/generated/comms/archive/archive';
 import type { PreferencesResponse, PreferencesUpdateRequest } from '../data/api/generated/assistant/models';
 import type { ConnectorStatusDto } from '../data/api/generated/comms/models';
 import { logDebug } from '../debug/log';
@@ -31,7 +31,7 @@ export const useSettings = create<SettingsState & SettingsActions>((set) => ({
 
   loadPreferences: async () => {
     try {
-      set({ preferences: ok<PreferencesResponse>(await getMePreferences()) });
+      set({ preferences: ok<PreferencesResponse>(await getPreferences()) });
     } catch (e) {
       logDebug('settings:preferences-error', e instanceof Error ? e.message : String(e));
     }
@@ -40,7 +40,7 @@ export const useSettings = create<SettingsState & SettingsActions>((set) => ({
   savePreferences: async (update) => {
     set({ savingPreferences: true });
     try {
-      set({ preferences: ok<PreferencesResponse>(await putMePreferences(update)) });
+      set({ preferences: ok<PreferencesResponse>(await setPreferences(update)) });
       return true;
     } catch (e) {
       logDebug('settings:preferences-save-error', e instanceof Error ? e.message : String(e));
@@ -53,7 +53,7 @@ export const useSettings = create<SettingsState & SettingsActions>((set) => ({
   loadConnectors: async () => {
     set({ loadingConnectors: true });
     try {
-      set({ connectors: ok<ConnectorStatusDto[]>(await getMeConnectors()), loadingConnectors: false });
+      set({ connectors: ok<ConnectorStatusDto[]>(await listConnectors()), loadingConnectors: false });
     } catch (e) {
       logDebug('settings:connectors-error', e instanceof Error ? e.message : String(e));
       set({ loadingConnectors: false });

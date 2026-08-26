@@ -7,6 +7,9 @@
  */
 import type { TopicStatus } from './topicStatus';
 
+/**
+ * A topic in a list response (the poll alternative — `GET /topics`).
+ */
 export interface TopicSummaryDto {
   id: string;
   label: string;

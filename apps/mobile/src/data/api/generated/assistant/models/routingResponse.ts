@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * The principal's resolved routing defaults (null = not yet learned/set).
+ */
 export interface RoutingResponse {
   /** @nullable */
   personalCalendarId: string | null;

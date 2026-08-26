@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Patch the routing defaults — only non-null fields are applied (others keep their value).
+ */
 export interface RoutingUpdateRequest {
   /** @nullable */
   personalCalendarId?: string | null;

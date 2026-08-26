@@ -7,6 +7,7 @@
  */
 
 /**
+ * Per-field provenance: payload field → the durable message refs that justify it.
  * @nullable
  */
 export type ProposalDetailDtoSources = null | {[key: string]: string[]};

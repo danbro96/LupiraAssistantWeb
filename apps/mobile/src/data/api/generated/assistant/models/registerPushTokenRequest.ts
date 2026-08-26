@@ -7,9 +7,15 @@
  */
 import type { PushPlatform } from './pushPlatform';
 
+/**
+ * Register this device's Expo push token. Idempotent on the token.
+ */
 export interface RegisterPushTokenRequest {
   token: string;
-  /** @nullable */
+  /**
+     * The app's device id, so a re-install supersedes its predecessor's token.
+     * @nullable
+     */
   deviceId?: string | null;
   platform: PushPlatform;
 }

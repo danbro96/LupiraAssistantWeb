@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * A proposed contact (lands in P's default address book).
+ */
 export interface ContactProposal {
   /** @nullable */
   givenName?: string | null;

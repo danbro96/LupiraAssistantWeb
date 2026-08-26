@@ -7,10 +7,18 @@
  */
 import type { MessageSource } from './messageSource';
 
+/**
+ * What the owner can see about one capture source: is it granted, and is it still arriving. Read-only
+ * by design — connector grants and credentials are managed out-of-band via the ops CLI, never over HTTP.
+ */
 export interface ConnectorStatusDto {
   source: MessageSource;
+  /** The service identities granted ingest for this principal on this source. */
   connectors: string[];
   messageCount: number;
-  /** @nullable */
+  /**
+     * The newest captured message's timestamp; null when nothing has arrived yet.
+     * @nullable
+     */
   lastMessageAt?: string | null;
 }

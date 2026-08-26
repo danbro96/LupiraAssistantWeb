@@ -10,6 +10,7 @@ import type {
   AnswerCheckInRequest,
   GetInboxParams,
   InboxResponse,
+  ProblemDetails,
   ReadNoticeRequest,
   ResolveProposalRequest
 } from '../models';
@@ -27,14 +28,19 @@ export type getInboxResponse400 = {
 }
 
 export type getInboxResponse401 = {
-  data: void
+  data: ProblemDetails
   status: 401
+}
+
+export type getInboxResponse500 = {
+  data: ProblemDetails
+  status: 500
 }
 
 export type getInboxResponseSuccess = (getInboxResponse200) & {
   headers: Headers;
 };
-export type getInboxResponseError = (getInboxResponse400 | getInboxResponse401) & {
+export type getInboxResponseError = (getInboxResponse400 | getInboxResponse401 | getInboxResponse500) & {
   headers: Headers;
 };
 
@@ -70,41 +76,46 @@ export const getInbox = async (params?: GetInboxParams, options?: Parameters<typ
 );}
 
 
-export type postProposalsIdResolveResponse200 = {
+export type resolveProposalResponse200 = {
   data: AckResponse
   status: 200
 }
 
-export type postProposalsIdResolveResponse400 = {
+export type resolveProposalResponse400 = {
   data: string
   status: 400
 }
 
-export type postProposalsIdResolveResponse401 = {
-  data: void
+export type resolveProposalResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type postProposalsIdResolveResponse404 = {
-  data: void
+export type resolveProposalResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type postProposalsIdResolveResponse409 = {
-  data: void
+export type resolveProposalResponse409 = {
+  data: ProblemDetails
   status: 409
 }
 
-export type postProposalsIdResolveResponseSuccess = (postProposalsIdResolveResponse200) & {
+export type resolveProposalResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type resolveProposalResponseSuccess = (resolveProposalResponse200) & {
   headers: Headers;
 };
-export type postProposalsIdResolveResponseError = (postProposalsIdResolveResponse400 | postProposalsIdResolveResponse401 | postProposalsIdResolveResponse404 | postProposalsIdResolveResponse409) & {
+export type resolveProposalResponseError = (resolveProposalResponse400 | resolveProposalResponse401 | resolveProposalResponse404 | resolveProposalResponse409 | resolveProposalResponse500) & {
   headers: Headers;
 };
 
-export type postProposalsIdResolveResponse = (postProposalsIdResolveResponseSuccess | postProposalsIdResolveResponseError)
+export type resolveProposalResponse = (resolveProposalResponseSuccess | resolveProposalResponseError)
 
-export const getPostProposalsIdResolveUrl = (id: string,) => {
+export const getResolveProposalUrl = (id: string,) => {
 
 
 
@@ -115,10 +126,10 @@ export const getPostProposalsIdResolveUrl = (id: string,) => {
 /**
  * @summary Approve, edit, or dismiss a pending proposal. Idempotent on clientActionId.
  */
-export const postProposalsIdResolve = async (id: string,
-    resolveProposalRequest: ResolveProposalRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postProposalsIdResolveResponse> => {
+export const resolveProposal = async (id: string,
+    resolveProposalRequest: ResolveProposalRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<resolveProposalResponse> => {
 
-  return apiFetchAssistant<postProposalsIdResolveResponse>(getPostProposalsIdResolveUrl(id),
+  return apiFetchAssistant<resolveProposalResponse>(getResolveProposalUrl(id),
   {
     ...options,
     method: 'POST',
@@ -128,41 +139,46 @@ export const postProposalsIdResolve = async (id: string,
 );}
 
 
-export type postCheckinsIdAnswerResponse200 = {
+export type answerCheckInResponse200 = {
   data: AckResponse
   status: 200
 }
 
-export type postCheckinsIdAnswerResponse400 = {
+export type answerCheckInResponse400 = {
   data: string
   status: 400
 }
 
-export type postCheckinsIdAnswerResponse401 = {
-  data: void
+export type answerCheckInResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type postCheckinsIdAnswerResponse404 = {
-  data: void
+export type answerCheckInResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type postCheckinsIdAnswerResponse409 = {
-  data: void
+export type answerCheckInResponse409 = {
+  data: ProblemDetails
   status: 409
 }
 
-export type postCheckinsIdAnswerResponseSuccess = (postCheckinsIdAnswerResponse200) & {
+export type answerCheckInResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type answerCheckInResponseSuccess = (answerCheckInResponse200) & {
   headers: Headers;
 };
-export type postCheckinsIdAnswerResponseError = (postCheckinsIdAnswerResponse400 | postCheckinsIdAnswerResponse401 | postCheckinsIdAnswerResponse404 | postCheckinsIdAnswerResponse409) & {
+export type answerCheckInResponseError = (answerCheckInResponse400 | answerCheckInResponse401 | answerCheckInResponse404 | answerCheckInResponse409 | answerCheckInResponse500) & {
   headers: Headers;
 };
 
-export type postCheckinsIdAnswerResponse = (postCheckinsIdAnswerResponseSuccess | postCheckinsIdAnswerResponseError)
+export type answerCheckInResponse = (answerCheckInResponseSuccess | answerCheckInResponseError)
 
-export const getPostCheckinsIdAnswerUrl = (id: string,) => {
+export const getAnswerCheckInUrl = (id: string,) => {
 
 
 
@@ -173,10 +189,10 @@ export const getPostCheckinsIdAnswerUrl = (id: string,) => {
 /**
  * @summary Answer or skip an open question. Idempotent on clientActionId.
  */
-export const postCheckinsIdAnswer = async (id: string,
-    answerCheckInRequest: AnswerCheckInRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postCheckinsIdAnswerResponse> => {
+export const answerCheckIn = async (id: string,
+    answerCheckInRequest: AnswerCheckInRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<answerCheckInResponse> => {
 
-  return apiFetchAssistant<postCheckinsIdAnswerResponse>(getPostCheckinsIdAnswerUrl(id),
+  return apiFetchAssistant<answerCheckInResponse>(getAnswerCheckInUrl(id),
   {
     ...options,
     method: 'POST',
@@ -186,41 +202,46 @@ export const postCheckinsIdAnswer = async (id: string,
 );}
 
 
-export type postNoticesIdReadResponse200 = {
+export type markNoticeReadResponse200 = {
   data: AckResponse
   status: 200
 }
 
-export type postNoticesIdReadResponse400 = {
+export type markNoticeReadResponse400 = {
   data: string
   status: 400
 }
 
-export type postNoticesIdReadResponse401 = {
-  data: void
+export type markNoticeReadResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type postNoticesIdReadResponse404 = {
-  data: void
+export type markNoticeReadResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type postNoticesIdReadResponse409 = {
-  data: void
+export type markNoticeReadResponse409 = {
+  data: ProblemDetails
   status: 409
 }
 
-export type postNoticesIdReadResponseSuccess = (postNoticesIdReadResponse200) & {
+export type markNoticeReadResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type markNoticeReadResponseSuccess = (markNoticeReadResponse200) & {
   headers: Headers;
 };
-export type postNoticesIdReadResponseError = (postNoticesIdReadResponse400 | postNoticesIdReadResponse401 | postNoticesIdReadResponse404 | postNoticesIdReadResponse409) & {
+export type markNoticeReadResponseError = (markNoticeReadResponse400 | markNoticeReadResponse401 | markNoticeReadResponse404 | markNoticeReadResponse409 | markNoticeReadResponse500) & {
   headers: Headers;
 };
 
-export type postNoticesIdReadResponse = (postNoticesIdReadResponseSuccess | postNoticesIdReadResponseError)
+export type markNoticeReadResponse = (markNoticeReadResponseSuccess | markNoticeReadResponseError)
 
-export const getPostNoticesIdReadUrl = (id: string,) => {
+export const getMarkNoticeReadUrl = (id: string,) => {
 
 
 
@@ -231,10 +252,10 @@ export const getPostNoticesIdReadUrl = (id: string,) => {
 /**
  * @summary Mark a notice read. Idempotent on clientActionId.
  */
-export const postNoticesIdRead = async (id: string,
-    readNoticeRequest: ReadNoticeRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<postNoticesIdReadResponse> => {
+export const markNoticeRead = async (id: string,
+    readNoticeRequest: ReadNoticeRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<markNoticeReadResponse> => {
 
-  return apiFetchAssistant<postNoticesIdReadResponse>(getPostNoticesIdReadUrl(id),
+  return apiFetchAssistant<markNoticeReadResponse>(getMarkNoticeReadUrl(id),
   {
     ...options,
     method: 'POST',

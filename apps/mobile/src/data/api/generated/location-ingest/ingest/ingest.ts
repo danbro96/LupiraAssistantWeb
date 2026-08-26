@@ -8,24 +8,37 @@
 import type {
   LocationCursor,
   LocationIngestReceipt,
+  ProblemDetails,
   TrackingStateDto
 } from '../models';
 
 import { deviceKeyFetchLocation } from '../../../mutators';
 
-export type postIngestLocationResponse202 = {
+export type ingestLocationResponse202 = {
   data: LocationIngestReceipt
   status: 202
 }
 
-export type postIngestLocationResponseSuccess = (postIngestLocationResponse202) & {
+export type ingestLocationResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type ingestLocationResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type ingestLocationResponseSuccess = (ingestLocationResponse202) & {
   headers: Headers;
 };
-;
+export type ingestLocationResponseError = (ingestLocationResponse401 | ingestLocationResponse500) & {
+  headers: Headers;
+};
 
-export type postIngestLocationResponse = (postIngestLocationResponseSuccess)
+export type ingestLocationResponse = (ingestLocationResponseSuccess | ingestLocationResponseError)
 
-export const getPostIngestLocationUrl = () => {
+export const getIngestLocationUrl = () => {
 
 
 
@@ -36,31 +49,43 @@ export const getPostIngestLocationUrl = () => {
 /**
  * @summary Ingest a batch of GPS fixes (NDJSON, one fix per line).
  */
-export const postIngestLocation = async (postIngestLocationBody: string, options?: Parameters<typeof deviceKeyFetchLocation>[1]): Promise<postIngestLocationResponse> => {
+export const ingestLocation = async (ingestLocationBody: string, options?: Parameters<typeof deviceKeyFetchLocation>[1]): Promise<ingestLocationResponse> => {
 
-  return deviceKeyFetchLocation<postIngestLocationResponse>(getPostIngestLocationUrl(),
+  return deviceKeyFetchLocation<ingestLocationResponse>(getIngestLocationUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/x-ndjson', ...options?.headers },
-    body: JSON.stringify(postIngestLocationBody)
+    body: JSON.stringify(ingestLocationBody)
   }
 );}
 
 
-export type getIngestLocationCursorResponse200 = {
+export type getIngestCursorResponse200 = {
   data: LocationCursor
   status: 200
 }
 
-export type getIngestLocationCursorResponseSuccess = (getIngestLocationCursorResponse200) & {
+export type getIngestCursorResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type getIngestCursorResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type getIngestCursorResponseSuccess = (getIngestCursorResponse200) & {
   headers: Headers;
 };
-;
+export type getIngestCursorResponseError = (getIngestCursorResponse401 | getIngestCursorResponse500) & {
+  headers: Headers;
+};
 
-export type getIngestLocationCursorResponse = (getIngestLocationCursorResponseSuccess)
+export type getIngestCursorResponse = (getIngestCursorResponseSuccess | getIngestCursorResponseError)
 
-export const getGetIngestLocationCursorUrl = () => {
+export const getGetIngestCursorUrl = () => {
 
 
 
@@ -71,9 +96,9 @@ export const getGetIngestLocationCursorUrl = () => {
 /**
  * @summary The device's resume cursor (last accepted seq + ts).
  */
-export const getIngestLocationCursor = async ( options?: Parameters<typeof deviceKeyFetchLocation>[1]): Promise<getIngestLocationCursorResponse> => {
+export const getIngestCursor = async ( options?: Parameters<typeof deviceKeyFetchLocation>[1]): Promise<getIngestCursorResponse> => {
 
-  return deviceKeyFetchLocation<getIngestLocationCursorResponse>(getGetIngestLocationCursorUrl(),
+  return deviceKeyFetchLocation<getIngestCursorResponse>(getGetIngestCursorUrl(),
   {
     ...options,
     method: 'GET'
@@ -83,19 +108,31 @@ export const getIngestLocationCursor = async ( options?: Parameters<typeof devic
 );}
 
 
-export type getIngestLocationStateResponse200 = {
+export type getIngestStateResponse200 = {
   data: TrackingStateDto
   status: 200
 }
 
-export type getIngestLocationStateResponseSuccess = (getIngestLocationStateResponse200) & {
+export type getIngestStateResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type getIngestStateResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type getIngestStateResponseSuccess = (getIngestStateResponse200) & {
   headers: Headers;
 };
-;
+export type getIngestStateResponseError = (getIngestStateResponse401 | getIngestStateResponse500) & {
+  headers: Headers;
+};
 
-export type getIngestLocationStateResponse = (getIngestLocationStateResponseSuccess)
+export type getIngestStateResponse = (getIngestStateResponseSuccess | getIngestStateResponseError)
 
-export const getGetIngestLocationStateUrl = () => {
+export const getGetIngestStateUrl = () => {
 
 
 
@@ -106,9 +143,9 @@ export const getGetIngestLocationStateUrl = () => {
 /**
  * @summary Whether tracking is paused for this device (the uploader should stop collecting if so).
  */
-export const getIngestLocationState = async ( options?: Parameters<typeof deviceKeyFetchLocation>[1]): Promise<getIngestLocationStateResponse> => {
+export const getIngestState = async ( options?: Parameters<typeof deviceKeyFetchLocation>[1]): Promise<getIngestStateResponse> => {
 
-  return deviceKeyFetchLocation<getIngestLocationStateResponse>(getGetIngestLocationStateUrl(),
+  return deviceKeyFetchLocation<getIngestStateResponse>(getGetIngestStateUrl(),
   {
     ...options,
     method: 'GET'

@@ -7,4 +7,5 @@
  */
 
 export * from './ingestReject';
+export * from './problemDetails';
 export * from './ringIngestReceipt';

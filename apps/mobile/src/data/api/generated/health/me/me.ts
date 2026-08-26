@@ -7,31 +7,37 @@
  */
 import type {
   HealthRecordDto,
-  MeDto
+  MeDto,
+  ProblemDetails
 } from '../models';
 
 import { apiFetchHealth } from '../../../mutators';
 
-export type getMeResponse200 = {
+export type whoAmIResponse200 = {
   data: MeDto
   status: 200
 }
 
-export type getMeResponse401 = {
-  data: void
+export type whoAmIResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type getMeResponseSuccess = (getMeResponse200) & {
+export type whoAmIResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type whoAmIResponseSuccess = (whoAmIResponse200) & {
   headers: Headers;
 };
-export type getMeResponseError = (getMeResponse401) & {
+export type whoAmIResponseError = (whoAmIResponse401 | whoAmIResponse500) & {
   headers: Headers;
 };
 
-export type getMeResponse = (getMeResponseSuccess | getMeResponseError)
+export type whoAmIResponse = (whoAmIResponseSuccess | whoAmIResponseError)
 
-export const getGetMeUrl = () => {
+export const getWhoAmIUrl = () => {
 
 
 
@@ -42,9 +48,9 @@ export const getGetMeUrl = () => {
 /**
  * @summary The caller's resolved local identity (JIT-provisioned on first login).
  */
-export const getMe = async ( options?: Parameters<typeof apiFetchHealth>[1]): Promise<getMeResponse> => {
+export const whoAmI = async ( options?: Parameters<typeof apiFetchHealth>[1]): Promise<whoAmIResponse> => {
 
-  return apiFetchHealth<getMeResponse>(getGetMeUrl(),
+  return apiFetchHealth<whoAmIResponse>(getWhoAmIUrl(),
   {
     ...options,
     method: 'GET'
@@ -54,26 +60,31 @@ export const getMe = async ( options?: Parameters<typeof apiFetchHealth>[1]): Pr
 );}
 
 
-export type postMeBootstrapResponse200 = {
+export type bootstrapMeResponse200 = {
   data: HealthRecordDto
   status: 200
 }
 
-export type postMeBootstrapResponse401 = {
-  data: void
+export type bootstrapMeResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type postMeBootstrapResponseSuccess = (postMeBootstrapResponse200) & {
+export type bootstrapMeResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type bootstrapMeResponseSuccess = (bootstrapMeResponse200) & {
   headers: Headers;
 };
-export type postMeBootstrapResponseError = (postMeBootstrapResponse401) & {
+export type bootstrapMeResponseError = (bootstrapMeResponse401 | bootstrapMeResponse500) & {
   headers: Headers;
 };
 
-export type postMeBootstrapResponse = (postMeBootstrapResponseSuccess | postMeBootstrapResponseError)
+export type bootstrapMeResponse = (bootstrapMeResponseSuccess | bootstrapMeResponseError)
 
-export const getPostMeBootstrapUrl = () => {
+export const getBootstrapMeUrl = () => {
 
 
 
@@ -84,9 +95,9 @@ export const getPostMeBootstrapUrl = () => {
 /**
  * @summary Idempotently ensure the caller has a personal health record; returns it.
  */
-export const postMeBootstrap = async ( options?: Parameters<typeof apiFetchHealth>[1]): Promise<postMeBootstrapResponse> => {
+export const bootstrapMe = async ( options?: Parameters<typeof apiFetchHealth>[1]): Promise<bootstrapMeResponse> => {
 
-  return apiFetchHealth<postMeBootstrapResponse>(getPostMeBootstrapUrl(),
+  return apiFetchHealth<bootstrapMeResponse>(getBootstrapMeUrl(),
   {
     ...options,
     method: 'POST'

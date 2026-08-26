@@ -8,8 +8,12 @@
 import type { JsonElement } from './jsonElement';
 import type { ResolutionAction } from './resolutionAction';
 
+/**
+ * Resolve a pending proposal. Replay-safe: the hub dedups on Guid ResolveProposalRequest.ClientActionId.
+ */
 export interface ResolveProposalRequest {
   action: ResolutionAction;
   edits?: null | JsonElement;
+  /** Client-generated idempotency key (one per user gesture, stable across retries). */
   clientActionId: string;
 }

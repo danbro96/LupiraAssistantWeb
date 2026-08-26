@@ -7,12 +7,21 @@
  */
 import type { DeliveryMode } from './deliveryMode';
 
+/**
+ * The caller's delivery preferences. Quiet hours are local wall-clock in string? PreferencesResponse.TimeZone.
+ */
 export interface PreferencesResponse {
   mode: DeliveryMode;
-  /** @nullable */
+  /**
+     * ISO-8601 local time (`HH:mm`); null = no quiet hours.
+     * @nullable
+     */
   quietHoursStart?: string | null;
   /** @nullable */
   quietHoursEnd?: string | null;
-  /** @nullable */
+  /**
+     * IANA zone the quiet-hours clock is read in; null = UTC.
+     * @nullable
+     */
   timeZone?: string | null;
 }

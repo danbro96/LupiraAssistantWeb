@@ -9,6 +9,13 @@ import type { BillDetail } from './billDetail';
 import type { DeliveryDetail } from './deliveryDetail';
 import type { ReplyDetail } from './replyDetail';
 
+/**
+ * A proposed task. Lands on the "Assistant" list by default; a BillDetail? TaskProposal.Bill or
+ *             DeliveryDetail? TaskProposal.Delivery instead routes it to the dedicated "Bills"/"Deliveries" list, carries its
+ *             structured fields into the task's metadata, and (with DateTimeOffset? TaskProposal.DueAt) gets a linked cal-api
+ *             reminder that fires at the due date / arrival. Bills and deliveries are tracked-to-done work, never
+ *             calendar events.
+ */
 export interface TaskProposal {
   title: string;
   /** @nullable */

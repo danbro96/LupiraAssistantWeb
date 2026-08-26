@@ -6,9 +6,16 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Answer or skip an elicited question. Replay-safe on Guid AnswerCheckInRequest.ClientActionId.
+ */
 export interface AnswerCheckInRequest {
-  /** @nullable */
+  /**
+     * The answer text; null/empty with bool AnswerCheckInRequest.Skip unset is rejected.
+     * @nullable
+     */
   answer?: string | null;
+  /** Dismiss the question without answering — no follow-up run is spawned. */
   skip?: boolean;
   clientActionId: string;
 }

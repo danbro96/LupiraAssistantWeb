@@ -7,6 +7,10 @@
  */
 import type { CalendarTarget } from './calendarTarget';
 
+/**
+ * A proposed calendar event. CalendarTarget EventProposal.TargetCalendar is the agent's suggestion
+ *             (Personal vs Group); the resolver maps it to a concrete calendar id.
+ */
 export interface EventProposal {
   targetCalendar?: CalendarTarget;
   title: string;
@@ -14,7 +18,12 @@ export interface EventProposal {
   description?: string | null;
   /** @nullable */
   location?: string | null;
-  /** @nullable */
+  /**
+     * The geo-api place the free-text string? EventProposal.Location resolved to (filled pre-consent by the
+     *             place enricher). Sent to cal-api alongside string? EventProposal.Location; cal-api uses it when it can, else
+     *             re-resolves the label itself.
+     * @nullable
+     */
   placeId?: string | null;
   isAllDay?: boolean;
   /** @nullable */

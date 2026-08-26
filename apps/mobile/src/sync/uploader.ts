@@ -2,7 +2,7 @@ import type { Db } from '../data/db/db';
 import * as fixesRepo from '../data/db/pending-fixes-repo';
 import * as syncState from '../data/db/sync-state-repo';
 import * as collectorMeta from '../data/db/collector-meta-repo';
-import { postIngestLocation } from '../data/api/generated/location-ingest/ingest/ingest';
+import { ingestLocation } from '../data/api/generated/location-ingest/ingest/ingest';
 import { applyReceipt } from '../domain/receipt-apply';
 import { selectBatch, type BatchItem } from '../domain/batcher';
 import { utf8ByteLength } from '../domain/ndjson';
@@ -40,7 +40,10 @@ export async function runLocationUpload(db: Db, deviceId: string): Promise<Uploa
 
   let receipt;
   try {
-    receipt = (await postIngestLocation(body)).data;
+    const res = await ingestLocation(body);
+    // The mutator throws on non-2xx; this narrows the envelope off its ProblemDetails branch.
+    if (res.status !== 202) throw new Error(`ingest returned ${res.status}`);
+    receipt = res.data;
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e);
     await syncState.setError(db, deviceId, 'location', error);

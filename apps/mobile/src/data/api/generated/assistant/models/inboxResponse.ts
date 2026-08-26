@@ -9,6 +9,9 @@ import type { InboxItemDto } from './inboxItemDto';
 
 export interface InboxResponse {
   items: InboxItemDto[];
-  /** @nullable */
+  /**
+     * Present when more history exists; pass back as `?cursor=`.
+     * @nullable
+     */
   nextCursor?: string | null;
 }

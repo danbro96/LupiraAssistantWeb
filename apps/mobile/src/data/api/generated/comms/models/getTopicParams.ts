@@ -6,9 +6,6 @@
  * OpenAPI spec version: v1
  */
 
-export type GetTopicsParams = {
-status?: string;
-cursor?: string;
-limit?: number;
+export type GetTopicParams = {
 principalId?: string;
 };

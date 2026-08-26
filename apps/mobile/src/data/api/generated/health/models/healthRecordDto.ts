@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * A health record owned by the caller.
+ */
 export interface HealthRecordDto {
   id: string;
   slug: string;

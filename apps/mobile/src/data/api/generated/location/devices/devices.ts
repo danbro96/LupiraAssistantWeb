@@ -15,26 +15,31 @@ import type {
 
 import { apiFetchLocation } from '../../../mutators';
 
-export type getDevicesResponse200 = {
+export type listDevicesResponse200 = {
   data: DeviceDto[]
   status: 200
 }
 
-export type getDevicesResponse401 = {
-  data: void
+export type listDevicesResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type getDevicesResponseSuccess = (getDevicesResponse200) & {
+export type listDevicesResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type listDevicesResponseSuccess = (listDevicesResponse200) & {
   headers: Headers;
 };
-export type getDevicesResponseError = (getDevicesResponse401) & {
+export type listDevicesResponseError = (listDevicesResponse401 | listDevicesResponse500) & {
   headers: Headers;
 };
 
-export type getDevicesResponse = (getDevicesResponseSuccess | getDevicesResponseError)
+export type listDevicesResponse = (listDevicesResponseSuccess | listDevicesResponseError)
 
-export const getGetDevicesUrl = () => {
+export const getListDevicesUrl = () => {
 
 
 
@@ -45,9 +50,9 @@ export const getGetDevicesUrl = () => {
 /**
  * @summary List the caller's registered location-tracking devices.
  */
-export const getDevices = async ( options?: Parameters<typeof apiFetchLocation>[1]): Promise<getDevicesResponse> => {
+export const listDevices = async ( options?: Parameters<typeof apiFetchLocation>[1]): Promise<listDevicesResponse> => {
 
-  return apiFetchLocation<getDevicesResponse>(getGetDevicesUrl(),
+  return apiFetchLocation<listDevicesResponse>(getListDevicesUrl(),
   {
     ...options,
     method: 'GET'
@@ -57,31 +62,36 @@ export const getDevices = async ( options?: Parameters<typeof apiFetchLocation>[
 );}
 
 
-export type postDevicesResponse200 = {
+export type registerDeviceResponse200 = {
   data: RegisterDeviceResponse
   status: 200
 }
 
-export type postDevicesResponse400 = {
+export type registerDeviceResponse400 = {
   data: ProblemDetails
   status: 400
 }
 
-export type postDevicesResponse401 = {
-  data: void
+export type registerDeviceResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type postDevicesResponseSuccess = (postDevicesResponse200) & {
+export type registerDeviceResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type registerDeviceResponseSuccess = (registerDeviceResponse200) & {
   headers: Headers;
 };
-export type postDevicesResponseError = (postDevicesResponse400 | postDevicesResponse401) & {
+export type registerDeviceResponseError = (registerDeviceResponse400 | registerDeviceResponse401 | registerDeviceResponse500) & {
   headers: Headers;
 };
 
-export type postDevicesResponse = (postDevicesResponseSuccess | postDevicesResponseError)
+export type registerDeviceResponse = (registerDeviceResponseSuccess | registerDeviceResponseError)
 
-export const getPostDevicesUrl = () => {
+export const getRegisterDeviceUrl = () => {
 
 
 
@@ -92,9 +102,9 @@ export const getPostDevicesUrl = () => {
 /**
  * @summary Register a device; returns the one-time ingest API key.
  */
-export const postDevices = async (registerDeviceRequest: RegisterDeviceRequest, options?: Parameters<typeof apiFetchLocation>[1]): Promise<postDevicesResponse> => {
+export const registerDevice = async (registerDeviceRequest: RegisterDeviceRequest, options?: Parameters<typeof apiFetchLocation>[1]): Promise<registerDeviceResponse> => {
 
-  return apiFetchLocation<postDevicesResponse>(getPostDevicesUrl(),
+  return apiFetchLocation<registerDeviceResponse>(getRegisterDeviceUrl(),
   {
     ...options,
     method: 'POST',
@@ -104,41 +114,46 @@ export const postDevices = async (registerDeviceRequest: RegisterDeviceRequest, 
 );}
 
 
-export type putDevicesIdResponse200 = {
+export type renameDeviceResponse200 = {
   data: DeviceDto
   status: 200
 }
 
-export type putDevicesIdResponse400 = {
+export type renameDeviceResponse400 = {
   data: ProblemDetails
   status: 400
 }
 
-export type putDevicesIdResponse401 = {
-  data: void
+export type renameDeviceResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type putDevicesIdResponse403 = {
+export type renameDeviceResponse403 = {
   data: ProblemDetails
   status: 403
 }
 
-export type putDevicesIdResponse404 = {
-  data: void
+export type renameDeviceResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type putDevicesIdResponseSuccess = (putDevicesIdResponse200) & {
+export type renameDeviceResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type renameDeviceResponseSuccess = (renameDeviceResponse200) & {
   headers: Headers;
 };
-export type putDevicesIdResponseError = (putDevicesIdResponse400 | putDevicesIdResponse401 | putDevicesIdResponse403 | putDevicesIdResponse404) & {
+export type renameDeviceResponseError = (renameDeviceResponse400 | renameDeviceResponse401 | renameDeviceResponse403 | renameDeviceResponse404 | renameDeviceResponse500) & {
   headers: Headers;
 };
 
-export type putDevicesIdResponse = (putDevicesIdResponseSuccess | putDevicesIdResponseError)
+export type renameDeviceResponse = (renameDeviceResponseSuccess | renameDeviceResponseError)
 
-export const getPutDevicesIdUrl = (id: string,) => {
+export const getRenameDeviceUrl = (id: string,) => {
 
 
 
@@ -149,10 +164,10 @@ export const getPutDevicesIdUrl = (id: string,) => {
 /**
  * @summary Rename a device.
  */
-export const putDevicesId = async (id: string,
-    renameDeviceRequest: RenameDeviceRequest, options?: Parameters<typeof apiFetchLocation>[1]): Promise<putDevicesIdResponse> => {
+export const renameDevice = async (id: string,
+    renameDeviceRequest: RenameDeviceRequest, options?: Parameters<typeof apiFetchLocation>[1]): Promise<renameDeviceResponse> => {
 
-  return apiFetchLocation<putDevicesIdResponse>(getPutDevicesIdUrl(id),
+  return apiFetchLocation<renameDeviceResponse>(getRenameDeviceUrl(id),
   {
     ...options,
     method: 'PUT',
@@ -162,36 +177,41 @@ export const putDevicesId = async (id: string,
 );}
 
 
-export type deleteDevicesIdResponse204 = {
+export type retireDeviceResponse204 = {
   data: void
   status: 204
 }
 
-export type deleteDevicesIdResponse400 = {
+export type retireDeviceResponse400 = {
   data: ProblemDetails
   status: 400
 }
 
-export type deleteDevicesIdResponse401 = {
-  data: void
+export type retireDeviceResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type deleteDevicesIdResponse404 = {
-  data: void
+export type retireDeviceResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type deleteDevicesIdResponseSuccess = (deleteDevicesIdResponse204) & {
+export type retireDeviceResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type retireDeviceResponseSuccess = (retireDeviceResponse204) & {
   headers: Headers;
 };
-export type deleteDevicesIdResponseError = (deleteDevicesIdResponse400 | deleteDevicesIdResponse401 | deleteDevicesIdResponse404) & {
+export type retireDeviceResponseError = (retireDeviceResponse400 | retireDeviceResponse401 | retireDeviceResponse404 | retireDeviceResponse500) & {
   headers: Headers;
 };
 
-export type deleteDevicesIdResponse = (deleteDevicesIdResponseSuccess | deleteDevicesIdResponseError)
+export type retireDeviceResponse = (retireDeviceResponseSuccess | retireDeviceResponseError)
 
-export const getDeleteDevicesIdUrl = (id: string,) => {
+export const getRetireDeviceUrl = (id: string,) => {
 
 
 
@@ -202,9 +222,9 @@ export const getDeleteDevicesIdUrl = (id: string,) => {
 /**
  * @summary Retire a device (revokes its ingest keys).
  */
-export const deleteDevicesId = async (id: string, options?: Parameters<typeof apiFetchLocation>[1]): Promise<deleteDevicesIdResponse> => {
+export const retireDevice = async (id: string, options?: Parameters<typeof apiFetchLocation>[1]): Promise<retireDeviceResponse> => {
 
-  return apiFetchLocation<deleteDevicesIdResponse>(getDeleteDevicesIdUrl(id),
+  return apiFetchLocation<retireDeviceResponse>(getRetireDeviceUrl(id),
   {
     ...options,
     method: 'DELETE'

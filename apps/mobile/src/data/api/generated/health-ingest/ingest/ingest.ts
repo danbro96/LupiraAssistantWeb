@@ -6,24 +6,37 @@
  * OpenAPI spec version: v1
  */
 import type {
+  ProblemDetails,
   RingIngestReceipt
 } from '../models';
 
 import { deviceKeyFetchHealth } from '../../../mutators';
 
-export type postIngestRingResponse202 = {
+export type ingestRingSamplesResponse202 = {
   data: RingIngestReceipt
   status: 202
 }
 
-export type postIngestRingResponseSuccess = (postIngestRingResponse202) & {
+export type ingestRingSamplesResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type ingestRingSamplesResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type ingestRingSamplesResponseSuccess = (ingestRingSamplesResponse202) & {
   headers: Headers;
 };
-;
+export type ingestRingSamplesResponseError = (ingestRingSamplesResponse401 | ingestRingSamplesResponse500) & {
+  headers: Headers;
+};
 
-export type postIngestRingResponse = (postIngestRingResponseSuccess)
+export type ingestRingSamplesResponse = (ingestRingSamplesResponseSuccess | ingestRingSamplesResponseError)
 
-export const getPostIngestRingUrl = () => {
+export const getIngestRingSamplesUrl = () => {
 
 
 
@@ -34,31 +47,43 @@ export const getPostIngestRingUrl = () => {
 /**
  * @summary Ingest a batch of ring point-samples (NDJSON).
  */
-export const postIngestRing = async (postIngestRingBody: string, options?: Parameters<typeof deviceKeyFetchHealth>[1]): Promise<postIngestRingResponse> => {
+export const ingestRingSamples = async (ingestRingSamplesBody: string, options?: Parameters<typeof deviceKeyFetchHealth>[1]): Promise<ingestRingSamplesResponse> => {
 
-  return deviceKeyFetchHealth<postIngestRingResponse>(getPostIngestRingUrl(),
+  return deviceKeyFetchHealth<ingestRingSamplesResponse>(getIngestRingSamplesUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/x-ndjson', ...options?.headers },
-    body: JSON.stringify(postIngestRingBody)
+    body: JSON.stringify(ingestRingSamplesBody)
   }
 );}
 
 
-export type postIngestSummariesResponse202 = {
+export type ingestSummariesResponse202 = {
   data: RingIngestReceipt
   status: 202
 }
 
-export type postIngestSummariesResponseSuccess = (postIngestSummariesResponse202) & {
+export type ingestSummariesResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type ingestSummariesResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type ingestSummariesResponseSuccess = (ingestSummariesResponse202) & {
   headers: Headers;
 };
-;
+export type ingestSummariesResponseError = (ingestSummariesResponse401 | ingestSummariesResponse500) & {
+  headers: Headers;
+};
 
-export type postIngestSummariesResponse = (postIngestSummariesResponseSuccess)
+export type ingestSummariesResponse = (ingestSummariesResponseSuccess | ingestSummariesResponseError)
 
-export const getPostIngestSummariesUrl = () => {
+export const getIngestSummariesUrl = () => {
 
 
 
@@ -69,14 +94,14 @@ export const getPostIngestSummariesUrl = () => {
 /**
  * @summary Ingest a batch of device-computed summaries (NDJSON).
  */
-export const postIngestSummaries = async (postIngestSummariesBody: string, options?: Parameters<typeof deviceKeyFetchHealth>[1]): Promise<postIngestSummariesResponse> => {
+export const ingestSummaries = async (ingestSummariesBody: string, options?: Parameters<typeof deviceKeyFetchHealth>[1]): Promise<ingestSummariesResponse> => {
 
-  return deviceKeyFetchHealth<postIngestSummariesResponse>(getPostIngestSummariesUrl(),
+  return deviceKeyFetchHealth<ingestSummariesResponse>(getIngestSummariesUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/x-ndjson', ...options?.headers },
-    body: JSON.stringify(postIngestSummariesBody)
+    body: JSON.stringify(ingestSummariesBody)
   }
 );}
 

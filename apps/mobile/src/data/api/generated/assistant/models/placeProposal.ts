@@ -6,6 +6,11 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * A proposed place (lands in the geo-api gazetteer as a user place). string? PlaceProposal.Kind and
+ *             string? PlaceProposal.Category are pass-through strings validated by geo-api's enums (e.g. Kind "Poi"/"Address";
+ *             Category "Restaurant"/"Cafe"/… ). Update only carries Name/Category (geo-api's PATCH can't change coords).
+ */
 export interface PlaceProposal {
   name: string;
   /** @nullable */

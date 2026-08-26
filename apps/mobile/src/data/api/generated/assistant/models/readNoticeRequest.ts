@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Mark a notice read. Replay-safe on Guid ReadNoticeRequest.ClientActionId.
+ */
 export interface ReadNoticeRequest {
   clientActionId: string;
 }

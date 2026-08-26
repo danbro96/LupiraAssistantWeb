@@ -8,32 +8,38 @@
 import type {
   PreferencesResponse,
   PreferencesUpdateRequest,
+  ProblemDetails,
   ProfileResponse,
   RoutingUpdateRequest
 } from '../models';
 
 import { apiFetchAssistant } from '../../../mutators';
 
-export type getMeProfileResponse200 = {
+export type getProfileResponse200 = {
   data: ProfileResponse
   status: 200
 }
 
-export type getMeProfileResponse401 = {
-  data: void
+export type getProfileResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type getMeProfileResponseSuccess = (getMeProfileResponse200) & {
+export type getProfileResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type getProfileResponseSuccess = (getProfileResponse200) & {
   headers: Headers;
 };
-export type getMeProfileResponseError = (getMeProfileResponse401) & {
+export type getProfileResponseError = (getProfileResponse401 | getProfileResponse500) & {
   headers: Headers;
 };
 
-export type getMeProfileResponse = (getMeProfileResponseSuccess | getMeProfileResponseError)
+export type getProfileResponse = (getProfileResponseSuccess | getProfileResponseError)
 
-export const getGetMeProfileUrl = () => {
+export const getGetProfileUrl = () => {
 
 
 
@@ -44,9 +50,9 @@ export const getGetMeProfileUrl = () => {
 /**
  * @summary Get the caller's assistant profile (routing defaults).
  */
-export const getMeProfile = async ( options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getMeProfileResponse> => {
+export const getProfile = async ( options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getProfileResponse> => {
 
-  return apiFetchAssistant<getMeProfileResponse>(getGetMeProfileUrl(),
+  return apiFetchAssistant<getProfileResponse>(getGetProfileUrl(),
   {
     ...options,
     method: 'GET'
@@ -56,26 +62,31 @@ export const getMeProfile = async ( options?: Parameters<typeof apiFetchAssistan
 );}
 
 
-export type putMeProfileRoutingResponse200 = {
+export type setProfileRoutingResponse200 = {
   data: ProfileResponse
   status: 200
 }
 
-export type putMeProfileRoutingResponse401 = {
-  data: void
+export type setProfileRoutingResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type putMeProfileRoutingResponseSuccess = (putMeProfileRoutingResponse200) & {
+export type setProfileRoutingResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type setProfileRoutingResponseSuccess = (setProfileRoutingResponse200) & {
   headers: Headers;
 };
-export type putMeProfileRoutingResponseError = (putMeProfileRoutingResponse401) & {
+export type setProfileRoutingResponseError = (setProfileRoutingResponse401 | setProfileRoutingResponse500) & {
   headers: Headers;
 };
 
-export type putMeProfileRoutingResponse = (putMeProfileRoutingResponseSuccess | putMeProfileRoutingResponseError)
+export type setProfileRoutingResponse = (setProfileRoutingResponseSuccess | setProfileRoutingResponseError)
 
-export const getPutMeProfileRoutingUrl = () => {
+export const getSetProfileRoutingUrl = () => {
 
 
 
@@ -86,9 +97,9 @@ export const getPutMeProfileRoutingUrl = () => {
 /**
  * @summary Set routing defaults (calendar/list/address-book) the assistant writes to.
  */
-export const putMeProfileRouting = async (routingUpdateRequest: RoutingUpdateRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<putMeProfileRoutingResponse> => {
+export const setProfileRouting = async (routingUpdateRequest: RoutingUpdateRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<setProfileRoutingResponse> => {
 
-  return apiFetchAssistant<putMeProfileRoutingResponse>(getPutMeProfileRoutingUrl(),
+  return apiFetchAssistant<setProfileRoutingResponse>(getSetProfileRoutingUrl(),
   {
     ...options,
     method: 'PUT',
@@ -98,26 +109,31 @@ export const putMeProfileRouting = async (routingUpdateRequest: RoutingUpdateReq
 );}
 
 
-export type getMePreferencesResponse200 = {
+export type getPreferencesResponse200 = {
   data: PreferencesResponse
   status: 200
 }
 
-export type getMePreferencesResponse401 = {
-  data: void
+export type getPreferencesResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type getMePreferencesResponseSuccess = (getMePreferencesResponse200) & {
+export type getPreferencesResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type getPreferencesResponseSuccess = (getPreferencesResponse200) & {
   headers: Headers;
 };
-export type getMePreferencesResponseError = (getMePreferencesResponse401) & {
+export type getPreferencesResponseError = (getPreferencesResponse401 | getPreferencesResponse500) & {
   headers: Headers;
 };
 
-export type getMePreferencesResponse = (getMePreferencesResponseSuccess | getMePreferencesResponseError)
+export type getPreferencesResponse = (getPreferencesResponseSuccess | getPreferencesResponseError)
 
-export const getGetMePreferencesUrl = () => {
+export const getGetPreferencesUrl = () => {
 
 
 
@@ -128,9 +144,9 @@ export const getGetMePreferencesUrl = () => {
 /**
  * @summary Get delivery preferences (per-item vs digest, quiet hours).
  */
-export const getMePreferences = async ( options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getMePreferencesResponse> => {
+export const getPreferences = async ( options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getPreferencesResponse> => {
 
-  return apiFetchAssistant<getMePreferencesResponse>(getGetMePreferencesUrl(),
+  return apiFetchAssistant<getPreferencesResponse>(getGetPreferencesUrl(),
   {
     ...options,
     method: 'GET'
@@ -140,31 +156,36 @@ export const getMePreferences = async ( options?: Parameters<typeof apiFetchAssi
 );}
 
 
-export type putMePreferencesResponse200 = {
+export type setPreferencesResponse200 = {
   data: PreferencesResponse
   status: 200
 }
 
-export type putMePreferencesResponse400 = {
+export type setPreferencesResponse400 = {
   data: string
   status: 400
 }
 
-export type putMePreferencesResponse401 = {
-  data: void
+export type setPreferencesResponse401 = {
+  data: ProblemDetails
   status: 401
 }
 
-export type putMePreferencesResponseSuccess = (putMePreferencesResponse200) & {
+export type setPreferencesResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type setPreferencesResponseSuccess = (setPreferencesResponse200) & {
   headers: Headers;
 };
-export type putMePreferencesResponseError = (putMePreferencesResponse400 | putMePreferencesResponse401) & {
+export type setPreferencesResponseError = (setPreferencesResponse400 | setPreferencesResponse401 | setPreferencesResponse500) & {
   headers: Headers;
 };
 
-export type putMePreferencesResponse = (putMePreferencesResponseSuccess | putMePreferencesResponseError)
+export type setPreferencesResponse = (setPreferencesResponseSuccess | setPreferencesResponseError)
 
-export const getPutMePreferencesUrl = () => {
+export const getSetPreferencesUrl = () => {
 
 
 
@@ -175,9 +196,9 @@ export const getPutMePreferencesUrl = () => {
 /**
  * @summary Set delivery preferences. Quiet hours suppress the push only — items still land in the inbox.
  */
-export const putMePreferences = async (preferencesUpdateRequest: PreferencesUpdateRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<putMePreferencesResponse> => {
+export const setPreferences = async (preferencesUpdateRequest: PreferencesUpdateRequest, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<setPreferencesResponse> => {
 
-  return apiFetchAssistant<putMePreferencesResponse>(getPutMePreferencesUrl(),
+  return apiFetchAssistant<setPreferencesResponse>(getSetPreferencesUrl(),
   {
     ...options,
     method: 'PUT',

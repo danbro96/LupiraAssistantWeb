@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { postMeBootstrap } from '../data/api/generated/health/me/me';
-import { postDevices } from '../data/api/generated/location/devices/devices';
+import { bootstrapMe } from '../data/api/generated/health/me/me';
+import { registerDevice } from '../data/api/generated/location/devices/devices';
 import {
   loadCredentials,
   saveCredentials,
@@ -63,8 +63,8 @@ export const useDevice = create<DeviceState & DeviceActions>((set) => ({
   register: async (label) => {
     try {
       // The mutator throws on non-2xx, so the generated error/void response branches are unreachable.
-      const { data: record } = (await postMeBootstrap()) as { data: HealthRecordDto };
-      const { data: resp } = (await postDevices({ kind: 'Phone', label })) as { data: RegisterDeviceResponse };
+      const { data: record } = (await bootstrapMe()) as { data: HealthRecordDto };
+      const { data: resp } = (await registerDevice({ kind: 'Phone', label })) as { data: RegisterDeviceResponse };
       await saveCredentials(resp, record);
 
       // fresh device: reset local streams, clear stale buffers, seed sync state

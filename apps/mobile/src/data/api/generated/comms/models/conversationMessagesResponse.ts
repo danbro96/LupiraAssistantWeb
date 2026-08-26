@@ -7,6 +7,9 @@
  */
 import type { ConversationMessageDto } from './conversationMessageDto';
 
+/**
+ * A thread page. Page onwards using the first/last item ids as `before`/`after`.
+ */
 export interface ConversationMessagesResponse {
   conversationId: string;
   /** @nullable */

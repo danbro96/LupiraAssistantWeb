@@ -7,6 +7,10 @@
  */
 import type { DeliveryMode } from './deliveryMode';
 
+/**
+ * Replace the delivery preferences. Absent `mode` keeps the current one; quiet hours are set as a
+ * pair — sending either bound as null clears the window.
+ */
 export interface PreferencesUpdateRequest {
   mode?: null | DeliveryMode;
   /** @nullable */

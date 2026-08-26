@@ -8,14 +8,25 @@
 import type { InboxItemKind } from './inboxItemKind';
 import type { ProposalDetailDto } from './proposalDetailDto';
 
+/**
+ * One entry in the app's inbox feed, newest first.
+ */
 export interface InboxItemDto {
+  /** The ApprovalRequest id (Proposal) or CheckIn id (Question) — what resolve/answer target. */
   id: string;
   kind: InboxItemKind;
+  /** The human line: the approval message / the frozen check-in question. */
   title: string;
   createdAt: string;
-  /** @nullable */
+  /**
+     * Questions may expire; an expired question is no longer answerable.
+     * @nullable
+     */
   expiresAt?: string | null;
-  /** @nullable */
+  /**
+     * Notices carry their message body here; null for proposals and questions.
+     * @nullable
+     */
   body?: string | null;
   proposal?: null | ProposalDetailDto;
 }

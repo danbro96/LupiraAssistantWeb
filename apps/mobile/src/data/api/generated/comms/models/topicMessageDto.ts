@@ -6,10 +6,14 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * One message in a released topic window (ordered chronologically).
+ */
 export interface TopicMessageDto {
   id: string;
   /** @nullable */
   sender?: string | null;
+  /** True when the owner sent this message — the assistant's inbound-vs-outbound signal. */
   fromPrincipal?: boolean;
   timestamp: string;
   text: string;

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { setDeviceKeyPort } from './auth-ports';
-import { postIngestLocation } from './generated/location-ingest/ingest/ingest';
+import { ingestLocation } from './generated/location-ingest/ingest/ingest';
 
 // The NDJSON path is the one Orval can't express: it JSON-encodes every request body, so the mutator
 // has to undo that for x-ndjson or the server receives one quoted, escaped line.
@@ -30,13 +30,13 @@ afterEach(() => {
 describe('deviceKeyFetch over the generated ingest client', () => {
   it('sends the NDJSON batch verbatim, not JSON-encoded', async () => {
     const body = '{"seq":1}\n{"seq":2}';
-    await postIngestLocation(body);
+    await ingestLocation(body);
 
     expect(seen?.init.body).toBe(body);
   });
 
   it('targets the real route with no /api prefix and a device-key header', async () => {
-    await postIngestLocation('{"seq":1}');
+    await ingestLocation('{"seq":1}');
 
     expect(seen?.url).toBe('https://location-api.test/ingest/location');
     const headers = new Headers(seen?.init.headers);
@@ -45,7 +45,7 @@ describe('deviceKeyFetch over the generated ingest client', () => {
   });
 
   it('returns the parsed receipt in the envelope', async () => {
-    const res = await postIngestLocation('{"seq":1}');
+    const res = await ingestLocation('{"seq":1}');
 
     expect(res.status).toBe(202);
     expect(res.data).toEqual({ rejects: [], paused: false });

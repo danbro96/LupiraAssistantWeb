@@ -6,6 +6,11 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * The Topic lifecycle. `Open` accrues messages; the closer moves an idle topic to
+ * `Closed` then `Released` (handed to the assistant). A high-similarity hit on a
+ * recently-released topic may reopen it (back to `Open`) rather than start a new one.
+ */
 export type TopicStatus = typeof TopicStatus[keyof typeof TopicStatus];
 
 

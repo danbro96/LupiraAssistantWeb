@@ -23,6 +23,26 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -38,6 +58,7 @@
           "Intake"
         ],
         "summary": "Accept a due fire from lupira-cal-worker (accept-then-own).",
+        "operationId": "CreateFire",
         "requestBody": {
           "content": {
             "application/json": {
@@ -70,7 +91,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -86,6 +124,7 @@
           "Intake"
         ],
         "summary": "Accept a closed topic from comms-api (accept-then-own).",
+        "operationId": "CreateInbound",
         "requestBody": {
           "content": {
             "application/json": {
@@ -118,7 +157,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -134,6 +190,7 @@
           "Inbox"
         ],
         "summary": "The caller's feed: pending approvals + open questions (default), or resolved history.",
+        "operationId": "GetInbox",
         "parameters": [
           {
             "name": "status",
@@ -180,7 +237,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -196,6 +270,7 @@
           "Inbox"
         ],
         "summary": "Approve, edit, or dismiss a pending proposal. Idempotent on clientActionId.",
+        "operationId": "ResolveProposal",
         "parameters": [
           {
             "name": "id",
@@ -239,13 +314,44 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Conflict"
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -261,6 +367,7 @@
           "Inbox"
         ],
         "summary": "Answer or skip an open question. Idempotent on clientActionId.",
+        "operationId": "AnswerCheckIn",
         "parameters": [
           {
             "name": "id",
@@ -304,13 +411,44 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Conflict"
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -326,6 +464,7 @@
           "Inbox"
         ],
         "summary": "Mark a notice read. Idempotent on clientActionId.",
+        "operationId": "MarkNoticeRead",
         "parameters": [
           {
             "name": "id",
@@ -369,13 +508,44 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Conflict"
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -390,6 +560,8 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Whether the caller has a live offline grant (and for which audiences).",
+        "operationId": "GetAuthStatus",
         "responses": {
           "200": {
             "description": "OK",
@@ -397,6 +569,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuthStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -415,6 +607,7 @@
           "Profile"
         ],
         "summary": "Get the caller's assistant profile (routing defaults).",
+        "operationId": "GetProfile",
         "responses": {
           "200": {
             "description": "OK",
@@ -427,7 +620,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -443,6 +653,7 @@
           "Profile"
         ],
         "summary": "Set routing defaults (calendar/list/address-book) the assistant writes to.",
+        "operationId": "SetProfileRouting",
         "requestBody": {
           "content": {
             "application/json": {
@@ -465,7 +676,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -481,6 +709,7 @@
           "Profile"
         ],
         "summary": "Get delivery preferences (per-item vs digest, quiet hours).",
+        "operationId": "GetPreferences",
         "responses": {
           "200": {
             "description": "OK",
@@ -493,7 +722,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -507,6 +753,7 @@
           "Profile"
         ],
         "summary": "Set delivery preferences. Quiet hours suppress the push only — items still land in the inbox.",
+        "operationId": "SetPreferences",
         "requestBody": {
           "content": {
             "application/json": {
@@ -539,7 +786,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -555,6 +819,7 @@
           "Push"
         ],
         "summary": "Register this device's Expo push token (idempotent on the token).",
+        "operationId": "CreatePushToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -580,7 +845,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -596,6 +878,7 @@
           "Push"
         ],
         "summary": "Drop a push token (logout).",
+        "operationId": "DeletePushToken",
         "parameters": [
           {
             "name": "token",
@@ -611,10 +894,34 @@
             "description": "No Content"
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -638,7 +945,8 @@
             "type": "boolean"
           },
           "duplicate": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "True when this client action id was already processed (a replay)."
           }
         }
       },
@@ -651,7 +959,8 @@
           "RescheduleSelf",
           "RunJob",
           "Rescore"
-        ]
+        ],
+        "description": "A deterministic, no-LLM action executed directly at fire time."
       },
       "AnswerCheckInRequest": {
         "required": [
@@ -663,16 +972,19 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The answer text; null/empty with bool AnswerCheckInRequest.Skip unset is rejected."
           },
           "skip": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Dismiss the question without answering — no follow-up run is spawned."
           },
           "clientActionId": {
             "type": "string",
             "format": "uuid"
           }
-        }
+        },
+        "description": "Answer or skip an elicited question. Replay-safe on Guid AnswerCheckInRequest.ClientActionId."
       },
       "AuthStatusResponse": {
         "required": [
@@ -688,7 +1000,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The grant lifecycle state (`Active`/`Revoked`/`Expired`), null without a grant."
           },
           "audiences": {
             "type": "array",
@@ -696,7 +1009,8 @@
               "type": "string"
             }
           }
-        }
+        },
+        "description": "Whether the caller has a live offline grant (and for which downstream audiences)."
       },
       "BillDetail": {
         "type": "object",
@@ -726,13 +1040,15 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "A bill to pay. DateTimeOffset? TaskProposal.DueAt is the payment due date."
       },
       "CalendarClass": {
         "enum": [
           "Agenda",
           "System"
-        ]
+        ],
+        "description": "cal-api's calendar classification — relayed on the fire so Policy can tell agent\n            scaffolding (System) from user records (Agenda). Mirrors LupiraCalApi.Domain.CalendarClass."
       },
       "CalendarKind": {
         "enum": [
@@ -746,13 +1062,15 @@
           "DevOps",
           "FoodPlan",
           "Generic"
-        ]
+        ],
+        "description": "cal-api's calendar kind. Mirrors LupiraCalApi.Domain.CalendarKind."
       },
       "CalendarTarget": {
         "enum": [
           "Personal",
           "Group"
-        ]
+        ],
+        "description": "Which calendar class the assistant suggests for a proposed event; the routing maps it to a\n            concrete calendar id per principal."
       },
       "ContactProposal": {
         "type": "object",
@@ -809,7 +1127,8 @@
               "type": "string"
             }
           }
-        }
+        },
+        "description": "A proposed contact (lands in P's default address book)."
       },
       "DeliveryDetail": {
         "type": "object",
@@ -838,13 +1157,15 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "A parcel to receive. DateTimeOffset? TaskProposal.DueAt is the expected arrival."
       },
       "DeliveryMode": {
         "enum": [
           "PerItem",
           "Digest"
-        ]
+        ],
+        "description": "Per-item = wake me for each item; digest = stay silent and let the digest carry them."
       },
       "EventProposal": {
         "required": [
@@ -875,6 +1196,7 @@
               "null",
               "string"
             ],
+            "description": "The geo-api place the free-text string? EventProposal.Location resolved to (filled pre-consent by the\n            place enricher). Sent to cal-api alongside string? EventProposal.Location; cal-api uses it when it can, else\n            re-resolves the label itself.",
             "format": "uuid"
           },
           "isAllDay": {
@@ -923,14 +1245,16 @@
               "type": "string"
             }
           }
-        }
+        },
+        "description": "A proposed calendar event. CalendarTarget EventProposal.TargetCalendar is the agent's suggestion\n            (Personal vs Group); the resolver maps it to a concrete calendar id."
       },
       "FallbackMode": {
         "enum": [
           "Retry",
           "Ask",
           "Drop"
-        ]
+        ],
+        "description": "On a missed contract: retry once then ask (Retry), ask immediately (Ask), or drop (Drop)."
       },
       "FireAcceptedResponse": {
         "required": [
@@ -946,7 +1270,8 @@
           "duplicate": {
             "type": "boolean"
           }
-        }
+        },
+        "description": "The 202 body for an accepted fire/message: the recorded item id, and whether this was a\n            dedupe hit (a redelivery that recorded nothing new)."
       },
       "FireRequest": {
         "required": [
@@ -961,7 +1286,8 @@
         "type": "object",
         "properties": {
           "principalId": {
-            "type": "string"
+            "type": "string",
+            "description": "The owning principal, stamped from calendar ownership and relayed by the worker."
           },
           "itemId": {
             "type": "string",
@@ -972,6 +1298,7 @@
             "format": "uuid"
           },
           "calendarClass": {
+            "description": "System = agent scaffolding (free CRUD); Agenda = user record (consent-first).",
             "$ref": "#/components/schemas/CalendarClass"
           },
           "calendarKind": {
@@ -982,7 +1309,8 @@
             "format": "date-time"
           },
           "dedupeKey": {
-            "type": "string"
+            "type": "string",
+            "description": "The cal-side `dedupe_key` (item_id + occurrence_at) — one run per occurrence across retries."
           },
           "expireAfter": {
             "type": [
@@ -1011,7 +1339,8 @@
               }
             ]
           }
-        }
+        },
+        "description": "The wire contract for `POST /fires` — a due fire pushed by lupira-cal-worker. Carries the\nscheduled-fire context (item/calendar/occurrence/dedupe) plus the calendar classification Policy\nneeds and exactly one of ItemPrompt? FireRequest.Prompt / ItemAction? FireRequest.Action (XOR, validated server-side).\nThe cal doc leaves the body shape open; this mirrors the scheduled_fire columns +\nthe relayed principal_id and calendar class/kind."
       },
       "InboundSource": {
         "enum": [
@@ -1034,13 +1363,15 @@
             "type": "string"
           },
           "topicRef": {
-            "type": "string"
+            "type": "string",
+            "description": "comms-api's stable topic id (also the ref for the open-topic tail pull)."
           },
           "releasedAt": {
             "type": [
               "null",
               "string"
             ],
+            "description": "When comms released this window. Versions the dedupe key; absent (legacy sender) the\n            key falls back to `Topic:{topicRef}` — one delivery per topic ever.",
             "format": "date-time"
           },
           "label": {
@@ -1050,7 +1381,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TopicMessage"
-            }
+            },
+            "description": "The topic's messages in order (sender, timestamp, text)."
           },
           "source": {
             "oneOf": [
@@ -1058,11 +1390,13 @@
                 "type": "null"
               },
               {
+                "description": "Defaults to InboundSource.Comms.",
                 "$ref": "#/components/schemas/InboundSource"
               }
             ]
           }
-        }
+        },
+        "description": "The wire contract for `POST /inbound` — a closed topic released by comms-api: a label plus an\nordered window of messages and comms-api's stable topic ref. Deduped on `Topic:{topicRef}:{releasedAt}`\nso a reopened topic's re-release is a new inbound, while a retry of the same release stays idempotent."
       },
       "InboxItemDto": {
         "required": [
@@ -1075,13 +1409,15 @@
         "properties": {
           "id": {
             "type": "string",
+            "description": "The ApprovalRequest id (Proposal) or CheckIn id (Question) — what resolve/answer target.",
             "format": "uuid"
           },
           "kind": {
             "$ref": "#/components/schemas/InboxItemKind"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "The human line: the approval message / the frozen check-in question."
           },
           "createdAt": {
             "type": "string",
@@ -1092,13 +1428,15 @@
               "null",
               "string"
             ],
+            "description": "Questions may expire; an expired question is no longer answerable.",
             "format": "date-time"
           },
           "body": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Notices carry their message body here; null for proposals and questions."
           },
           "proposal": {
             "oneOf": [
@@ -1106,11 +1444,13 @@
                 "type": "null"
               },
               {
+                "description": "Set when InboxItemKind InboxItemDto.Kind is InboxItemKind.Proposal.",
                 "$ref": "#/components/schemas/ProposalDetailDto"
               }
             ]
           }
-        }
+        },
+        "description": "One entry in the app's inbox feed, newest first."
       },
       "InboxItemKind": {
         "enum": [
@@ -1135,7 +1475,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Present when more history exists; pass back as `?cursor=`."
           }
         }
       },
@@ -1171,7 +1512,8 @@
           "enabled": {
             "type": "boolean"
           }
-        }
+        },
+        "description": "A deterministic payload executed directly (no LLM). `ParamsJson` carries the frozen\n            params (e.g. a SendCheckIn message + optional follow-up Prompt ref)."
       },
       "ItemPrompt": {
         "required": [
@@ -1234,7 +1576,8 @@
           "enabled": {
             "type": "boolean"
           }
-        }
+        },
+        "description": "An LLM-interpreted, contracted payload → an agent run. Declared at authoring; enforced here at fire."
       },
       "JsonElement": {},
       "ModelTier": {
@@ -1256,7 +1599,8 @@
           "Relation",
           "Place",
           "None"
-        ]
+        ],
+        "description": "The ProposedAction kind a run is contracted to yield (assistant-api validates against it)."
       },
       "PingDto": {
         "required": [
@@ -1280,7 +1624,8 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "Claims echo for cross-service auth-seam probes; the audiences say which half of a\n            broken seam is misconfigured."
       },
       "PlaceProposal": {
         "required": [
@@ -1323,7 +1668,8 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "A proposed place (lands in the geo-api gazetteer as a user place). string? PlaceProposal.Kind and\n            string? PlaceProposal.Category are pass-through strings validated by geo-api's enums (e.g. Kind \"Poi\"/\"Address\";\n            Category \"Restaurant\"/\"Cafe\"/… ). Update only carries Name/Category (geo-api's PATCH can't change coords)."
       },
       "PreferencesResponse": {
         "required": [
@@ -1338,7 +1684,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "ISO-8601 local time (`HH:mm`); null = no quiet hours."
           },
           "quietHoursEnd": {
             "type": [
@@ -1350,9 +1697,11 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "IANA zone the quiet-hours clock is read in; null = UTC."
           }
-        }
+        },
+        "description": "The caller's delivery preferences. Quiet hours are local wall-clock in string? PreferencesResponse.TimeZone."
       },
       "PreferencesUpdateRequest": {
         "type": "object",
@@ -1385,7 +1734,8 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "Replace the delivery preferences. Absent `mode` keeps the current one; quiet hours are set as a\npair — sending either bound as null clears the window."
       },
       "ProblemDetails": {
         "type": "object",
@@ -1420,8 +1770,15 @@
               "null",
               "string"
             ]
+          },
+          "traceId": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
-        }
+        },
+        "description": "RFC 9457 problem details."
       },
       "ProfileResponse": {
         "required": [
@@ -1470,7 +1827,8 @@
             ],
             "format": "time"
           }
-        }
+        },
+        "description": "Fire timing (flattened union): OnStart/OnEnd carry nothing; Offset uses `OffsetMinutes`\n            (negative = lead time); AllDayAt uses `AllDayAt` (local wall-clock on the occurrence date)."
       },
       "PromptFireKind": {
         "enum": [
@@ -1478,7 +1836,8 @@
           "OnEnd",
           "Offset",
           "AllDayAt"
-        ]
+        ],
+        "description": "When a payload fires relative to its item's occurrence."
       },
       "PromptIntent": {
         "enum": [
@@ -1488,7 +1847,8 @@
           "Monitor",
           "Summarise",
           "AskUser"
-        ]
+        ],
+        "description": "What an LLM-interpreted run should accomplish."
       },
       "ProposalDetailDto": {
         "required": [
@@ -1505,6 +1865,7 @@
           },
           "runId": {
             "type": "string",
+            "description": "The AgentRun that emitted this proposal (the audit trail behind it).",
             "format": "uuid"
           },
           "actionKind": {
@@ -1516,6 +1877,7 @@
                 "type": "null"
               },
               {
+                "description": "For Update* kinds: the resolved record this proposal targets.",
                 "$ref": "#/components/schemas/Ref"
               }
             ]
@@ -1534,7 +1896,8 @@
               "items": {
                 "type": "string"
               }
-            }
+            },
+            "description": "Per-field provenance: payload field → the durable message refs that justify it."
           },
           "event": {
             "oneOf": [
@@ -1576,7 +1939,8 @@
               }
             ]
           }
-        }
+        },
+        "description": "The proposal behind an approval card: what will be written on approve. Exactly one of the typed\npayloads is set, matching ProposedActionKind ProposalDetailDto.ActionKind (event/contact/task/place families)."
       },
       "ProposedActionKind": {
         "enum": [
@@ -1593,7 +1957,8 @@
           "CreatePrompt",
           "SendCheckIn",
           "Report"
-        ]
+        ],
+        "description": "What a ProposedAction would write. The agent run produces these; the M4 validator\nchecks the kind against the prompt's contracted `OutputKind`, and Policy (M5) routes the\nwrite to free CRUD (agent scaffolding) or an ApprovalRequest (user records). The Writer (M6)\ndispatches by kind to cal-api / tasks-api / career-api."
       },
       "PushPlatform": {
         "enum": [
@@ -1611,7 +1976,8 @@
             "type": "string",
             "format": "uuid"
           }
-        }
+        },
+        "description": "Mark a notice read. Replay-safe on Guid ReadNoticeRequest.ClientActionId."
       },
       "Ref": {
         "required": [
@@ -1637,7 +2003,8 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "A reference the fired payload acts on. `Id` for Event/Contact/Task; `Url` for External."
       },
       "RefKind": {
         "enum": [
@@ -1646,7 +2013,8 @@
           "Task",
           "Place",
           "External"
-        ]
+        ],
+        "description": "What a Ref points at."
       },
       "RegisterPushTokenRequest": {
         "required": [
@@ -1662,12 +2030,14 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The app's device id, so a re-install supersedes its predecessor's token."
           },
           "platform": {
             "$ref": "#/components/schemas/PushPlatform"
           }
-        }
+        },
+        "description": "Register this device's Expo push token. Idempotent on the token."
       },
       "ReplyDetail": {
         "type": "object",
@@ -1684,7 +2054,8 @@
               "string"
             ]
           }
-        }
+        },
+        "description": "A reply obligation: an unanswered message directed at the user, or the user's stated intent\n            to contact someone. Routes to the \"Replies\" list with a recurring nudge. The assistant tracks that a\n            reply is owed — it never drafts the reply text."
       },
       "ResolutionAction": {
         "enum": [
@@ -1709,15 +2080,18 @@
                 "type": "null"
               },
               {
+                "description": "For ResolutionAction.Edit: the full edited payload (same shape the\n            proposal's typed slot carries). Ignored for approve/dismiss.",
                 "$ref": "#/components/schemas/JsonElement"
               }
             ]
           },
           "clientActionId": {
             "type": "string",
+            "description": "Client-generated idempotency key (one per user gesture, stable across retries).",
             "format": "uuid"
           }
-        }
+        },
+        "description": "Resolve a pending proposal. Replay-safe: the hub dedups on Guid ResolveProposalRequest.ClientActionId."
       },
       "RoutingResponse": {
         "required": [
@@ -1756,7 +2130,8 @@
             ],
             "format": "uuid"
           }
-        }
+        },
+        "description": "The principal's resolved routing defaults (null = not yet learned/set)."
       },
       "RoutingUpdateRequest": {
         "type": "object",
@@ -1789,7 +2164,8 @@
             ],
             "format": "uuid"
           }
-        }
+        },
+        "description": "Patch the routing defaults — only non-null fields are applied (others keep their value)."
       },
       "TaskProposal": {
         "required": [
@@ -1847,7 +2223,8 @@
               }
             ]
           }
-        }
+        },
+        "description": "A proposed task. Lands on the \"Assistant\" list by default; a BillDetail? TaskProposal.Bill or\n            DeliveryDetail? TaskProposal.Delivery instead routes it to the dedicated \"Bills\"/\"Deliveries\" list, carries its\n            structured fields into the task's metadata, and (with DateTimeOffset? TaskProposal.DueAt) gets a linked cal-api\n            reminder that fires at the due date / arrival. Bills and deliveries are tracked-to-done work, never\n            calendar events."
       },
       "TopicMessage": {
         "required": [
@@ -1880,7 +2257,8 @@
             "type": "boolean",
             "default": false
           }
-        }
+        },
+        "description": "One message inside a closed topic: who sent it, when, the text, comms-api's stable\n            `SourceRef` (for provenance — the durable citation a proposal's field points back to), and whether\n            the owner sent it (`FromPrincipal` — the inbound-vs-outbound signal for reply-obligation detection).\n            Ordered within the topic. `Sender`/`SourceRef` are nullable — comms-api leaves sender null when\n            the participant is unknown; grounding cites the message's window ordinal, so it holds even without a ref."
       }
     },
     "securitySchemes": {

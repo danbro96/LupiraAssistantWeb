@@ -13,13 +13,21 @@ import type { ProposedActionKind } from './proposedActionKind';
 import type { Ref } from './ref';
 import type { TaskProposal } from './taskProposal';
 
+/**
+ * The proposal behind an approval card: what will be written on approve. Exactly one of the typed
+ * payloads is set, matching ProposedActionKind ProposalDetailDto.ActionKind (event/contact/task/place families).
+ */
 export interface ProposalDetailDto {
   proposedActionId: string;
+  /** The AgentRun that emitted this proposal (the audit trail behind it). */
   runId: string;
   actionKind: ProposedActionKind;
   target?: null | Ref;
   confidence: number;
-  /** @nullable */
+  /**
+     * Per-field provenance: payload field → the durable message refs that justify it.
+     * @nullable
+     */
   sources?: ProposalDetailDtoSources;
   event?: null | EventProposal;
   contact?: null | ContactProposal;

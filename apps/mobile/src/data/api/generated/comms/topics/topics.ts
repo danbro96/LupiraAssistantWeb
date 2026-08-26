@@ -6,8 +6,8 @@
  * OpenAPI spec version: v1
  */
 import type {
-  GetTopicsIdParams,
-  GetTopicsParams,
+  GetTopicParams,
+  ListTopicsParams,
   ProblemDetails,
   TopicDetailDto,
   TopicSummaryDto
@@ -15,26 +15,36 @@ import type {
 
 import { apiFetchAssistant } from '../../../mutators';
 
-export type getTopicsResponse200 = {
+export type listTopicsResponse200 = {
   data: TopicSummaryDto[]
   status: 200
 }
 
-export type getTopicsResponse400 = {
+export type listTopicsResponse400 = {
   data: ProblemDetails
   status: 400
 }
 
-export type getTopicsResponseSuccess = (getTopicsResponse200) & {
+export type listTopicsResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type listTopicsResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type listTopicsResponseSuccess = (listTopicsResponse200) & {
   headers: Headers;
 };
-export type getTopicsResponseError = (getTopicsResponse400) & {
+export type listTopicsResponseError = (listTopicsResponse400 | listTopicsResponse401 | listTopicsResponse500) & {
   headers: Headers;
 };
 
-export type getTopicsResponse = (getTopicsResponseSuccess | getTopicsResponseError)
+export type listTopicsResponse = (listTopicsResponseSuccess | listTopicsResponseError)
 
-export const getGetTopicsUrl = (params?: GetTopicsParams,) => {
+export const getListTopicsUrl = (params?: ListTopicsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -52,9 +62,9 @@ export const getGetTopicsUrl = (params?: GetTopicsParams,) => {
 /**
  * @summary List topics by status (poll alternative to closed-topic push).
  */
-export const getTopics = async (params?: GetTopicsParams, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getTopicsResponse> => {
+export const listTopics = async (params?: ListTopicsParams, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<listTopicsResponse> => {
 
-  return apiFetchAssistant<getTopicsResponse>(getGetTopicsUrl(params),
+  return apiFetchAssistant<listTopicsResponse>(getListTopicsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -64,32 +74,42 @@ export const getTopics = async (params?: GetTopicsParams, options?: Parameters<t
 );}
 
 
-export type getTopicsIdResponse200 = {
+export type getTopicResponse200 = {
   data: TopicDetailDto
   status: 200
 }
 
-export type getTopicsIdResponse400 = {
+export type getTopicResponse400 = {
   data: ProblemDetails
   status: 400
 }
 
-export type getTopicsIdResponse404 = {
-  data: void
+export type getTopicResponse401 = {
+  data: ProblemDetails
+  status: 401
+}
+
+export type getTopicResponse404 = {
+  data: ProblemDetails
   status: 404
 }
 
-export type getTopicsIdResponseSuccess = (getTopicsIdResponse200) & {
+export type getTopicResponse500 = {
+  data: ProblemDetails
+  status: 500
+}
+
+export type getTopicResponseSuccess = (getTopicResponse200) & {
   headers: Headers;
 };
-export type getTopicsIdResponseError = (getTopicsIdResponse400 | getTopicsIdResponse404) & {
+export type getTopicResponseError = (getTopicResponse400 | getTopicResponse401 | getTopicResponse404 | getTopicResponse500) & {
   headers: Headers;
 };
 
-export type getTopicsIdResponse = (getTopicsIdResponseSuccess | getTopicsIdResponseError)
+export type getTopicResponse = (getTopicResponseSuccess | getTopicResponseError)
 
-export const getGetTopicsIdUrl = (id: string,
-    params?: GetTopicsIdParams,) => {
+export const getGetTopicUrl = (id: string,
+    params?: GetTopicParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -107,10 +127,10 @@ export const getGetTopicsIdUrl = (id: string,
 /**
  * @summary Get a topic with its ordered message window (open-topic tail).
  */
-export const getTopicsId = async (id: string,
-    params?: GetTopicsIdParams, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getTopicsIdResponse> => {
+export const getTopic = async (id: string,
+    params?: GetTopicParams, options?: Parameters<typeof apiFetchAssistant>[1]): Promise<getTopicResponse> => {
 
-  return apiFetchAssistant<getTopicsIdResponse>(getGetTopicsIdUrl(id,params),
+  return apiFetchAssistant<getTopicResponse>(getGetTopicUrl(id,params),
   {
     ...options,
     method: 'GET'

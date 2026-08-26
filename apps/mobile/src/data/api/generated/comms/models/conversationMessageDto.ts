@@ -6,6 +6,9 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * One message in a thread page (chronological within the page).
+ */
 export interface ConversationMessageDto {
   id: string;
   /** @nullable */

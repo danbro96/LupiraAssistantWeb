@@ -6,6 +6,10 @@
  * OpenAPI spec version: v1
  */
 
+/**
+ * Which calendar class the assistant suggests for a proposed event; the routing maps it to a
+ *             concrete calendar id per principal.
+ */
 export type CalendarTarget = typeof CalendarTarget[keyof typeof CalendarTarget];
 
 

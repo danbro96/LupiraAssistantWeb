@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import {
-  getSearch,
-  getConversations,
-  getConversationsIdMessages,
+  search,
+  listConversations,
+  listMessages,
 } from '../data/api/generated/comms/archive/archive';
 import type {
   ArchiveSearchHitDto,
@@ -75,7 +75,7 @@ export const useArchive = create<ArchiveState & ArchiveActions>((set, get) => ({
     }
     set({ searching: true, searchError: null });
     try {
-      const res = await getSearch({
+      const res = await search({
         q: filters.q.trim(),
         source: filters.source,
         participant: filters.participant,
@@ -96,7 +96,7 @@ export const useArchive = create<ArchiveState & ArchiveActions>((set, get) => ({
     set({ loadingConversations: true });
     try {
       const cursor = opts.more ? (get().conversationsCursor ?? undefined) : undefined;
-      const data = ok<ConversationsResponse>(await getConversations({ cursor, q: opts.q }));
+      const data = ok<ConversationsResponse>(await listConversations({ cursor, q: opts.q }));
       const page = data.items;
       set({
         conversations: opts.more ? [...get().conversations, ...page] : page,
@@ -113,7 +113,7 @@ export const useArchive = create<ArchiveState & ArchiveActions>((set, get) => ({
     set({ threadId: conversationId, threadMessages: [], threadTitle: null, loadingThread: true });
     try {
       const data = ok<ConversationMessagesResponse>(
-        await getConversationsIdMessages(conversationId, { around: aroundMessageId }),
+        await listMessages(conversationId, { around: aroundMessageId }),
       );
       set({ threadTitle: data.title ?? null, threadMessages: data.items, loadingThread: false });
     } catch (e) {
@@ -128,7 +128,7 @@ export const useArchive = create<ArchiveState & ArchiveActions>((set, get) => ({
     set({ loadingThread: true });
     try {
       const data = ok<ConversationMessagesResponse>(
-        await getConversationsIdMessages(threadId, { before: threadMessages[0].id }),
+        await listMessages(threadId, { before: threadMessages[0].id }),
       );
       set({ threadMessages: mergeThreadPage(threadMessages, data.items), loadingThread: false });
     } catch (e) {
