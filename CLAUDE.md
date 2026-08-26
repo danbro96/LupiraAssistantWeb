@@ -33,8 +33,8 @@
   Icons are MaterialCommunityIcons (Paper's set). Confirms use `useConfirm()`
   (`ui/components/ConfirmDialog.tsx`); text inputs use `ui/components/TextField.tsx`.
   Tokens mirror the other repos' copies — see DevOps `Guides/design-tokens.md` and its drift check.
-- **`Button`, `ConfirmDialog`, `TextField` and `ToastHost` are byte-identical to
-  tasks-mobile's copies** — change both, or neither.
+- **Stay in step with the sibling Lupira frontends.** Same components, theme wiring and layout;
+  match what they already do rather than inventing a local shape. Shared files stay byte-identical.
 - **Row components take `styles` as a prop and are `memo`'d** — never a per-row `useMemo(makeStyles)`,
   and never Paper's `useTheme()` per row; that is what keeps list renders cheap.
 - **`ui/screens/ThreadScreen.tsx` bubbles stay bespoke `View`s.** No `Card`/`Surface`: the list is
