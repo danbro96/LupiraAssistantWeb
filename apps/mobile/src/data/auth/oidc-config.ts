@@ -1,6 +1,7 @@
 // Authentik OIDC config (public PKCE client). Issuer + client id must match the Authentik `assistant` provider.
 
-export const OIDC_ISSUER = 'https://auth.lupira.com/application/o/assistant/';
+// No trailing slash — expo-auth-session appends `/.well-known/...` verbatim and Authentik 404s the `//`.
+export const OIDC_ISSUER = 'https://auth.lupira.com/application/o/assistant';
 
 /** Public client id — also the token `aud` the API validates. */
 export const OIDC_CLIENT_ID = 'lupira-assistant';
