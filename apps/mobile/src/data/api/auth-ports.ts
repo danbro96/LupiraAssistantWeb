@@ -5,6 +5,7 @@ export type ApiBase = 'health' | 'location' | 'assistant';
 
 export interface OidcAuthPort {
   getApiUrl: (base: ApiBase) => string;
+  getAuthMode: () => 'oidc' | 'dev';
   getToken: () => string | null;
   refresh: (force?: boolean, sentToken?: string) => Promise<string | null>;
 }

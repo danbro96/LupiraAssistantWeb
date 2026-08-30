@@ -13,16 +13,16 @@ export const CONNECT_RETURN_URL = `${OIDC_SCHEME}://connected`;
 
 // The hub's hosted enrollment, reached through the BFF. return_uri must be on the hub's allowlist
 // (Auth:Offline:AllowedReturnUris); /auth/done 302s back to it when the grant is captured.
-function connectUrl(assistantApiUrl: string): string {
+function connectUrl(apiUrl: string): string {
   const ret = encodeURIComponent(CONNECT_RETURN_URL);
-  return `${joinUrl(assistantApiUrl, '/api/assistant/auth/login')}?return_uri=${ret}`;
+  return `${joinUrl(apiUrl, '/api/assistant/auth/login')}?return_uri=${ret}`;
 }
 
 export type ConnectResult = 'returned' | 'dismissed';
 
-export async function launchConnect(assistantApiUrl: string): Promise<ConnectResult> {
+export async function launchConnect(apiUrl: string): Promise<ConnectResult> {
   try {
-    const res = await WebBrowser.openAuthSessionAsync(connectUrl(assistantApiUrl), CONNECT_RETURN_URL);
+    const res = await WebBrowser.openAuthSessionAsync(connectUrl(apiUrl), CONNECT_RETURN_URL);
     return res.type === 'success' ? 'returned' : 'dismissed';
   } catch (e) {
     logDebug('connect:launch-error', e instanceof Error ? e.message : String(e));

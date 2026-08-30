@@ -3,7 +3,8 @@
 export const SECURE_KEYS = {
   healthApiUrl: 'lupira.assistant.healthApiUrl',
   locationApiUrl: 'lupira.assistant.locationApiUrl',
-  assistantApiUrl: 'lupira.assistant.assistantApiUrl',
+  apiUrl: 'lupira.assistant.assistantApiUrl',
+  authMode: 'lupira.assistant.authMode',
 
   oidcToken: 'lupira.assistant.oidc.token',
   oidcRefresh: 'lupira.assistant.oidc.refreshToken',

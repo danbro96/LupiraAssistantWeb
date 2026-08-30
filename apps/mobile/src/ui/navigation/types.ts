@@ -10,6 +10,7 @@ export type RootStackParamList = {
   RegisterDevice: undefined;
   Tabs: NavigatorScreenParams<TabParamList>;
   Settings: undefined;
+  Developer: undefined;
   EditProposal: { itemId: string };
   Conversations: undefined;
   Thread: { conversationId: string; aroundMessageId?: string };

@@ -27,7 +27,7 @@ export function InboxScreen() {
 
   const items = useInbox((s) => s.items);
   const grantStatus = useInbox((s) => s.grantStatus);
-  const assistantApiUrl = useAuth((s) => s.assistantApiUrl);
+  const apiUrl = useAuth((s) => s.apiUrl);
   const [refreshing, setRefreshing] = useState(false);
   const [connecting, setConnecting] = useState(false);
   // Drafts live here, not in the card: the list virtualizes, and an unmounted card would lose them.
@@ -47,7 +47,7 @@ export function InboxScreen() {
 
   async function onConnect() {
     setConnecting(true);
-    const res = await launchConnect(assistantApiUrl);
+    const res = await launchConnect(apiUrl);
     if (res === 'returned') {
       await useInbox.getState().refreshGrant();
       toast('Assistant connection updated.');

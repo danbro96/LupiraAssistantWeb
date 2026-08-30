@@ -1,7 +1,50 @@
-/** All overridable via the settings screen. Location ingest + device registration → LocationApi; health record/bootstrap → HealthApi; proposals/grant/archive → the assistant BFF (one origin, /api/{assistant,comms} prefixes baked into the generated clients). */
-export const DEFAULT_HEALTH_API_URL = 'https://health-api.lupira.com';
-export const DEFAULT_LOCATION_API_URL = 'https://location-api.lupira.com';
-export const DEFAULT_ASSISTANT_API_URL = 'https://assistant.lupira.com';
+/** Location ingest + device registration → LocationApi; health record/bootstrap → HealthApi;
+ *  proposals/grant/archive → the assistant BFF (one origin, /api/{assistant,comms} prefixes baked
+ *  into the generated clients). */
+
+/** 'dev' = this backend's bypass; all three accept an `X-Dev-User` header in Development. */
+export type AuthMode = 'oidc' | 'dev';
+
+/** `urls.api` is the primary origin; multi-backend apps add keys. */
+export type ApiPreset = {
+  key: string;
+  label: string;
+  urls: { api: string } & Record<string, string>;
+  authMode: AuthMode;
+};
+
+export const API_PRESETS: ApiPreset[] = [
+  {
+    key: 'prod',
+    label: 'Production',
+    urls: { api: 'https://assistant.lupira.com', location: 'https://location-api.lupira.com', health: 'https://health-api.lupira.com' },
+    authMode: 'oidc',
+  },
+  {
+    key: 'lan',
+    label: 'LAN dev',
+    urls: { api: 'http://192.168.14.108:5285', location: 'http://192.168.14.108:5270', health: 'http://192.168.14.108:5260' },
+    authMode: 'dev',
+  },
+  {
+    key: 'emulator',
+    label: 'Emulator dev',
+    urls: { api: 'http://10.0.2.2:5285', location: 'http://10.0.2.2:5270', health: 'http://10.0.2.2:5260' },
+    authMode: 'dev',
+  },
+];
+
+/** The upstreams trust X-Dev-User only in Development. */
+export const DEV_USER = 'daniel.brostrom@hotmail.se';
+
+export const DEFAULT_AUTH_MODE: AuthMode = 'oidc';
+
+export const DEFAULT_ASSISTANT_API_URL = API_PRESETS[0].urls.api;
+export const DEFAULT_LOCATION_API_URL = API_PRESETS[0].urls.location;
+export const DEFAULT_HEALTH_API_URL = API_PRESETS[0].urls.health;
+
+/** Extra screens the Developer screen links to. */
+export const DIAGNOSTIC_ROUTES: { route: string; label: string }[] = [];
 
 /** Keep in sync with app.config.ts. */
 export const APP_VERSION = '0.1.0';

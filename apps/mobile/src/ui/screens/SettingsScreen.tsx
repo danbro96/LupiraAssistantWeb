@@ -13,7 +13,6 @@ import { useInbox } from '../../state/inbox-store';
 import { launchConnect } from '../../data/auth/connect';
 import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
-import { TextField } from '../components/TextField';
 import { useConfirm } from '../components/ConfirmDialog';
 import { cardSurface, spacing, type Palette, useColors } from '../theme';
 import { toast } from '../../feedback/toast';
@@ -31,13 +30,10 @@ export function SettingsScreen() {
   const status = useSyncStatus();
   const locationApiUrl = useAuth((s) => s.locationApiUrl);
   const healthApiUrl = useAuth((s) => s.healthApiUrl);
-  const assistantApiUrl = useAuth((s) => s.assistantApiUrl);
+  const apiUrl = useAuth((s) => s.apiUrl);
   const grantStatus = useInbox((s) => s.grantStatus);
   const mirror = useSyncStatus((s) => s.mirror);
 
-  const [locationUrlDraft, setLocationUrlDraft] = useState(locationApiUrl);
-  const [healthUrlDraft, setHealthUrlDraft] = useState(healthApiUrl);
-  const [assistantUrlDraft, setAssistantUrlDraft] = useState(assistantApiUrl);
   const [connecting, setConnecting] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -81,18 +77,10 @@ export function SettingsScreen() {
     })();
   }
 
-  async function onSaveUrls() {
-    await Promise.all([
-      useAuth.getState().setLocationApiUrl(locationUrlDraft.trim()),
-      useAuth.getState().setHealthApiUrl(healthUrlDraft.trim()),
-      useAuth.getState().setAssistantApiUrl(assistantUrlDraft.trim()),
-    ]);
-    toast('Server URLs saved.');
-  }
 
   async function onConnect() {
     setConnecting(true);
-    const res = await launchConnect(assistantApiUrl);
+    const res = await launchConnect(apiUrl);
     if (res === 'returned') {
       await useInbox.getState().refreshGrant();
       toast('Assistant connection updated.');
@@ -175,32 +163,11 @@ export function SettingsScreen() {
       </View>
 
       <Text style={styles.section}>SERVERS</Text>
-      <View style={[styles.card, styles.serversCard]}>
-        <TextField
-          label="Location API URL"
-          value={locationUrlDraft}
-          onChangeText={setLocationUrlDraft}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-        />
-        <TextField
-          label="Health API URL"
-          value={healthUrlDraft}
-          onChangeText={setHealthUrlDraft}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-        />
-        <TextField
-          label="Assistant API URL"
-          value={assistantUrlDraft}
-          onChangeText={setAssistantUrlDraft}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-        />
-        <Button title="Save URLs" variant="secondary" onPress={() => void onSaveUrls()} style={styles.btn} />
+      <View style={styles.card}>
+        <Row label="Assistant" value={apiUrl} styles={styles} />
+        <Row label="Location" value={locationApiUrl} styles={styles} />
+        <Row label="Health" value={healthApiUrl} styles={styles} />
+        <Button title="Developer" variant="secondary" onPress={() => navigation.navigate('Developer')} style={styles.btn} />
       </View>
 
       <Button title="Re-register device" variant="destructive" onPress={() => void onReRegister()} style={styles.btn} />

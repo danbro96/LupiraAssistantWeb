@@ -19,6 +19,10 @@
   (boundaries already forbids `collector`/`sync` → `ui`).
 - **API clients are generated**: orval → `src/data/api/generated/` (never hand-edit). `client: 'fetch'`,
   not react-query — assistant reads come from the BFF and the inbox cache.
+- **Dev backend switching**: `API_PRESETS` in `config/env.ts` carries all three origins per preset
+  (assistant / location / health); Settings → Developer switches at runtime. `authMode: 'dev'` swaps
+  the bearer for `X-Dev-User`, which all three upstreams accept only in Development. The emulator
+  preset uses `10.0.2.2` — a LAN IP is unreachable from one.
 - **UI stack**: react-native-paper 5 (MD3), themed in `ui/theme/paperTheme.ts` from
   `@lupira/assistant-tokens`; React Navigation themes come from `adaptNavigationTheme`. Paper covers
   the MD3-expressible colors, and the whole palette — including the app's own semantics (`pending`,

@@ -3,6 +3,7 @@ import { coreFetch, joinUrl } from './http';
 import { ApiError, DeviceKeyInvalidError } from '../../domain/api-error';
 import { buildDeviceKeyHeader } from '../../domain/device-key-auth';
 import { isRetriableRequest } from '../../domain/retry-policy';
+import { DEV_USER } from '../../config/env';
 
 // One mutator per (backend, auth scheme) pair — Orval binds a single mutator per generation target.
 
@@ -21,7 +22,8 @@ async function oidcFetch<T>(base: ApiBase, path: string, init: RequestInit = {})
   for (;;) {
     const headers = new Headers(init.headers ?? {});
     if (!headers.has('Accept')) headers.set('Accept', 'application/json');
-    if (token && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
+    if (auth.getAuthMode() === 'dev') headers.set('X-Dev-User', DEV_USER);
+    else if (token && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
     if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
 
     try {
