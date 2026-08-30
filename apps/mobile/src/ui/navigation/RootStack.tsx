@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RegisterDeviceScreen } from '../screens/RegisterDeviceScreen';
 import { InboxScreen } from '../screens/InboxScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { DebugLogScreen } from '../screens/DebugLogScreen';
 import { DeveloperScreen } from '../screens/DeveloperScreen';
 import { EditProposalScreen } from '../screens/EditProposalScreen';
 import { ArchiveSearchScreen } from '../screens/ArchiveSearchScreen';
@@ -31,6 +32,7 @@ export function RootStack() {
           <Stack.Screen name="Tabs" component={TabLayout} options={{ headerShown: false }} />
           <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
           <Stack.Screen name="Developer" component={DeveloperScreen} options={{ title: 'Developer' }} />
+          <Stack.Screen name="DebugLog" component={DebugLogScreen} options={{ title: 'Debug log' }} />
           <Stack.Screen name="EditProposal" component={EditProposalScreen} options={{ title: 'Edit proposal' }} />
           <Stack.Screen name="Conversations" component={ConversationsScreen} options={{ title: 'Conversations' }} />
           <Stack.Screen name="Thread" component={ThreadScreen} options={{ title: 'Thread' }} />

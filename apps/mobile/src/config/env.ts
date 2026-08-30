@@ -44,7 +44,9 @@ export const DEFAULT_LOCATION_API_URL = API_PRESETS[0].urls.location;
 export const DEFAULT_HEALTH_API_URL = API_PRESETS[0].urls.health;
 
 /** Extra screens the Developer screen links to. */
-export const DIAGNOSTIC_ROUTES: { route: string; label: string }[] = [];
+export const DIAGNOSTIC_ROUTES: { route: string; label: string }[] = [
+  { route: 'DebugLog', label: 'Debug log' },
+];
 
 /** Keep in sync with app.config.ts. */
 export const APP_VERSION = '0.1.0';

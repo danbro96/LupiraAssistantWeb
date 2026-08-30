@@ -16,6 +16,7 @@ import { useAuth } from './src/state/auth-store';
 import { useDevice } from './src/state/device-store';
 import { useInbox } from './src/state/inbox-store';
 import { useCollector } from './src/state/collector-store';
+import { usePrefs } from './src/state/prefs-store';
 import { startSyncTriggers, kickSync } from './src/sync/sync-engine';
 import { registerUploadTask } from './src/sync/background-upload-task';
 import { SENTRY_DSN, APP_VERSION } from './src/config/env';
@@ -54,6 +55,7 @@ function App() {
         useAuth.getState().load(),
         useDevice.getState().load(),
         useInbox.getState().loadFromCache(),
+        usePrefs.getState().init(),
       ]);
       await useAuth.getState().refreshIfNeeded();
       await useCollector.getState().hydrate();

@@ -10,6 +10,7 @@ import { useSyncStatus, refreshSyncStatus } from '../../sync/sync-status';
 import { kickSync } from '../../sync/sync-engine';
 import { useAuth } from '../../state/auth-store';
 import { useInbox } from '../../state/inbox-store';
+import { usePrefs } from '../../state/prefs-store';
 import { launchConnect } from '../../data/auth/connect';
 import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
@@ -23,6 +24,7 @@ export function SettingsScreen() {
   const c = useColors();
   const styles = useMemo(() => makeStyles(c), [c]);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const debugEnabled = usePrefs((s) => s.debugEnabled);
   const confirm = useConfirm();
 
   const device = useDevice();
@@ -167,7 +169,13 @@ export function SettingsScreen() {
         <Row label="Assistant" value={apiUrl} styles={styles} />
         <Row label="Location" value={locationApiUrl} styles={styles} />
         <Row label="Health" value={healthApiUrl} styles={styles} />
-        <Button title="Developer" variant="secondary" onPress={() => navigation.navigate('Developer')} style={styles.btn} />
+        <View style={styles.toggleRow}>
+          <Text style={styles.rowLabel}>Enable debug</Text>
+          <Switch value={debugEnabled} onValueChange={(v) => void usePrefs.getState().setDebugEnabled(v)} />
+        </View>
+        {debugEnabled ? (
+          <Button title="Developer" variant="secondary" onPress={() => navigation.navigate('Developer')} style={styles.btn} />
+        ) : null}
       </View>
 
       <Button title="Re-register device" variant="destructive" onPress={() => void onReRegister()} style={styles.btn} />

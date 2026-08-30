@@ -5,6 +5,7 @@ export const SECURE_KEYS = {
   locationApiUrl: 'lupira.assistant.locationApiUrl',
   apiUrl: 'lupira.assistant.assistantApiUrl',
   authMode: 'lupira.assistant.authMode',
+  debugEnabled: 'lupira.assistant.debugEnabled',
 
   oidcToken: 'lupira.assistant.oidc.token',
   oidcRefresh: 'lupira.assistant.oidc.refreshToken',

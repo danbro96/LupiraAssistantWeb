@@ -23,6 +23,7 @@
   (assistant / location / health); Settings → Developer switches at runtime. `authMode: 'dev'` swaps
   the bearer for `X-Dev-User`, which all three upstreams accept only in Development. The emulator
   preset uses `10.0.2.2` — a LAN IP is unreachable from one.
+- **Diagnostics**: `debug/log.ts` (redacted zustand buffer + Sentry breadcrumbs), `DebugLogScreen` and `DeveloperScreen` are shared with the sibling apps; Settings gates them on `debugEnabled` (`state/prefs-store.ts`).
 - **UI stack**: react-native-paper 5 (MD3), themed in `ui/theme/paperTheme.ts` from
   `@lupira/assistant-tokens`; React Navigation themes come from `adaptNavigationTheme`. Paper covers
   the MD3-expressible colors, and the whole palette — including the app's own semantics (`pending`,
