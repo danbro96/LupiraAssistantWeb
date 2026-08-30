@@ -41,7 +41,10 @@
   render would defeat that. `useColors` is imported only from `ui/`, which is what keeps Paper out of
   the headless cone. Deriving the palette from `useColorScheme()` instead is what this replaced: it
   was a second source that could disagree with the theme `PaperProvider` holds.
-  Icons are MaterialCommunityIcons (Paper's set). Confirms use `useConfirm()`
+  Icons come from `ui/icons.ts` (Google `MaterialIcons`, the family the SPAs also render) — Paper's
+  MCI default is overridden by `settings={paperSettings}` in `App.tsx`, so every `icon=` string must
+  be an `ICONS.x` value; a wrong name renders nothing rather than failing the build. Inline glyphs
+  inside `<Text>` use `Glyph`. Confirms use `useConfirm()`
   (`ui/components/ConfirmDialog.tsx`); text inputs use `ui/components/TextField.tsx`.
   Tokens mirror the other repos' copies — see DevOps `Guides/design-tokens.md` and its drift check.
 - **Stay in step with the sibling Lupira frontends.** Same components, theme wiring and layout;

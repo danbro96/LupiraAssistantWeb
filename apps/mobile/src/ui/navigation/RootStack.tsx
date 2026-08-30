@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RegisterDeviceScreen } from '../screens/RegisterDeviceScreen';
@@ -16,6 +16,7 @@ import { useDevice } from '../../state/device-store';
 import { useColors } from '../theme';
 import type { RootStackParamList, TabParamList } from './types';
 import { IconButton } from '../components/IconButton';
+import { ICONS } from '../icons';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
@@ -55,7 +56,7 @@ function TabLayout() {
         tabBarInactiveTintColor: c.textMuted,
         headerRight: () => (
           <IconButton
-            name="cog-outline"
+            name={ICONS.settings}
             size={22}
             color={c.text}
             onPress={() => navigation.getParent()?.navigate('Settings')}
@@ -70,7 +71,7 @@ function TabLayout() {
         options={{
           title: 'Inbox',
           headerTitle: 'Lupira Assistant',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="email-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <MaterialIcons name={ICONS.email} size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -79,7 +80,7 @@ function TabLayout() {
         options={{
           title: 'Archive',
           headerTitle: 'Archive',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="magnify" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <MaterialIcons name={ICONS.search} size={size} color={color} />,
         }}
       />
     </Tabs.Navigator>

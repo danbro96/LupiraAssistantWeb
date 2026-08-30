@@ -21,6 +21,7 @@ import { startSyncTriggers, kickSync } from './src/sync/sync-engine';
 import { registerUploadTask } from './src/sync/background-upload-task';
 import { SENTRY_DSN, APP_VERSION } from './src/config/env';
 import { lightColors, darkColors, navDark, navLight, paperDark, paperLight, type Palette } from './src/ui/theme';
+import { paperSettings } from './src/ui/theme/paperSettings';
 
 // SENTRY_DSN is a public client key; Sentry no-ops when empty.
 Sentry.init({
@@ -80,7 +81,7 @@ function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <PaperProvider theme={scheme === 'dark' ? paperDark : paperLight}>
+        <PaperProvider theme={scheme === 'dark' ? paperDark : paperLight} settings={paperSettings}>
           <Sentry.ErrorBoundary fallback={<ErrorFallback palette={palette} />}>
             <ConfirmDialogHost>
               <NavigationContainer ref={navigationRef} theme={scheme === 'dark' ? navDark : navLight}>
