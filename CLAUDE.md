@@ -58,6 +58,9 @@
   when the action gates on screen state (a Save enabled only when dirty).
 - No reanimated, and don't add it — this app has no gestures to animate and it would move the Expo
   fingerprint. Paper 5 is pure JS, so it does not.
+- **Test floor**: `domain/` fully covered, plus the `sync/` orchestration (upload cycle, cursor resume,
+  pause poll) and `state/` store transitions. UI is verified on a device against a local backend —
+  that is what the Developer screen exists for.
 - Latest stable deps, bump hard. vitest (node env, `*.test.ts` — pure logic only; no UI tests).
   `packages/tokens` holds only constants, so it has no test script; adding logic there means adding one.
   Comment only the non-obvious *why*; docs = present state.
