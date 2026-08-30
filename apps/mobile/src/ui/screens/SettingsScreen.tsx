@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Switch } from 'react-native-paper';
+import { List, Switch } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
@@ -15,7 +15,7 @@ import { launchConnect } from '../../data/auth/connect';
 import { getDb } from '../../data/db/db';
 import { Button } from '../components/Button';
 import { useConfirm } from '../components/ConfirmDialog';
-import { cardSurface, spacing, type Palette, useColors } from '../theme';
+import { spacing, type Palette, useColors } from '../theme';
 import { toast } from '../../feedback/toast';
 
 type Styles = ReturnType<typeof makeStyles>;
@@ -105,80 +105,70 @@ export function SettingsScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.section}>DEVICE</Text>
-      <View style={styles.card}>
-        <Row label="Label" value={device.label ?? '—'} styles={styles} />
-        <Row label="Kind" value={device.kind ?? '—'} styles={styles} />
-        <Row label="Record" value={device.recordSlug ?? '—'} styles={styles} />
-        <Row label="Key id" value={device.keyId ?? '—'} styles={styles} mono />
-      </View>
+      <List.Subheader>Device</List.Subheader>
+      <Row label="Label" value={device.label ?? '—'} styles={styles} />
+      <Row label="Kind" value={device.kind ?? '—'} styles={styles} />
+      <Row label="Record" value={device.recordSlug ?? '—'} styles={styles} />
+      <Row label="Key id" value={device.keyId ?? '—'} styles={styles} mono />
 
-      <Text style={styles.section}>COLLECTION</Text>
-      <View style={styles.card}>
-        <View style={styles.toggleRow}>
-          <Text style={styles.rowLabel}>Record location</Text>
+      <List.Subheader>Collection</List.Subheader>
+      <List.Item
+        title="Record location"
+        right={() => (
           <Switch value={collector.collecting} onValueChange={(v) => void onToggleCollecting(v)} disabled={collector.starting} />
-        </View>
-        <Row label="Permission" value={collector.permissionStage} styles={styles} />
-        {collector.permissionStage !== 'background' ? (
-          <Text style={styles.warn}>Background ("Always") location is required to record while the app is closed.</Text>
-        ) : null}
-        {status.paused ? (
-          <Text style={styles.warn}>Tracking is paused on the server{status.pausedReason ? ` (${status.pausedReason})` : ''}. Fixes are discarded until it resumes.</Text>
-        ) : null}
-      </View>
+        )}
+      />
+      <Row label="Permission" value={collector.permissionStage} styles={styles} />
+      {collector.permissionStage !== 'background' ? (
+        <Text style={styles.warn}>Background ("Always") location is required to record while the app is closed.</Text>
+      ) : null}
+      {status.paused ? (
+        <Text style={styles.warn}>Tracking is paused on the server{status.pausedReason ? ` (${status.pausedReason})` : ''}. Fixes are discarded until it resumes.</Text>
+      ) : null}
 
-      <Text style={styles.section}>ASSISTANT</Text>
-      <View style={styles.card}>
-        <Row label="Grant" value={grantStatus} styles={styles} />
+      <List.Subheader>Assistant</List.Subheader>
+      <Row label="Grant" value={grantStatus} styles={styles} />
+      <View style={styles.action}>
         <Button
           title={grantStatus === 'connected' ? 'Reconnect assistant' : 'Connect assistant'}
           variant="secondary"
           onPress={() => void onConnect()}
           loading={connecting}
-          style={styles.btn}
-        />
-        <Button
-          title="Notifications"
-          variant="secondary"
-          onPress={() => navigation.navigate('Preferences')}
-          style={styles.btn}
-        />
-        <Button
-          title="Sources"
-          variant="secondary"
-          onPress={() => navigation.navigate('Connectors')}
-          style={styles.btn}
         />
       </View>
+      <List.Item title="Notifications" onPress={() => navigation.navigate('Preferences')} />
+      <List.Item title="Sources" onPress={() => navigation.navigate('Connectors')} />
 
-      <Text style={styles.section}>UPLOAD STATUS</Text>
-      <View style={styles.card}>
-        <Row label="Connectivity" value={status.online ? 'online' : 'offline'} styles={styles} />
-        <Row label="Uploading" value={status.uploading ? 'yes' : 'no'} styles={styles} />
-        <Row label="Buffered fixes" value={String(status.pendingCount)} styles={styles} mono />
-        <Row label="Last uploaded seq" value={String(status.lastUploadedSeq)} styles={styles} mono />
-        <Row label="Server high-water" value={status.highWaterSeq === null ? '—' : String(status.highWaterSeq)} styles={styles} mono />
-        <Row label="Last upload" value={status.lastUploadAt ? new Date(status.lastUploadAt).toLocaleString() : 'never'} styles={styles} />
-        {status.lastError ? <Text style={styles.error}>Last error: {status.lastError}</Text> : null}
-        <Button title="Upload now" onPress={onUploadNow} style={styles.btn} />
+      <List.Subheader>Upload status</List.Subheader>
+      <Row label="Connectivity" value={status.online ? 'online' : 'offline'} styles={styles} />
+      <Row label="Uploading" value={status.uploading ? 'yes' : 'no'} styles={styles} />
+      <Row label="Buffered fixes" value={String(status.pendingCount)} styles={styles} mono />
+      <Row label="Last uploaded seq" value={String(status.lastUploadedSeq)} styles={styles} mono />
+      <Row label="Server high-water" value={status.highWaterSeq === null ? '—' : String(status.highWaterSeq)} styles={styles} mono />
+      <Row label="Last upload" value={status.lastUploadAt ? new Date(status.lastUploadAt).toLocaleString() : 'never'} styles={styles} />
+      {status.lastError ? <Text style={styles.error}>Last error: {status.lastError}</Text> : null}
+      <View style={styles.action}>
+        <Button title="Upload now" onPress={onUploadNow} />
       </View>
 
-      <Text style={styles.section}>SERVERS</Text>
-      <View style={styles.card}>
-        <Row label="Assistant" value={apiUrl} styles={styles} />
-        <Row label="Location" value={locationApiUrl} styles={styles} />
-        <Row label="Health" value={healthApiUrl} styles={styles} />
-        <View style={styles.toggleRow}>
-          <Text style={styles.rowLabel}>Enable debug</Text>
+      <List.Subheader>Servers</List.Subheader>
+      <Row label="Assistant" value={apiUrl} styles={styles} />
+      <Row label="Location" value={locationApiUrl} styles={styles} />
+      <Row label="Health" value={healthApiUrl} styles={styles} />
+
+      <List.Subheader>Developer</List.Subheader>
+      <List.Item
+        title="Enable debug"
+        description="Show the developer tools and the on-device log"
+        right={() => (
           <Switch value={debugEnabled} onValueChange={(v) => void usePrefs.getState().setDebugEnabled(v)} />
-        </View>
-        {debugEnabled ? (
-          <Button title="Developer" variant="secondary" onPress={() => navigation.navigate('Developer')} style={styles.btn} />
-        ) : null}
-      </View>
+        )}
+      />
+      {debugEnabled ? <List.Item title="Developer options" onPress={() => navigation.navigate('Developer')} /> : null}
 
-      <Button title="Re-register device" variant="destructive" onPress={() => void onReRegister()} style={styles.btn} />
+      <View style={styles.action}>
+        <Button title="Re-register device" variant="destructive" onPress={() => void onReRegister()} />
+      </View>
     </ScrollView>
   );
 }
@@ -195,30 +185,26 @@ const Row = memo(function Row({
   mono?: boolean;
 }) {
   return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={mono ? styles.infoValueMono : styles.infoValue} numberOfLines={1}>
-        {value}
-      </Text>
-    </View>
+    <List.Item
+      title={label}
+      titleStyle={styles.infoLabel}
+      right={() => (
+        <Text style={mono ? styles.infoValueMono : styles.infoValue} numberOfLines={1}>
+          {value}
+        </Text>
+      )}
+    />
   );
 });
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: c.bg },
-    content: { padding: spacing.lg, gap: spacing.sm },
-    section: { fontSize: 12, fontWeight: '700', color: c.textSubtle, marginTop: spacing.md, marginBottom: spacing.xs },
-    card: cardSurface(c),
-    // Outlined fields carry a floating label on the border, so they need more air than info rows.
-    serversCard: { gap: spacing.sm },
-    toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    rowLabel: { fontSize: 16, color: c.text },
-    infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
+    content: { paddingBottom: spacing.xxl },
+    action: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
     infoLabel: { fontSize: 13, color: c.textMuted },
-    infoValue: { fontSize: 16, color: c.text, flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
-    infoValueMono: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'], flexShrink: 1, textAlign: 'right', marginLeft: spacing.md },
-    warn: { fontSize: 13, color: c.warning, marginTop: spacing.xs },
-    error: { fontSize: 13, color: c.danger, marginTop: spacing.xs },
-    btn: { marginTop: spacing.sm },
+    infoValue: { fontSize: 16, color: c.text, flexShrink: 1, textAlign: 'right', alignSelf: 'center' },
+    infoValueMono: { fontSize: 13, color: c.textMuted, fontVariant: ['tabular-nums'], flexShrink: 1, textAlign: 'right', alignSelf: 'center' },
+    warn: { fontSize: 13, color: c.warning, paddingHorizontal: spacing.lg },
+    error: { fontSize: 13, color: c.danger, paddingHorizontal: spacing.lg },
   });
