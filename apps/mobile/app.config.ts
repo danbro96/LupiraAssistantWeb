@@ -18,6 +18,8 @@ const config: ExpoConfig = {
   version: '0.1.0',
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
+  icon: './assets/icon.png',
+  primaryColor: '#E76F51',
   // Fingerprint: a JS-only change keeps the runtime version and ships OTA; a native change needs a build.
   runtimeVersion: { policy: 'fingerprint' },
   ios: {
@@ -33,6 +35,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.lupira.assistant',
+    adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#0F172A' },
     predictiveBackGestureEnabled: false,
     permissions: [
       'ACCESS_FINE_LOCATION',
@@ -64,6 +67,10 @@ const config: ExpoConfig = {
       { motionPermission: MOTION_RATIONALE },
     ],
     'expo-background-task',
+    [
+      'expo-splash-screen',
+      { image: './assets/splash-icon.png', imageWidth: 180, resizeMode: 'contain', backgroundColor: '#0F172A' },
+    ],
     'expo-status-bar',
     'expo-font',
   ],
