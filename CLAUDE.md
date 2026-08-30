@@ -54,8 +54,8 @@
 - **ToastHost is Paper's `Snackbar`**, keyed by the store's `nonce` so an identical repeat message
   remounts and re-arms the timer. The imperative zustand store (callable from `sync`/`state`, haptics
   included) stays in `feedback/toast.ts`; the host only renders it.
-- Headers are declarative in `ui/navigation/RootStack.tsx` — no `setOptions` pattern here (unlike
-  tasks-mobile).
+- **Header actions are declared in the navigator's `options`**; `useLayoutEffect` + `setOptions` only
+  when the action gates on screen state (a Save enabled only when dirty).
 - No reanimated, and don't add it — this app has no gestures to animate and it would move the Expo
   fingerprint. Paper 5 is pure JS, so it does not.
 - Latest stable deps, bump hard. vitest (node env, `*.test.ts` — pure logic only; no UI tests).
