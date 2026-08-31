@@ -57,6 +57,10 @@
 - **ToastHost is Paper's `Snackbar`**, keyed by the store's `nonce` so an identical repeat message
   remounts and re-arms the timer. The imperative zustand store (callable from `sync`/`state`, haptics
   included) stays in `feedback/toast.ts`; the host only renders it.
+- **Topbar**: every root screen shows the navigator's native header — title from `options.title`,
+  actions from `headerRight`, and the cog is the shared `SettingsButton`. Never `headerShown: false`
+  on a root screen. A screen's own controls (search, period nav, filters) go in `ScreenToolbar`,
+  a row *under* the header, not instead of it. Status strips render nothing when healthy.
 - **Header actions are declared in the navigator's `options`**; `useLayoutEffect` + `setOptions` only
   when the action gates on screen state (a Save enabled only when dirty).
 - No reanimated, and don't add it — this app has no gestures to animate and it would move the Expo

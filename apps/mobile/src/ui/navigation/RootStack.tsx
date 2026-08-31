@@ -15,8 +15,8 @@ import { PreferencesScreen } from '../screens/PreferencesScreen';
 import { useDevice } from '../../state/device-store';
 import { useColors } from '../theme';
 import type { RootStackParamList, TabParamList } from './types';
-import { IconButton } from '../components/IconButton';
 import { ICONS } from '../icons';
+import { SettingsButton } from '../components/SettingsButton';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
@@ -51,19 +51,11 @@ function TabLayout() {
   const c = useColors();
   return (
     <Tabs.Navigator
-      screenOptions={({ navigation }) => ({
+      screenOptions={{
         tabBarActiveTintColor: c.primary,
         tabBarInactiveTintColor: c.textMuted,
-        headerRight: () => (
-          <IconButton
-            name={ICONS.settings}
-            size={22}
-            color={c.text}
-            onPress={() => navigation.getParent()?.navigate('Settings')}
-            accessibilityLabel="Settings"
-          />
-        ),
-      })}
+        headerRight: () => <SettingsButton />,
+      }}
     >
       <Tabs.Screen
         name="InboxTab"
